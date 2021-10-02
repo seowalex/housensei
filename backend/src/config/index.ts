@@ -9,7 +9,7 @@ const config = {
   host: process.env.DB_HOST ?? 'localhost',
   user: process.env.DB_USER ?? 'postgres',
   password: process.env.DB_PASS ?? 'postgres',
-  dbName: process.env.DB_NAME ?? 'housing-sensei',
+  dbName: process.env.DB_NAME ?? 'housensei',
 };
 
 export default config;

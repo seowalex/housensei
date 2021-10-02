@@ -1,5 +1,4 @@
-# 2021-final-project-2021-final-group-01
-2021-final-project-2021-final-group-1 created by GitHub Classroom
+# Housensei
 
 ## Development
 
@@ -7,8 +6,8 @@ This repository is a monorepo containing both the frontend and the backend in th
 
 ### Requirements
 
-* Node.js (tested on v14.17.6)
-* PostgreSQL (tested on v13.4)
+- Node.js (tested on v14.18.0)
+- PostgreSQL (tested on v14.0)
 
 The following step is common for both the `frontend` and `backend` folder.
 
@@ -16,19 +15,19 @@ The following step is common for both the `frontend` and `backend` folder.
 
 ```bash
 npm install
-``` 
+```
 
 ### Backend
 
-1. Populate the `.env` file (following the `.env.example` file) with the generated VAPID keys. If the default user (`postgres`) and password (`postgres`) does exist, edit the variables in the `.env` file as well.
+1. (Optional) Populate the `.env` file (following the `.env.example` file) if the default user (`postgres`) and password (`postgres`) does exist.
 
-2. Create the database:
+2. Create/seed the database:
 
 ```bash
 npm run db:create
 ```
 
-2. [Optional] Seed the database:
+or
 
 ```bash
 npm run db:seed
@@ -40,3 +39,29 @@ npm run db:seed
 npm run dev
 ```
 
+### Frontend
+
+1. Start the development server:
+
+```bash
+npm run dev
+```
+
+### Production
+
+You may also choose to run the app in production mode.
+
+1. Build the frontend and backend:
+
+```bash
+cd frontend
+npm run build
+cd ../backend
+npm run build
+```
+
+2. Inside the `backend` folder, start the production server:
+
+```bash
+npm start
+```

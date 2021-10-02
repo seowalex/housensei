@@ -1,6 +1,7 @@
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
+import serve from 'koa-static';
 import json from 'koa-json';
 import logger from 'koa-logger';
 import HttpStatus from 'http-status-codes';
@@ -11,6 +12,8 @@ import config from './config/index';
 import router from './routes/index';
 
 const app = new Koa();
+
+app.use(serve('../frontend/dist'));
 
 dbConnection.then(() => {
   // eslint-disable-next-line no-console
