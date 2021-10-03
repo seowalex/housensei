@@ -24,7 +24,7 @@ const Routes = () => {
   const prefersDarkMode =
     useAppSelector(selectPrefersDarkMode) ?? systemPrefersDarkMode;
 
-  const handleToggleColorMode = () =>
+  const handleTogglePrefersDarkMode = () =>
     dispatch(setPrefersDarkMode(!prefersDarkMode));
 
   return (
@@ -37,7 +37,7 @@ const Routes = () => {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Housensei
           </Typography>
-          <IconButton size="large" onClick={handleToggleColorMode}>
+          <IconButton size="large" onClick={handleTogglePrefersDarkMode}>
             {prefersDarkMode ? <LightModeIcon /> : <DarkModeIcon />}
           </IconButton>
         </Toolbar>
