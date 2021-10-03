@@ -21,9 +21,9 @@ const LinkBehavior = React.forwardRef<
 >(({ href, ...other }, ref) => <Link ref={ref} to={href} {...other} />);
 
 const App = () => {
-  const systemColorMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const systemPrefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const prefersDarkMode =
-    useAppSelector(selectPrefersDarkMode) ?? systemColorMode;
+    useAppSelector(selectPrefersDarkMode) ?? systemPrefersDarkMode;
 
   const theme = React.useMemo(
     () =>

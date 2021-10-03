@@ -7,47 +7,68 @@ import {
   Link,
   Toolbar,
   Typography,
+  useMediaQuery,
 } from '@mui/material';
-import { Menu as MenuIcon } from '@mui/icons-material';
+import {
+  DarkMode as DarkModeIcon,
+  LightMode as LightModeIcon,
+  Menu as MenuIcon,
+} from '@mui/icons-material';
 
-const Routes = () => (
-  <Router>
-    <AppBar position="sticky">
-      <Toolbar>
-        <IconButton size="large" edge="start" sx={{ mr: 2 }}>
-          <MenuIcon />
-        </IconButton>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Housensei
-        </Typography>
-      </Toolbar>
-    </AppBar>
-    <nav>
-      <ul>
-        <li>
-          <Link href="/">Home</Link>
-        </li>
-        <li>
-          <Link href="/about">About</Link>
-        </li>
-        <li>
-          <Link href="/users">Users</Link>
-        </li>
-      </ul>
-    </nav>
+import { useAppDispatch, useAppSelector } from './app/hooks';
+import { selectPrefersDarkMode, setPrefersDarkMode } from './reducers/settings';
 
-    <Switch>
-      <Route path="/about">
-        <Button variant="contained">About</Button>
-      </Route>
-      <Route path="/users">
-        <Button variant="contained">Users</Button>
-      </Route>
-      <Route path="/">
-        <Button variant="contained">Hello World</Button>
-      </Route>
-    </Switch>
-  </Router>
-);
+const Routes = () => {
+  const dispatch = useAppDispatch();
+  const systemPrefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const prefersDarkMode =
+    useAppSelector(selectPrefersDarkMode) ?? systemPrefersDarkMode;
+
+  const handleToggleColorMode = () =>
+    dispatch(setPrefersDarkMode(!prefersDarkMode));
+
+  return (
+    <Router>
+      <AppBar position="sticky">
+        <Toolbar>
+          <IconButton size="large" edge="start" sx={{ mr: 2 }}>
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Housensei
+          </Typography>
+          <IconButton size="large" onClick={handleToggleColorMode}>
+            {prefersDarkMode ? <LightModeIcon /> : <DarkModeIcon />}
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+      <nav>
+        <ul>
+          <li>
+            <Link href="/">Home</Link>
+          </li>
+          <li>
+            <Link href="/about">About</Link>
+          </li>
+          <li>
+            <Link href="/users">Users</Link>
+          </li>
+        </ul>
+      </nav>
+
+      <Switch>
+        <Route path="/about">
+          <Button variant="contained">About</Button>
+        </Route>
+        <Route path="/users">
+          <Button variant="contained">Users</Button>
+        </Route>
+        <Route path="/">
+          <Button variant="contained">Hello World</Button>
+        </Route>
+      </Switch>
+    </Router>
+  );
+};
 
 export default Routes;
