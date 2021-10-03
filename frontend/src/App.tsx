@@ -8,6 +8,9 @@ import {
   useMediaQuery,
 } from '@mui/material';
 
+import { useAppSelector } from './app/hooks';
+import { selectPrefersDarkMode } from './reducers/settings';
+
 import Routes from './Routes';
 
 import './styles/main.scss';
@@ -18,7 +21,9 @@ const LinkBehavior = React.forwardRef<
 >(({ href, ...other }, ref) => <Link ref={ref} to={href} {...other} />);
 
 const App = () => {
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const systemColorMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const prefersDarkMode =
+    useAppSelector(selectPrefersDarkMode) ?? systemColorMode;
 
   const theme = React.useMemo(
     () =>
