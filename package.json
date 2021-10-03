@@ -2,7 +2,7 @@
   "name": "housensei",
   "version": "1.0.0",
   "scripts": {
-    "build": "(cd frontend && npm ci --production=false --ignore-scripts && npm run build); (cd backend && npm ci --production=false --ignore-scripts && npm run build)",
+    "build": "(cd frontend && npm ci --production=false --ignore-scripts && npm run build && npm prune --production); (cd backend && npm ci --production=false --ignore-scripts && npm run build && npm prune --production)",
     "start": "cd backend && npm start"
   }
 }
