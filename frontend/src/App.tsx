@@ -31,6 +31,11 @@ const App = () => {
           mode: darkMode ? 'dark' : 'light',
         },
         components: {
+          MuiButtonBase: {
+            defaultProps: {
+              LinkComponent: LinkBehavior,
+            },
+          },
           MuiLink: {
             defaultProps: {
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -38,9 +43,11 @@ const App = () => {
               component: LinkBehavior,
             },
           },
-          MuiButtonBase: {
-            defaultProps: {
-              LinkComponent: LinkBehavior,
+          MuiListSubheader: {
+            styleOverrides: {
+              root: {
+                backgroundColor: 'inherit',
+              },
             },
           },
         },
