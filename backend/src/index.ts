@@ -2,6 +2,7 @@ import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
 import serve from 'koa-static';
+import send from 'koa-send';
 import json from 'koa-json';
 import logger from 'koa-logger';
 import HttpStatus from 'http-status-codes';
@@ -47,6 +48,10 @@ app.use(async (ctx: Koa.Context, next: () => Promise<any>) => {
 });
 
 app.use(router.routes()).use(router.allowedMethods());
+
+app.use(async (ctx) => {
+  await send(ctx, '/index.html', { root: '../frontend/dist' });
+});
 
 // Development logging
 app.use(
