@@ -1,0 +1,45 @@
+/* eslint-disable no-shadow */
+/* eslint-disable no-unused-vars */
+
+export enum Town {
+  AMK = 'Ang Mo Kio',
+  BDK = 'Bedok',
+  BIS = 'Bishan',
+  BKB = 'Bukit Batok',
+  BKM = 'Bukit Merah',
+  BKP = 'Bukit Panjang',
+  BKT = 'Bukit Timah',
+  CEN = 'Central Area',
+  CCK = 'Choa Chu Kang',
+  CLM = 'Clementi',
+  GEY = 'Geylang',
+  HOU = 'Hougang',
+  JRE = 'Jurong East',
+  JRW = 'Jurong West',
+  KAL = 'Kallang/Whampoa',
+  LCK = 'Lim Chu Kang',
+  MRP = 'Marine Parade',
+  PGL = 'Punggol',
+  PSR = 'Pasir Ris',
+  QUE = 'Queenstown',
+  SBW = 'Sembawang',
+  SNK = 'Sengkang',
+  SRG = 'Serangoon',
+  SIM = 'Simei',
+  TPN = 'Tampines',
+  TPY = 'Toa Payoh',
+  WDL = 'Woodlands',
+  YCK = 'Yio Chu Kang',
+  YIS = 'Yishun',
+}
+
+export enum FlatType {
+  STUDIO_A = 'Studio Apartment type A',
+  STUDIO_B = 'Studio Apartment type B',
+  ROOM_2_A = '2-room type A',
+  ROOM_2_B = '2-room type B',
+  ROOM_3 = '3-room',
+  ROOM_4 = '4-room',
+  ROOM_5 = '5-room',
+  GEN_3 = '3gen',
+}
