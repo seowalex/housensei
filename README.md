@@ -33,6 +33,12 @@ or
 npm run db:seed
 ```
 
+3. Import data:
+Specify file path to excel file in command line arguments
+```bash
+npm run db:bto src/database/data/HDB-BTO-Prices-List.xls
+```
+
 4. Start the development server:
 
 ```bash

@@ -19,7 +19,8 @@
     "pg": "^8.7.1",
     "pg-god": "^1.0.11",
     "typeorm": "^0.2.37",
-    "typescript": "^4.4.2"
+    "typescript": "^4.4.2",
+    "xlsx": "^0.17.2"
   },
   "devDependencies": {
     "@types/faker": "^5.5.8",
@@ -53,7 +54,8 @@
     "format-fix": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "db:create": "ts-node src/database/create-db.ts",
     "db:drop": "ts-node src/database/drop-db.ts",
-    "db:seed": "npm run db:drop && npm run db:create && ts-node src/database/seed-db.ts"
+    "db:seed": "npm run db:drop && npm run db:create && ts-node src/database/seed-db.ts",
+    "db:bto": "ts-node src/database/seed-bto.ts"
   },
   "repository": {
     "type": "git",
