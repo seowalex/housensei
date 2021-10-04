@@ -1,9 +1,12 @@
+import seedBTOs from './seed-bto';
 import dbConnection from './connection';
 
 async function seedDB() {
   await dbConnection;
 
-  // TODO seed database
+  seedBTOs();
+
+  // TODO seed resale
 
   // eslint-disable-next-line no-console
   console.info('Seeded database');
