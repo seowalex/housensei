@@ -1,4 +1,4 @@
-import React from 'react';
+import { forwardRef, useMemo } from 'react';
 import { Link, LinkProps } from 'react-router-dom';
 import {
   CssBaseline,
@@ -9,27 +9,26 @@ import {
 } from '@mui/material';
 
 import { useAppSelector } from './app/hooks';
-import { selectPrefersDarkMode } from './reducers/settings';
+import { selectDarkMode } from './reducers/settings';
 
 import Routes from './Routes';
 
 import './styles/main.scss';
 
-const LinkBehavior = React.forwardRef<
+const LinkBehavior = forwardRef<
   never,
   Omit<LinkProps, 'to'> & { href: LinkProps['to'] }
 >(({ href, ...other }, ref) => <Link ref={ref} to={href} {...other} />);
 
 const App = () => {
-  const systemPrefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const prefersDarkMode =
-    useAppSelector(selectPrefersDarkMode) ?? systemPrefersDarkMode;
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const darkMode = useAppSelector(selectDarkMode) ?? prefersDarkMode;
 
-  const theme = React.useMemo(
+  const theme = useMemo(
     () =>
       createTheme({
         palette: {
-          mode: prefersDarkMode ? 'dark' : 'light',
+          mode: darkMode ? 'dark' : 'light',
         },
         components: {
           MuiLink: {
@@ -46,7 +45,7 @@ const App = () => {
           },
         },
       }),
-    [prefersDarkMode]
+    [darkMode]
   );
 
   return (
