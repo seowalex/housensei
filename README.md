@@ -21,28 +21,29 @@ npm install
 
 1. (Optional) Populate the `.env` file (following the `.env.example` file) if the default user (`postgres`) and password (`postgres`) does exist.
 
-2. Create/seed the database:
+2. Create and seed the database:
+Import BTO excel file to file path src/database/data/HDB-BTO-Prices-List.xls
 
 ```bash
 npm run db:create
 ```
 
-or
+and
 
 ```bash
-npm run db:seed
+npm run db:seed src/database/data/HDB-BTO-Prices-List.xls
 ```
 
-3. Import data:
-Specify file path to excel file in command line arguments
-```bash
-npm run db:bto src/database/data/HDB-BTO-Prices-List.xls
-```
-
-4. Start the development server:
+3. Start the development server:
 
 ```bash
 npm run dev
+```
+
+4. [In Long Term] To clear and import new data into BTO table
+Specify file path to excel file in command line arguments
+```bash
+npm run db:seed-bto src/database/data/HDB-BTO-Prices-List.xls
 ```
 
 ### Frontend

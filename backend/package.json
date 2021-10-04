@@ -55,7 +55,7 @@
     "db:create": "ts-node src/database/create-db.ts",
     "db:drop": "ts-node src/database/drop-db.ts",
     "db:seed": "npm run db:drop && npm run db:create && ts-node src/database/seed-db.ts",
-    "db:bto": "ts-node src/database/seed-bto.ts"
+    "db:seed-bto": "ts-node src/database/seed-bto.ts"
   },
   "repository": {
     "type": "git",
