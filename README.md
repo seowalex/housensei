@@ -22,7 +22,13 @@ npm install
 1. (Optional) Populate the `.env` file (following the `.env.example` file) if the default user (`postgres`) and password (`postgres`) does exist.
 
 2. Create and seed the database:
-Import BTO excel file to file path src/database/data/HDB-BTO-Prices-List.xls
+- Import BTO excel file to file path src/database/data/HDB-BTO-Prices-List.xls
+- Convert the resale files from csv to xlsx and import to the following file paths:
+    - src/database/data/resale-flat-prices-based-on-approval-date-1990-1999.xlsx
+    - src/database/data/resale-flat-prices-based-on-approval-date-2000-feb-2012.xlsx
+    - src/database/data/resale-flat-prices-based-on-registration-date-from-mar-2012-to-dec-2014.xlsx
+    - src/database/data/resale-flat-prices-based-on-registration-date-from-jan-2015-to-dec-2016.xlsx
+    - src/database/data/resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.xlsx
 
 ```bash
 npm run db:create
@@ -31,7 +37,7 @@ npm run db:create
 and
 
 ```bash
-npm run db:seed src/database/data/HDB-BTO-Prices-List.xls
+npm run db:seed
 ```
 
 3. Start the development server:
