@@ -135,6 +135,7 @@ async function seedResale() {
 
     const dataRows = data.slice(1);
 
+    // Map to correct database format
     const allResale = dataRows.map((row) => {
       const resale = new ResaleFlat();
       resale.transactionDate = new Date(row[MONTH]);
@@ -162,7 +163,7 @@ async function seedResale() {
     });
 
     let seededResale = 0;
-
+    // Insert by batches
     while (seededResale < allResale.length) {
       const resaleToSeed = allResale.slice(
         seededResale,

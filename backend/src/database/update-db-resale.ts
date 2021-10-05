@@ -108,7 +108,7 @@ function transformRecord(record: ResaleRecord): ResaleFlat {
   resale.location = parseLocation(record.town) as Town;
   resale.flatType = formatRoomType(record.flat_type) as FlatType;
   resale.flatModel = record.flat_model;
-  resale.block = parseInt(record.block, 10);
+  resale.block = record.block;
   resale.streetName = record.street_name;
   resale.floorArea = parseInt(record.floor_area_sqm, 10);
   resale.minStorey = minStorey;
@@ -122,6 +122,7 @@ function transformRecord(record: ResaleRecord): ResaleFlat {
   return resale;
 }
 
+// Pull new resale data through api
 async function updateResale() {
   await dbConnection;
 
@@ -131,6 +132,7 @@ async function updateResale() {
   for (let i = 0; i < resourceIds.length; i += 1) {
     let offset = 0;
 
+    // eslint-disable-next-line no-await-in-loop
     const initialResponse = await axios.get<ResaleResponse>(url, {
       params: {
         resource_id: resourceIds[i],
@@ -140,12 +142,14 @@ async function updateResale() {
 
     const { total } = initialResponse.data.result;
 
+    // eslint-disable-next-line no-console
     console.log(`Total: ${total}`);
 
     const allFlats: ResaleFlat[] = [];
 
     try {
       while (offset < total) {
+        // eslint-disable-next-line no-await-in-loop
         const response = await axios.get<ResaleResponse>(url, {
           params: {
             resource_id: resourceIds[i],
@@ -158,17 +162,19 @@ async function updateResale() {
         const resaleFlats = records.map(transformRecord);
         allFlats.push(...resaleFlats);
         offset += records.length;
-        console.info(offset);
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error);
     }
 
     try {
+      // eslint-disable-next-line no-await-in-loop
       await getRepository(ResaleFlat).save(allFlats);
       // eslint-disable-next-line no-console
       console.info(`Updated batch ${i + 1}`);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(error);
     }
   }
