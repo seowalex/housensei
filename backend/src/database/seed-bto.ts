@@ -100,7 +100,7 @@ const combineBTOs = (
 const seedBTOs = async () => {
   await dbConnection;
 
-  const file = process.argv[2];
+  const file = 'src/database/data/HDB-BTO-Prices-List.xls';
   const workbook = XLSX.readFile(file, {
     cellDates: true,
     cellNF: false,
@@ -311,7 +311,5 @@ const seedBTOs = async () => {
   // eslint-disable-next-line no-console
   console.info('Seeded bto table');
 };
-
-seedBTOs();
 
 export default seedBTOs;

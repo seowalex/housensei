@@ -183,4 +183,4 @@ async function seedResale() {
   console.log(`Resale table seeded: ${totalEntries} entries`);
 }
 
-seedResale();
+export default seedResale;
