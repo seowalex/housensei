@@ -6,8 +6,8 @@ export default class ResaleFlat {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('int')
-  transactionDate: number;
+  @Column('date')
+  transactionDate: Date; // yyyy-MM
 
   @Column('enum', { enum: Town })
   location: Town;
@@ -33,8 +33,8 @@ export default class ResaleFlat {
   @Column('int')
   maxStorey: number;
 
-  @Column('int')
-  leaseCommenceYear; // year
+  @Column('date')
+  leaseCommenceYear: Date; // year
 
   @Column('int')
   remainingLease: number; // months

@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "dependencies": {
     "@koa/cors": "^3.1.0",
+    "axios": "^0.22.0",
     "class-validator": "^0.13.1",
     "dotenv": "^10.0.0",
     "faker": "^5.5.3",
@@ -53,7 +54,8 @@
     "format-fix": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "db:create": "ts-node src/database/create-db.ts",
     "db:drop": "ts-node src/database/drop-db.ts",
-    "db:seed": "npm run db:drop && npm run db:create && ts-node src/database/seed-db.ts"
+    "db:seed": "npm run db:drop && npm run db:create && ts-node src/database/seed-db.ts",
+    "db:update": "ts-node src/database/update-db-resale.ts"
   },
   "repository": {
     "type": "git",
