@@ -107,8 +107,6 @@ export const townCoordinates = {
   },
 };
 
-// 244360641
-
 export const townBoundaries = {
   [Town.AMK]: [
     {

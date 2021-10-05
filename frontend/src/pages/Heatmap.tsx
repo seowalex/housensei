@@ -69,6 +69,14 @@ const heatmapLayerOptions: google.maps.visualization.HeatmapLayerOptions = {
   radius: 0.03,
 };
 
+const polygonOptions: google.maps.PolygonOptions = {
+  fillColor: '#ef5350',
+  fillOpacity: 0,
+  strokeColor: '#d32f2f',
+  strokeWeight: 2,
+  strokeOpacity: 0,
+};
+
 const currentYear = new Date().getFullYear();
 
 const yearMarks = [
@@ -85,6 +93,9 @@ const Heatmap = () => {
 
   const [map, setMap] = useState<google.maps.Map>();
   const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox>();
+  const [polygons, setPolygons] = useState<{
+    [K in Town]?: google.maps.Polygon;
+  }>({});
   const [town, setTown] = useState<Town | 'Islandwide'>('Islandwide');
   const [year, setYear] = useState(currentYear);
 
@@ -157,8 +168,28 @@ const Heatmap = () => {
           )}
           options={heatmapLayerOptions}
         />
-        {Object.values(townBoundaries).map((paths) => (
-          <Polygon paths={paths} />
+        {Object.entries(townBoundaries).map(([key, paths]) => (
+          <Polygon
+            paths={paths}
+            key={key}
+            options={polygonOptions}
+            onLoad={(polygon) =>
+              setPolygons((oldPolygons) => ({ ...oldPolygons, [key]: polygon }))
+            }
+            onMouseOver={() =>
+              polygons[key as Town]?.setOptions({
+                fillOpacity: 0.4,
+                strokeOpacity: 1,
+              })
+            }
+            onMouseOut={() =>
+              polygons[key as Town]?.setOptions({
+                fillOpacity: 0,
+                strokeOpacity: 0,
+              })
+            }
+            onClick={() => setTown(key as Town)}
+          />
         ))}
       </GoogleMap>
       <ThemeProvider theme={mapTheme}>
