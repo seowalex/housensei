@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import {
   Autocomplete,
   CircularProgress,
@@ -15,6 +16,8 @@ import {
   useJsApiLoader,
 } from '@react-google-maps/api';
 import { UseLoadScriptOptions } from '@react-google-maps/api/src/useJsApiLoader';
+
+import { Town } from '../app/types';
 
 const mapTheme = createTheme({
   components: {
@@ -60,48 +63,24 @@ const heatmapLayerOptions: google.maps.visualization.HeatmapLayerOptions = {
 
 const Heatmap = () => {
   const { google } = window;
+  const history = useHistory();
+  const location = useLocation();
   const { isLoaded } = useJsApiLoader(apiOptions);
+
+  const searchParams = {
+    town: new URLSearchParams(location.search).get('town'),
+  };
+  const defaultTown = Object.values(Town).some(
+    (town) => town === searchParams.town
+  )
+    ? (new URLSearchParams(location.search).get('town') as Town)
+    : null;
+
   const [map, setMap] = useState<google.maps.Map>();
   const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox>();
-  const heatmapData = google
-    ? [
-        {
-          location: new google.maps.LatLng({
-            lat: 1.352083,
-            lng: 103.819836,
-          }),
-          weight: 1,
-        },
-        {
-          location: new google.maps.LatLng({
-            lat: 1.452083,
-            lng: 103.819836,
-          }),
-          weight: 1,
-        },
-        {
-          location: new google.maps.LatLng({
-            lat: 1.252083,
-            lng: 103.819836,
-          }),
-          weight: 1,
-        },
-        {
-          location: new google.maps.LatLng({
-            lat: 1.352083,
-            lng: 103.719836,
-          }),
-          weight: 1,
-        },
-        {
-          location: new google.maps.LatLng({
-            lat: 1.352083,
-            lng: 103.919836,
-          }),
-          weight: 1,
-        },
-      ]
-    : [];
+  const [town, setTown] = useState<Town | 'Islandwide'>(
+    defaultTown ?? 'Islandwide'
+  );
 
   const setMapViewport = () => {
     if (!map || !searchBox) {
@@ -131,6 +110,17 @@ const Heatmap = () => {
     map.fitBounds(bounds);
   };
 
+  const handleTownChange = (_: unknown, value: string) => {
+    setTown(value as Town | 'Islandwide');
+    history.push({
+      pathname: location.pathname,
+      search:
+        value === 'Islandwide'
+          ? ''
+          : new URLSearchParams({ town: value }).toString(),
+    });
+  };
+
   return isLoaded ? (
     <Container
       sx={{
@@ -153,7 +143,46 @@ const Heatmap = () => {
         onBoundsChanged={() => searchBox?.setBounds(map?.getBounds() ?? null)}
         onLoad={setMap}
       >
-        <HeatmapLayer data={heatmapData} options={heatmapLayerOptions} />
+        <HeatmapLayer
+          data={[
+            {
+              location: new google.maps.LatLng({
+                lat: 1.352083,
+                lng: 103.819836,
+              }),
+              weight: 1,
+            },
+            {
+              location: new google.maps.LatLng({
+                lat: 1.452083,
+                lng: 103.819836,
+              }),
+              weight: 1,
+            },
+            {
+              location: new google.maps.LatLng({
+                lat: 1.252083,
+                lng: 103.819836,
+              }),
+              weight: 1,
+            },
+            {
+              location: new google.maps.LatLng({
+                lat: 1.352083,
+                lng: 103.719836,
+              }),
+              weight: 1,
+            },
+            {
+              location: new google.maps.LatLng({
+                lat: 1.352083,
+                lng: 103.919836,
+              }),
+              weight: 1,
+            },
+          ]}
+          options={heatmapLayerOptions}
+        />
         <ThemeProvider theme={mapTheme}>
           <Grid container spacing={2} sx={{ p: 2 }}>
             <Grid item xs={12} md="auto">
@@ -166,9 +195,12 @@ const Heatmap = () => {
             </Grid>
             <Grid item xs={12} md="auto">
               <Autocomplete
-                options={['Islandwide', 'Ang Mo Kio', 'Yishun']}
+                options={['Islandwide'].concat(
+                  Object.values(Town).sort((a, b) => a.localeCompare(b))
+                )}
                 renderInput={(params) => <TextField label="Town" {...params} />}
-                defaultValue="Islandwide"
+                value={town}
+                onChange={handleTownChange}
                 blurOnSelect
                 disableClearable
               />
