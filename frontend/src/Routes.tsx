@@ -32,6 +32,8 @@ import {
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import { selectDarkMode, setDarkMode } from './reducers/settings';
 
+import NotFound from './pages/NotFound';
+
 const drawerWidth = 240;
 
 const Routes = () => {
@@ -41,7 +43,6 @@ const Routes = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
-
   const handleDarkModeToggle = () => dispatch(setDarkMode(!darkMode));
 
   const drawer = (
@@ -160,6 +161,26 @@ const Routes = () => {
         </Drawer>
 
         <Switch>
+          <Route exact path="/">
+            <Container sx={{ p: 3 }}>
+              <Typography paragraph>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                Rhoncus dolor purus non enim praesent elementum facilisis leo
+                vel. Risus at ultrices mi tempus imperdiet. Semper risus in
+                hendrerit gravida rutrum quisque non tellus. Convallis convallis
+                tellus id interdum velit laoreet id donec ultrices. Odio morbi
+                quis commodo odio aenean sed adipiscing. Amet nisl suscipit
+                adipiscing bibendum est ultricies integer quis. Cursus euismod
+                quis viverra nibh cras. Metus vulputate eu scelerisque felis
+                imperdiet proin fermentum leo. Mauris commodo quis imperdiet
+                massa tincidunt. Cras tincidunt lobortis feugiat vivamus at
+                augue. At augue eget arcu dictum varius duis at consectetur
+                lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa
+                sapien faucibus et molestie ac.
+              </Typography>
+            </Container>
+          </Route>
           <Route path="/history">
             <Container sx={{ p: 3 }}>
               <Typography variant="h4" gutterBottom>
@@ -206,25 +227,8 @@ const Routes = () => {
               </Typography>
             </Container>
           </Route>
-          <Route path="/">
-            <Container sx={{ p: 3 }}>
-              <Typography paragraph>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                Rhoncus dolor purus non enim praesent elementum facilisis leo
-                vel. Risus at ultrices mi tempus imperdiet. Semper risus in
-                hendrerit gravida rutrum quisque non tellus. Convallis convallis
-                tellus id interdum velit laoreet id donec ultrices. Odio morbi
-                quis commodo odio aenean sed adipiscing. Amet nisl suscipit
-                adipiscing bibendum est ultricies integer quis. Cursus euismod
-                quis viverra nibh cras. Metus vulputate eu scelerisque felis
-                imperdiet proin fermentum leo. Mauris commodo quis imperdiet
-                massa tincidunt. Cras tincidunt lobortis feugiat vivamus at
-                augue. At augue eget arcu dictum varius duis at consectetur
-                lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa
-                sapien faucibus et molestie ac.
-              </Typography>
-            </Container>
+          <Route>
+            <NotFound />
           </Route>
         </Switch>
       </Box>
