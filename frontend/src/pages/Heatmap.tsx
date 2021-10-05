@@ -1,5 +1,13 @@
 import { useState } from 'react';
-import { CircularProgress, Container, TextField } from '@mui/material';
+import {
+  Autocomplete,
+  CircularProgress,
+  Container,
+  Grid,
+  TextField,
+  ThemeProvider,
+  createTheme,
+} from '@mui/material';
 import {
   GoogleMap,
   HeatmapLayer,
@@ -7,6 +15,28 @@ import {
   useJsApiLoader,
 } from '@react-google-maps/api';
 import { UseLoadScriptOptions } from '@react-google-maps/api/src/useJsApiLoader';
+
+const mapTheme = createTheme({
+  components: {
+    MuiFormControl: {
+      defaultProps: {
+        sx: {
+          width: {
+            xs: '100%',
+            md: 400,
+          },
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#fff',
+        },
+      },
+    },
+  },
+});
 
 const apiOptions: UseLoadScriptOptions = {
   googleMapsApiKey: 'AIzaSyAG6A2F0zMMHkLByBzBe0SUGeO8r8ICWEY',
@@ -124,32 +154,27 @@ const Heatmap = () => {
         onLoad={setMap}
       >
         <HeatmapLayer data={heatmapData} options={heatmapLayerOptions} />
-        <StandaloneSearchBox
-          onPlacesChanged={setMapViewport}
-          onLoad={setSearchBox}
-        >
-          <TextField
-            variant="outlined"
-            placeholder="Search..."
-            sx={{
-              p: 2,
-              width: {
-                xs: '100%',
-                md: 400,
-              },
-              '.MuiInputBase-root': {
-                backgroundColor: '#fff',
-                color: 'rgba(0, 0, 0, 0.87)',
-                '.MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(0, 0, 0, 0.23)',
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(0, 0, 0, 0.87)',
-                },
-              },
-            }}
-          />
-        </StandaloneSearchBox>
+        <ThemeProvider theme={mapTheme}>
+          <Grid container spacing={2} sx={{ p: 2 }}>
+            <Grid item xs={12} md="auto">
+              <StandaloneSearchBox
+                onPlacesChanged={setMapViewport}
+                onLoad={setSearchBox}
+              >
+                <TextField placeholder="Search..." />
+              </StandaloneSearchBox>
+            </Grid>
+            <Grid item xs={12} md="auto">
+              <Autocomplete
+                options={['Islandwide', 'Ang Mo Kio', 'Yishun']}
+                renderInput={(params) => <TextField label="Town" {...params} />}
+                defaultValue="Islandwide"
+                blurOnSelect
+                disableClearable
+              />
+            </Grid>
+          </Grid>
+        </ThemeProvider>
       </GoogleMap>
     </Container>
   ) : (
