@@ -23,7 +23,15 @@ const NotFound = () => {
   ];
 
   return (
-    <Container sx={{ height: 'calc(100vh - 64px)', p: 3 }}>
+    <Container
+      sx={{
+        height: {
+          xs: 'calc(100vh - 56px)',
+          sm: 'calc(100vh - 64px)',
+        },
+        p: 3,
+      }}
+    >
       <Stack justifyContent="center" sx={{ height: '100%' }}>
         <Box sx={{ textAlign: 'center', my: 2 }}>
           <Ghost
