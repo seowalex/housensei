@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
 import {
   Autocomplete,
   CircularProgress,
@@ -63,24 +62,11 @@ const heatmapLayerOptions: google.maps.visualization.HeatmapLayerOptions = {
 
 const Heatmap = () => {
   const { google } = window;
-  const history = useHistory();
-  const location = useLocation();
   const { isLoaded } = useJsApiLoader(apiOptions);
-
-  const searchParams = {
-    town: new URLSearchParams(location.search).get('town'),
-  };
-  const defaultTown = Object.values(Town).some(
-    (town) => town === searchParams.town
-  )
-    ? (new URLSearchParams(location.search).get('town') as Town)
-    : null;
 
   const [map, setMap] = useState<google.maps.Map>();
   const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox>();
-  const [town, setTown] = useState<Town | 'Islandwide'>(
-    defaultTown ?? 'Islandwide'
-  );
+  const [town, setTown] = useState<Town | 'Islandwide'>('Islandwide');
 
   const setMapViewport = () => {
     if (!map || !searchBox) {
@@ -108,17 +94,6 @@ const Heatmap = () => {
     });
 
     map.fitBounds(bounds);
-  };
-
-  const handleTownChange = (_: unknown, value: string) => {
-    setTown(value as Town | 'Islandwide');
-    history.push({
-      pathname: location.pathname,
-      search:
-        value === 'Islandwide'
-          ? ''
-          : new URLSearchParams({ town: value }).toString(),
-    });
   };
 
   return isLoaded ? (
@@ -200,7 +175,7 @@ const Heatmap = () => {
                 )}
                 renderInput={(params) => <TextField label="Town" {...params} />}
                 value={town}
-                onChange={handleTownChange}
+                onChange={(_, value) => setTown(value as Town | 'Islandwide')}
                 blurOnSelect
                 disableClearable
               />

@@ -39,6 +39,7 @@ const drawerWidth = 240;
 
 const Routes = () => {
   const dispatch = useAppDispatch();
+  const isDesktop = useMediaQuery('(min-width: 600px)');
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const darkMode = useAppSelector(selectDarkMode) ?? prefersDarkMode;
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -123,7 +124,10 @@ const Routes = () => {
             Housensei
           </Typography>
           <Tooltip title="Toggle dark mode" placement="bottom-start">
-            <IconButton size="large" onClick={handleDarkModeToggle}>
+            <IconButton
+              size={isDesktop ? 'large' : 'medium'}
+              onClick={handleDarkModeToggle}
+            >
               {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
             </IconButton>
           </Tooltip>
