@@ -4,8 +4,8 @@ import { getRepository } from 'typeorm';
 import { FlatType, Town } from '../utils/model';
 import ResaleFlat from '../models/resale';
 import dbConnection from './connection';
-import { ResaleRecord } from './resaleRecord';
-import { ResaleResponse } from './resaleResponse';
+import { ResaleRecord } from '../utils/resaleRecord';
+import { ResaleResponse } from '../utils/resaleResponse';
 
 const url = 'https://data.gov.sg/api/action/datastore_search';
 
