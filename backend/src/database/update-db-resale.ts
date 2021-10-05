@@ -9,6 +9,33 @@ import { ResaleResponse } from './resaleResponse';
 
 const url = 'https://data.gov.sg/api/action/datastore_search';
 
+const resourceIds = [
+  'adbbddd3-30e2-445f-a123-29bee150a6fe',
+  '8c00bf08-9124-479e-aeca-7cc411d884c4',
+  '83b2fc37-ce8c-4df4-968b-370fd818138b',
+  '1b702208-44bf-4829-b620-4615ee19b57c',
+  'f1765b54-a209-4718-8d38-a39237f502b3',
+];
+
+const capitalizeEachWord = (text: string) => {
+  let newText = '';
+  let toCapitalize = true;
+
+  for (let i = 0; i < text.length; i += 1) {
+    if (text.charAt(i) === ' ' || text.charAt(i) === '/') {
+      toCapitalize = true;
+      newText += text.charAt(i);
+    } else if (toCapitalize) {
+      newText += text.charAt(i).toUpperCase();
+      toCapitalize = !toCapitalize;
+    } else {
+      newText += text.charAt(i).toLowerCase();
+    }
+  }
+
+  return newText;
+};
+
 function transformRecord(record: ResaleRecord): ResaleFlat {
   const storeyRangeSplit = record.storey_range.split('TO');
   const minStorey = parseInt(storeyRangeSplit[0].trim(), 10);
@@ -41,7 +68,7 @@ function transformRecord(record: ResaleRecord): ResaleFlat {
 
   const resale = new ResaleFlat();
   resale.transactionDate = new Date(record.month);
-  resale.location = record.town as Town;
+  resale.location = capitalizeEachWord(record.town) as Town;
   resale.flatType = record.flat_type as FlatType;
   resale.flatModel = record.flat_model;
   resale.block = parseInt(record.block, 10);
@@ -71,6 +98,9 @@ async function updateResale() {
     const resaleFlats = records.map(transformRecord);
 
     console.log(resaleFlats);
+
+    // find a better way to update
+    await getRepository(ResaleFlat).clear();
 
     await getRepository(ResaleFlat).save(resaleFlats);
     // eslint-disable-next-line no-console
