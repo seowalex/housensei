@@ -18,8 +18,8 @@ export default class ResaleFlat {
   @Column('text')
   flatModel: string;
 
-  @Column('int')
-  block: number;
+  @Column('text')
+  block: string;
 
   @Column('text')
   streetName: string;

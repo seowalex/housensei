@@ -7,6 +7,7 @@
     "@koa/cors": "^3.1.0",
     "axios": "^0.22.0",
     "class-validator": "^0.13.1",
+    "csv-parse": "^4.16.3",
     "dotenv": "^10.0.0",
     "faker": "^5.5.3",
     "http-status-codes": "^2.1.4",
@@ -58,6 +59,7 @@
     "db:drop": "ts-node src/database/drop-db.ts",
     "db:seed": "npm run db:drop && npm run db:create && ts-node src/database/seed-db.ts",
     "db:update": "ts-node src/database/update-db-resale.ts",
+    "db:seed-resale": "ts-node src/database/seed-resale.ts",
     "db:seed-bto": "ts-node src/database/seed-bto.ts"
   },
   "repository": {
