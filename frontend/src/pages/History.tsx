@@ -4,7 +4,8 @@ import GroupList from '../components/history/GroupList';
 
 const History = () => (
   <Container sx={{ p: 3 }}>
-    <GroupForm />
+    <GroupList />
+    {/* <GroupForm /> */}
   </Container>
 );
 

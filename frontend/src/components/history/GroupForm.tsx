@@ -5,7 +5,6 @@ import {
   Grid,
   Paper,
   Switch,
-  Typography,
 } from '@mui/material';
 import { useState } from 'react';
 import { Control, FieldValues, SubmitHandler, useForm } from 'react-hook-form';
