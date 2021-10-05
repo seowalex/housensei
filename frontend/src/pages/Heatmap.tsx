@@ -1,11 +1,17 @@
 import { useState } from 'react';
 import {
   Autocomplete,
+  Box,
+  Card,
+  CardContent,
   CircularProgress,
   Container,
   Grid,
+  OutlinedInput,
+  Slider,
   TextField,
   ThemeProvider,
+  Typography,
   createTheme,
 } from '@mui/material';
 import {
@@ -60,6 +66,16 @@ const heatmapLayerOptions: google.maps.visualization.HeatmapLayerOptions = {
   radius: 0.05,
 };
 
+const currentYear = new Date().getFullYear();
+
+const yearMarks = [
+  ...Array(Math.floor((currentYear - 1990) / 10) + 1).keys(),
+].map((i) => {
+  const value = 1990 + i * 10;
+
+  return { value, label: value.toString() };
+});
+
 const Heatmap = () => {
   const { google } = window;
   const { isLoaded } = useJsApiLoader(apiOptions);
@@ -67,6 +83,7 @@ const Heatmap = () => {
   const [map, setMap] = useState<google.maps.Map>();
   const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox>();
   const [town, setTown] = useState<Town | 'Islandwide'>('Islandwide');
+  const [year, setYear] = useState(currentYear);
 
   const setMapViewport = () => {
     if (!map || !searchBox) {
@@ -96,9 +113,18 @@ const Heatmap = () => {
     map.fitBounds(bounds);
   };
 
+  const handleYearBlur = () => {
+    if (year < 1990) {
+      setYear(1990);
+    } else if (year > currentYear) {
+      setYear(currentYear);
+    }
+  };
+
   return isLoaded ? (
     <Container
       sx={{
+        position: 'relative',
         height: {
           xs: 'calc(100vh - 56px)',
           sm: 'calc(100vh - 64px)',
@@ -158,31 +184,76 @@ const Heatmap = () => {
           ]}
           options={heatmapLayerOptions}
         />
-        <ThemeProvider theme={mapTheme}>
-          <Grid container spacing={2} sx={{ p: 2 }}>
-            <Grid item xs={12} md="auto">
-              <StandaloneSearchBox
-                onPlacesChanged={setMapViewport}
-                onLoad={setSearchBox}
-              >
-                <TextField placeholder="Search..." />
-              </StandaloneSearchBox>
-            </Grid>
-            <Grid item xs={12} md="auto">
-              <Autocomplete
-                options={['Islandwide'].concat(
-                  Object.values(Town).sort((a, b) => a.localeCompare(b))
-                )}
-                renderInput={(params) => <TextField label="Town" {...params} />}
-                value={town}
-                onChange={(_, value) => setTown(value as Town | 'Islandwide')}
-                blurOnSelect
-                disableClearable
-              />
-            </Grid>
-          </Grid>
-        </ThemeProvider>
       </GoogleMap>
+      <ThemeProvider theme={mapTheme}>
+        <Grid container spacing={2} sx={{ position: 'absolute', top: 0, p: 2 }}>
+          <Grid item xs={12} md="auto">
+            <StandaloneSearchBox
+              onPlacesChanged={setMapViewport}
+              onLoad={setSearchBox}
+            >
+              <TextField placeholder="Search..." />
+            </StandaloneSearchBox>
+          </Grid>
+          <Grid item xs={12} md="auto">
+            <Autocomplete
+              options={['Islandwide'].concat(
+                Object.values(Town).sort((a, b) => a.localeCompare(b))
+              )}
+              renderInput={(params) => <TextField label="Town" {...params} />}
+              value={town}
+              onChange={(_, value) => setTown(value as Town | 'Islandwide')}
+              blurOnSelect
+              disableClearable
+            />
+          </Grid>
+          <Grid item xs={12} md="auto">
+            <Card
+              sx={{
+                width: {
+                  xs: '100%',
+                  md: 600,
+                },
+              }}
+            >
+              <CardContent sx={{ pb: '8px !important' }}>
+                <Grid container columnSpacing={2}>
+                  <Grid item xs={12}>
+                    <Typography gutterBottom>Year</Typography>
+                  </Grid>
+                  <Grid item xs>
+                    <Box sx={{ px: 2 }}>
+                      <Slider
+                        min={1990}
+                        max={currentYear}
+                        marks={yearMarks}
+                        value={year}
+                        onChange={(_, value) => setYear(value as number)}
+                        valueLabelDisplay="auto"
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item>
+                    <OutlinedInput
+                      value={year}
+                      size="small"
+                      onChange={(event) =>
+                        setYear(parseInt(event.target.value, 10))
+                      }
+                      onBlur={handleYearBlur}
+                      inputProps={{
+                        min: 1990,
+                        max: currentYear,
+                        type: 'number',
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </ThemeProvider>
     </Container>
   ) : (
     <Container
