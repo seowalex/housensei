@@ -17,11 +17,13 @@ import {
 import {
   GoogleMap,
   HeatmapLayer,
+  TransitLayer,
   StandaloneSearchBox,
   useJsApiLoader,
 } from '@react-google-maps/api';
 import { UseLoadScriptOptions } from '@react-google-maps/api/src/useJsApiLoader';
 
+import { townCoordinates } from '../app/constants';
 import { Town } from '../app/types';
 
 const mapTheme = createTheme({
@@ -63,7 +65,7 @@ const mapOptions: google.maps.MapOptions = {
 
 const heatmapLayerOptions: google.maps.visualization.HeatmapLayerOptions = {
   dissipating: false,
-  radius: 0.05,
+  radius: 0.03,
 };
 
 const currentYear = new Date().getFullYear();
@@ -144,44 +146,14 @@ const Heatmap = () => {
         onBoundsChanged={() => searchBox?.setBounds(map?.getBounds() ?? null)}
         onLoad={setMap}
       >
+        <TransitLayer />
         <HeatmapLayer
-          data={[
-            {
-              location: new google.maps.LatLng({
-                lat: 1.352083,
-                lng: 103.819836,
-              }),
-              weight: 1,
-            },
-            {
-              location: new google.maps.LatLng({
-                lat: 1.452083,
-                lng: 103.819836,
-              }),
-              weight: 1,
-            },
-            {
-              location: new google.maps.LatLng({
-                lat: 1.252083,
-                lng: 103.819836,
-              }),
-              weight: 1,
-            },
-            {
-              location: new google.maps.LatLng({
-                lat: 1.352083,
-                lng: 103.719836,
-              }),
-              weight: 1,
-            },
-            {
-              location: new google.maps.LatLng({
-                lat: 1.352083,
-                lng: 103.919836,
-              }),
-              weight: 1,
-            },
-          ]}
+          data={Object.values(townCoordinates).map(
+            (coordinates: google.maps.LatLngLiteral) => ({
+              location: new google.maps.LatLng(coordinates),
+              weight: Math.random(),
+            })
+          )}
           options={heatmapLayerOptions}
         />
       </GoogleMap>
