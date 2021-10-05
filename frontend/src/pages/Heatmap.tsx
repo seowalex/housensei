@@ -17,13 +17,14 @@ import {
 import {
   GoogleMap,
   HeatmapLayer,
+  Polygon,
   TransitLayer,
   StandaloneSearchBox,
   useJsApiLoader,
 } from '@react-google-maps/api';
 import { UseLoadScriptOptions } from '@react-google-maps/api/src/useJsApiLoader';
 
-import { townCoordinates } from '../app/constants';
+import { townBoundaries, townCoordinates } from '../app/constants';
 import { Town } from '../app/types';
 
 const mapTheme = createTheme({
@@ -156,6 +157,9 @@ const Heatmap = () => {
           )}
           options={heatmapLayerOptions}
         />
+        {Object.values(townBoundaries).map((paths) => (
+          <Polygon paths={paths} />
+        ))}
       </GoogleMap>
       <ThemeProvider theme={mapTheme}>
         <Grid container spacing={2} sx={{ position: 'absolute', top: 0, p: 2 }}>
