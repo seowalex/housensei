@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Container, TextField } from '@mui/material';
+import { CircularProgress, Container, TextField } from '@mui/material';
 import {
   GoogleMap,
+  HeatmapLayer,
   StandaloneSearchBox,
   useJsApiLoader,
 } from '@react-google-maps/api';
@@ -9,7 +10,7 @@ import { UseLoadScriptOptions } from '@react-google-maps/api/src/useJsApiLoader'
 
 const apiOptions: UseLoadScriptOptions = {
   googleMapsApiKey: 'AIzaSyAG6A2F0zMMHkLByBzBe0SUGeO8r8ICWEY',
-  libraries: ['places'],
+  libraries: ['places', 'visualization'],
 };
 
 const mapOptions: google.maps.MapOptions = {
@@ -22,10 +23,55 @@ const mapOptions: google.maps.MapOptions = {
   zoom: 12,
 };
 
+const heatmapLayerOptions: google.maps.visualization.HeatmapLayerOptions = {
+  dissipating: false,
+  radius: 0.05,
+};
+
 const Heatmap = () => {
+  const { google } = window;
   const { isLoaded } = useJsApiLoader(apiOptions);
   const [map, setMap] = useState<google.maps.Map>();
   const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox>();
+  const heatmapData = google
+    ? [
+        {
+          location: new google.maps.LatLng({
+            lat: 1.352083,
+            lng: 103.819836,
+          }),
+          weight: 1,
+        },
+        {
+          location: new google.maps.LatLng({
+            lat: 1.452083,
+            lng: 103.819836,
+          }),
+          weight: 1,
+        },
+        {
+          location: new google.maps.LatLng({
+            lat: 1.252083,
+            lng: 103.819836,
+          }),
+          weight: 1,
+        },
+        {
+          location: new google.maps.LatLng({
+            lat: 1.352083,
+            lng: 103.719836,
+          }),
+          weight: 1,
+        },
+        {
+          location: new google.maps.LatLng({
+            lat: 1.352083,
+            lng: 103.919836,
+          }),
+          weight: 1,
+        },
+      ]
+    : [];
 
   const setMapViewport = () => {
     if (!map || !searchBox) {
@@ -58,7 +104,6 @@ const Heatmap = () => {
   return isLoaded ? (
     <Container
       sx={{
-        position: 'relative',
         height: {
           xs: 'calc(100vh - 56px)',
           sm: 'calc(100vh - 64px)',
@@ -77,37 +122,51 @@ const Heatmap = () => {
         options={mapOptions}
         onBoundsChanged={() => searchBox?.setBounds(map?.getBounds() ?? null)}
         onLoad={setMap}
-      />
-      <StandaloneSearchBox
-        onPlacesChanged={setMapViewport}
-        onLoad={setSearchBox}
       >
-        <TextField
-          variant="outlined"
-          placeholder="Search..."
-          sx={{
-            position: 'absolute',
-            top: 0,
-            p: 2,
-            width: {
-              xs: '100%',
-              md: 400,
-            },
-            '.MuiInputBase-root': {
-              backgroundColor: '#fff',
-              color: 'rgba(0, 0, 0, 0.87)',
-              '.MuiOutlinedInput-notchedOutline': {
-                borderColor: 'rgba(0, 0, 0, 0.23)',
+        <HeatmapLayer data={heatmapData} options={heatmapLayerOptions} />
+        <StandaloneSearchBox
+          onPlacesChanged={setMapViewport}
+          onLoad={setSearchBox}
+        >
+          <TextField
+            variant="outlined"
+            placeholder="Search..."
+            sx={{
+              p: 2,
+              width: {
+                xs: '100%',
+                md: 400,
               },
-              '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'rgba(0, 0, 0, 0.87)',
+              '.MuiInputBase-root': {
+                backgroundColor: '#fff',
+                color: 'rgba(0, 0, 0, 0.87)',
+                '.MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(0, 0, 0, 0.23)',
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(0, 0, 0, 0.87)',
+                },
               },
-            },
-          }}
-        />
-      </StandaloneSearchBox>
+            }}
+          />
+        </StandaloneSearchBox>
+      </GoogleMap>
     </Container>
-  ) : null;
+  ) : (
+    <Container
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: {
+          xs: 'calc(100vh - 56px)',
+          sm: 'calc(100vh - 64px)',
+        },
+      }}
+    >
+      <CircularProgress />
+    </Container>
+  );
 };
 
 export default Heatmap;
