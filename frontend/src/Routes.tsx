@@ -1,5 +1,13 @@
-import { useState } from 'react';
-import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
+import {
+  AccountBalance as AccountBalanceIcon,
+  Calculate as CalculateIcon,
+  DarkMode as DarkModeIcon,
+  Home as HomeIcon,
+  LightMode as LightModeIcon,
+  Map as MapIcon,
+  Menu as MenuIcon,
+  Timeline as TimelineIcon,
+} from '@mui/icons-material';
 import {
   AppBar,
   Box,
@@ -18,21 +26,13 @@ import {
   Typography,
   useMediaQuery,
 } from '@mui/material';
-import {
-  AccountBalance as AccountBalanceIcon,
-  Calculate as CalculateIcon,
-  DarkMode as DarkModeIcon,
-  Home as HomeIcon,
-  LightMode as LightModeIcon,
-  Map as MapIcon,
-  Menu as MenuIcon,
-  Timeline as TimelineIcon,
-} from '@mui/icons-material';
+import { useState } from 'react';
+import { Link, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 
 import { useAppDispatch, useAppSelector } from './app/hooks';
-import { selectDarkMode, setDarkMode } from './reducers/settings';
-
+import History from './pages/History';
 import NotFound from './pages/NotFound';
+import { selectDarkMode, setDarkMode } from './reducers/settings';
 
 const drawerWidth = 240;
 
@@ -182,27 +182,7 @@ const Routes = () => {
             </Container>
           </Route>
           <Route path="/history">
-            <Container sx={{ p: 3 }}>
-              <Typography variant="h4" gutterBottom>
-                HDB Property Price History
-              </Typography>
-              <Typography paragraph>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                Rhoncus dolor purus non enim praesent elementum facilisis leo
-                vel. Risus at ultrices mi tempus imperdiet. Semper risus in
-                hendrerit gravida rutrum quisque non tellus. Convallis convallis
-                tellus id interdum velit laoreet id donec ultrices. Odio morbi
-                quis commodo odio aenean sed adipiscing. Amet nisl suscipit
-                adipiscing bibendum est ultricies integer quis. Cursus euismod
-                quis viverra nibh cras. Metus vulputate eu scelerisque felis
-                imperdiet proin fermentum leo. Mauris commodo quis imperdiet
-                massa tincidunt. Cras tincidunt lobortis feugiat vivamus at
-                augue. At augue eget arcu dictum varius duis at consectetur
-                lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa
-                sapien faucibus et molestie ac.
-              </Typography>
-            </Container>
+            <History />
           </Route>
           <Route path="/heatmap">
             <Container sx={{ p: 3 }}>

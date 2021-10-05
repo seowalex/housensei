@@ -1,21 +1,22 @@
 import {
   Action,
-  ThunkAction,
   combineReducers,
   configureStore,
+  ThunkAction,
 } from '@reduxjs/toolkit';
 import {
-  persistReducer,
-  persistStore,
   FLUSH,
-  REHYDRATE,
   PAUSE,
   PERSIST,
+  persistReducer,
+  persistStore,
   PURGE,
   REGISTER,
+  REHYDRATE,
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
+import history from '../reducers/history';
 import settings from '../reducers/settings';
 
 const persistConfig = {
@@ -24,6 +25,7 @@ const persistConfig = {
 };
 
 const rootReducer = combineReducers({
+  history,
   settings,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
