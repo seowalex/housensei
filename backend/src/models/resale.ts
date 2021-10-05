@@ -36,7 +36,7 @@ export default class ResaleFlat {
   @Column('date')
   leaseCommenceYear: Date; // year
 
-  @Column('int')
+  @Column('int', { nullable: true })
   remainingLease: number; // months
 
   @Column('int')

@@ -36,18 +36,45 @@ const capitalizeEachWord = (text: string) => {
   return newText;
 };
 
-function transformRecord(record: ResaleRecord): ResaleFlat {
-  const storeyRangeSplit = record.storey_range.split('TO');
-  const minStorey = parseInt(storeyRangeSplit[0].trim(), 10);
-  const maxStorey = parseInt(storeyRangeSplit[1].trim(), 10);
+const parseLocation = (text: string) => {
+  const formatted = capitalizeEachWord(text);
+
+  if (formatted === 'Central Area') {
+    return 'Central';
+  }
+
+  if (formatted === 'Kallang/Whampoa') {
+    return 'Kallang-Whampoa';
+  }
+
+  return formatted;
+};
+
+const formatRoomType = (type: string) => {
+  if (type === 'EXECUTIVE') {
+    return 'studio';
+  }
+
+  if (type === 'MULTI-GENERATION') {
+    return 'gen';
+  }
+
+  return capitalizeEachWord(type).replace(' ', '-');
+};
+
+const parseRemainingLease = (
+  remainingLease: string | undefined
+): number | undefined => {
+  if (remainingLease === undefined) {
+    return undefined;
+  }
 
   let remainingLeaseYear = 0;
   let remainingLeaseMonth = 0;
 
-  const remainingLease = record.remaining_lease;
   remainingLeaseYear = parseInt(remainingLease, 10);
   if (Number.isNaN(remainingLeaseYear)) {
-    if (record.remaining_lease.includes('years')) {
+    if (remainingLease.includes('years')) {
       remainingLeaseYear = parseInt(
         remainingLease.split('years')[0].trim(),
         10
@@ -66,10 +93,20 @@ function transformRecord(record: ResaleRecord): ResaleFlat {
     remainingLeaseMonth = 1;
   }
 
+  return remainingLeaseYear * 12 + remainingLeaseMonth;
+};
+
+function transformRecord(record: ResaleRecord): ResaleFlat {
+  const storeyRangeSplit = record.storey_range.split('TO');
+  const minStorey = parseInt(storeyRangeSplit[0].trim(), 10);
+  const maxStorey = parseInt(storeyRangeSplit[1].trim(), 10);
+
+  const remainingLease = parseRemainingLease(record.remaining_lease);
+
   const resale = new ResaleFlat();
   resale.transactionDate = new Date(record.month);
-  resale.location = capitalizeEachWord(record.town) as Town;
-  resale.flatType = record.flat_type as FlatType;
+  resale.location = parseLocation(record.town) as Town;
+  resale.flatType = formatRoomType(record.flat_type) as FlatType;
   resale.flatModel = record.flat_model;
   resale.block = parseInt(record.block, 10);
   resale.streetName = record.street_name;
@@ -77,7 +114,10 @@ function transformRecord(record: ResaleRecord): ResaleFlat {
   resale.minStorey = minStorey;
   resale.maxStorey = maxStorey;
   resale.leaseCommenceYear = new Date(record.lease_commence_date);
-  resale.remainingLease = remainingLeaseYear * 12 + remainingLeaseMonth;
+  if (remainingLease !== undefined) {
+    resale.remainingLease = remainingLease;
+  }
+
   resale.resalePrice = parseInt(record.resale_price, 10);
   return resale;
 }
@@ -85,30 +125,56 @@ function transformRecord(record: ResaleRecord): ResaleFlat {
 async function updateResale() {
   await dbConnection;
 
-  try {
-    const response = await axios.get<ResaleResponse>(url, {
+  // find a better way to update
+  await getRepository(ResaleFlat).clear();
+
+  for (let i = 0; i < resourceIds.length; i += 1) {
+    let offset = 0;
+
+    const initialResponse = await axios.get<ResaleResponse>(url, {
       params: {
-        resource_id: '1b702208-44bf-4829-b620-4615ee19b57c',
-        limit: 5,
+        resource_id: resourceIds[i],
+        limit: 1,
       },
     });
 
-    const { records } = response.data.result;
+    const { total } = initialResponse.data.result;
 
-    const resaleFlats = records.map(transformRecord);
+    console.log(`Total: ${total}`);
 
-    console.log(resaleFlats);
+    const allFlats: ResaleFlat[] = [];
 
-    // find a better way to update
-    await getRepository(ResaleFlat).clear();
+    try {
+      while (offset < total) {
+        const response = await axios.get<ResaleResponse>(url, {
+          params: {
+            resource_id: resourceIds[i],
+            offset,
+          },
+        });
 
-    await getRepository(ResaleFlat).save(resaleFlats);
-    // eslint-disable-next-line no-console
-    console.info('Updated resale database table');
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
+        const { records } = response.data.result;
+
+        const resaleFlats = records.map(transformRecord);
+        allFlats.push(...resaleFlats);
+        offset += records.length;
+        console.info(offset);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    try {
+      await getRepository(ResaleFlat).save(allFlats);
+      // eslint-disable-next-line no-console
+      console.info(`Updated batch ${i + 1}`);
+    } catch (error) {
+      console.error(error);
+    }
   }
+
+  // eslint-disable-next-line no-console
+  console.info('Updated resale database table');
 }
 
 updateResale();

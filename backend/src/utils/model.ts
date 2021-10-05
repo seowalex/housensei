@@ -36,6 +36,7 @@ export enum Town {
 }
 
 export enum FlatType {
+  ROOM_1 = '1-room',
   ROOM_2 = '2-room',
   ROOM_3 = '3-room',
   ROOM_4 = '4-room',
