@@ -15,27 +15,35 @@ const slice = createSlice({
   name: 'history',
   initialState,
   reducers: {
-    createGroup: (state, action: PayloadAction<GroupFilters>) => {
-      state.groups.push(action.payload);
-    },
+    createGroup: (state, action: PayloadAction<GroupFilters>) => ({
+      groups: [...state.groups, action.payload],
+    }),
     updateGroup: (
       state,
       action: PayloadAction<{ index: number; filters: GroupFilters }>
-    ) => {
-      state.groups[action.payload.index] = action.payload.filters;
-    },
-    removeGroup: (state, action: PayloadAction<number>) => {
-      state.groups.splice(action.payload, 1);
-    },
-    resetGroups: (state) => {
-      state.groups = initialState.groups;
-    },
+    ) => ({
+      groups: [
+        ...state.groups.slice(0, action.payload.index),
+        action.payload.filters,
+        ...state.groups.slice(action.payload.index + 1),
+      ],
+    }),
+    removeGroup: (state, action: PayloadAction<number>) => ({
+      groups: [
+        ...state.groups.slice(0, action.payload),
+        ...state.groups.slice(action.payload + 1),
+      ],
+    }),
+    resetGroups: (state) => ({
+      groups: initialState.groups,
+    }),
   },
 });
 
 export const { createGroup, updateGroup, removeGroup, resetGroups } =
   slice.actions;
 
-export const selectGroups = (state: RootState) => state.history.groups;
+export const selectGroups = (state: RootState): GroupFilters[] =>
+  state.history.groups;
 
 export default slice.reducer;

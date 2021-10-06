@@ -5,13 +5,15 @@ interface Props {
   name: string;
   control: Control<FieldValues>;
   options: string[];
+  disabled?: boolean;
   label?: string;
   placeholder?: string;
   limitTags?: number;
 }
 
 const FormAutocompleteInput = (props: Props) => {
-  const { name, control, options, label, placeholder, limitTags } = props;
+  const { name, control, options, disabled, label, placeholder, limitTags } =
+    props;
   return (
     <Controller
       name={name}
@@ -21,11 +23,21 @@ const FormAutocompleteInput = (props: Props) => {
           onChange={(e, data) => onChange(data)}
           value={value}
           multiple
+          disabled={disabled}
           limitTags={limitTags}
           options={options}
           disableCloseOnSelect
           renderInput={(params) => (
-            <TextField {...params} label={label} placeholder={placeholder} />
+            <TextField
+              {...params}
+              label={label}
+              placeholder={placeholder}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                }
+              }}
+            />
           )}
         />
       )}
@@ -34,6 +46,7 @@ const FormAutocompleteInput = (props: Props) => {
 };
 
 FormAutocompleteInput.defaultProps = {
+  disabled: false,
   label: '',
   placeholder: '',
   limitTags: undefined,

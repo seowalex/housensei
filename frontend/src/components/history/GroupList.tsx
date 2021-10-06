@@ -4,13 +4,19 @@ import {
   CardActionArea,
   CardContent,
   Grid,
+  Modal,
   Paper,
   Typography,
 } from '@mui/material';
 import { Box, styled } from '@mui/system';
-import { GroupFilters } from '../../types/history';
-import { FlatType, Town } from '../../types/property';
+import { useState } from 'react';
+import { SubmitHandler } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../app/hooks';
+import { createGroup, selectGroups } from '../../reducers/history';
+import { mapFormValuesToFilters } from '../../utils/history';
 import GroupCard from './GroupCard';
+import GroupForm, { FormPaper, GroupFormValues } from './GroupForm';
 
 const AddGroupCard = styled(Card)(({ theme }) => ({
   borderColor: theme.palette.primary.main,
@@ -19,22 +25,16 @@ const AddGroupCard = styled(Card)(({ theme }) => ({
 }));
 
 const GroupList = () => {
-  const filters: GroupFilters = {
-    towns: [Town.AMK, Town.BDK, Town.PSR],
-    flatTypes: [
-      FlatType.ROOM_2,
-      FlatType.ROOM_4,
-      FlatType.GEN_3,
-      FlatType.ROOM_4,
-    ],
-    minStorey: 13,
-    maxStorey: 20,
-    minFloorArea: 100,
-    maxFloorArea: 120,
-    minLeasePeriod: 80,
-    maxLeasePeriod: 99,
-    startYear: 2010,
-    endYear: 2022,
+  const dispatch = useDispatch();
+  const groups = useAppSelector(selectGroups);
+  const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
+
+  const handleCreateGroup: SubmitHandler<GroupFormValues> = (
+    data: GroupFormValues
+  ) => {
+    const groupFilters = mapFormValuesToFilters(data);
+    dispatch(createGroup(groupFilters));
+    setShowCreateForm(false);
   };
 
   return (
@@ -42,8 +42,11 @@ const GroupList = () => {
       <Box sx={{ p: '1rem', maxHeight: '15rem', overflow: 'auto' }}>
         <Grid container spacing={2}>
           <Grid item xs={6} md={3}>
-            <AddGroupCard>
-              <CardActionArea sx={{ height: '100%' }}>
+            <AddGroupCard elevation={0}>
+              <CardActionArea
+                sx={{ height: '100%' }}
+                onClick={() => setShowCreateForm(true)}
+              >
                 <CardContent>
                   <Grid container alignItems="center" justifyContent="center">
                     <Grid item>
@@ -51,7 +54,7 @@ const GroupList = () => {
                     </Grid>
                     <Grid item>
                       <Typography variant="h4" color="primary">
-                        Add Group
+                        New Group
                       </Typography>
                     </Grid>
                   </Grid>
@@ -59,26 +62,26 @@ const GroupList = () => {
               </CardActionArea>
             </AddGroupCard>
           </Grid>
-          <Grid item xs={6} md={3}>
-            <GroupCard name="Group 1" filters={filters} />
-          </Grid>
-          <Grid item xs={6} md={3}>
-            <GroupCard name="Group 1" filters={filters} />
-          </Grid>
-          <Grid item xs={6} md={3}>
-            <GroupCard name="Group 1" filters={filters} />
-          </Grid>
-          <Grid item xs={6} md={3}>
-            <GroupCard name="Group 1" filters={filters} />
-          </Grid>
-          <Grid item xs={6} md={3}>
-            <GroupCard name="Group 1" filters={filters} />
-          </Grid>
-          <Grid item xs={6} md={3}>
-            <GroupCard name="Group 1" filters={filters} />
-          </Grid>
+          {groups.map((group, index) => (
+            <Grid item xs={6} md={3} key={group}>
+              <GroupCard
+                name={`Group ${index + 1}`}
+                index={index}
+                filters={group}
+              />
+            </Grid>
+          ))}
         </Grid>
       </Box>
+      <Modal open={showCreateForm} onClose={() => setShowCreateForm(false)}>
+        <FormPaper>
+          <GroupForm
+            onSubmit={handleCreateGroup}
+            handleClose={() => setShowCreateForm(false)}
+            submitText="Add Group"
+          />
+        </FormPaper>
+      </Modal>
     </Paper>
   );
 };
