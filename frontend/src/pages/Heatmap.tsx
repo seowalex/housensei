@@ -28,7 +28,9 @@ import {
 import { UseLoadScriptOptions } from '@react-google-maps/api/src/useJsApiLoader';
 import { InfoBoxOptions } from '@react-google-maps/infobox';
 
-import { useDebounce } from '../app/utils';
+import { useGetIslandHeatmapQuery } from '../api/heatmap';
+
+import { currencyFormatter, useDebounce } from '../app/utils';
 import {
   googleMapsApiKey,
   singaporeCoordinates,
@@ -73,7 +75,7 @@ const mapOptions: google.maps.MapOptions = {
 
 const heatmapLayerOptions: google.maps.visualization.HeatmapLayerOptions = {
   dissipating: false,
-  radius: 0.03,
+  radius: 0.035,
 };
 
 const polygonOptions: google.maps.PolygonOptions = {
@@ -103,6 +105,31 @@ const yearMarks = [
   return { value, label: value.toString() };
 });
 
+const formatPrice = (price?: number) =>
+  price ? currencyFormatter.format(price) : '';
+
+const normaliseHeatmap = (
+  heatmap?: [{ resalePrice: number; [key: string]: any }]
+) => {
+  if (!heatmap) {
+    return [];
+  }
+
+  const minPrice = Math.min(...heatmap.map((point) => point.resalePrice));
+  const maxPrice = Math.max(...heatmap.map((point) => point.resalePrice));
+
+  return heatmap.map((point) =>
+    Object.fromEntries(
+      Object.entries(point).map(([key, value]) => [
+        key,
+        key === 'resalePrice'
+          ? (value - minPrice) / (maxPrice - minPrice) + Number.MIN_VALUE
+          : value,
+      ])
+    )
+  );
+};
+
 const Heatmap = () => {
   const { google } = window;
   const { isLoaded } = useJsApiLoader(apiOptions);
@@ -121,6 +148,8 @@ const Heatmap = () => {
   const [showOverlay, setShowOverlay] = useState(false);
 
   const debouncedYear = useDebounce(year, 500);
+
+  const { data: islandHeatmap } = useGetIslandHeatmapQuery(debouncedYear);
 
   useEffect(() => {
     map?.setCenter(townCoordinates[town as Town] ?? singaporeCoordinates);
@@ -244,12 +273,12 @@ const Heatmap = () => {
         >
           <TransitLayer />
           <HeatmapLayer
-            data={Object.values(townCoordinates).map(
-              (coordinates: google.maps.LatLngLiteral) => ({
-                location: new google.maps.LatLng(coordinates),
-                weight: Math.random(),
-              })
-            )}
+            data={normaliseHeatmap(islandHeatmap).map((point) => ({
+              location: new google.maps.LatLng(
+                townCoordinates[point.town as Town]
+              ),
+              weight: point.resalePrice,
+            }))}
             options={heatmapLayerOptions}
           />
           {Object.entries(townBoundaries).map(([townName, paths]) => (
@@ -290,7 +319,12 @@ const Heatmap = () => {
                 >
                   <CardContent sx={{ p: '8px !important' }}>
                     <Typography variant="subtitle2">{townName}</Typography>
-                    <Typography variant="caption">S$123,456</Typography>
+                    <Typography variant="caption">
+                      {formatPrice(
+                        islandHeatmap?.find((point) => point.town === townName)
+                          ?.resalePrice
+                      )}
+                    </Typography>
                   </CardContent>
                 </Card>
               </InfoBox>

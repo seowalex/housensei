@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-/* eslint-disable import/prefer-default-export */
 export const useDebounce = <T>(value: T, delay: number) => {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
@@ -16,3 +15,10 @@ export const useDebounce = <T>(value: T, delay: number) => {
 
   return debouncedValue;
 };
+
+export const currencyFormatter = new Intl.NumberFormat(undefined, {
+  style: 'currency',
+  currency: 'SGD',
+  currencyDisplay: 'narrowSymbol',
+  maximumFractionDigits: 0,
+});
