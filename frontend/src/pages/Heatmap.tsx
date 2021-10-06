@@ -6,9 +6,11 @@ import {
   CardContent,
   CircularProgress,
   Container,
+  FormControlLabel,
   Grid,
   OutlinedInput,
   Slider,
+  Switch,
   TextField,
   ThemeProvider,
   Typography,
@@ -113,8 +115,10 @@ const Heatmap = () => {
   const [infoBoxes, setInfoBoxes] = useState<{
     [K in Town]?: boolean;
   }>({});
+
   const [town, setTown] = useState<Town | 'Islandwide'>('Islandwide');
   const [year, setYear] = useState(currentYear);
+  const [showOverlay, setShowOverlay] = useState(false);
 
   const debouncedYear = useDebounce(year, 500);
 
@@ -123,6 +127,34 @@ const Heatmap = () => {
     map?.setZoom(town === 'Islandwide' ? 12 : 15);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [town]);
+
+  useEffect(() => {
+    if (showOverlay) {
+      for (const polygon of Object.values(polygons)) {
+        polygon?.setOptions({
+          fillOpacity: 0.4,
+          strokeOpacity: 1,
+        });
+      }
+
+      setInfoBoxes((prevInfoBoxes) =>
+        Object.fromEntries(Object.keys(prevInfoBoxes).map((key) => [key, true]))
+      );
+    } else {
+      for (const polygon of Object.values(polygons)) {
+        polygon?.setOptions({
+          fillOpacity: 0,
+          strokeOpacity: 0,
+        });
+      }
+
+      setInfoBoxes((prevInfoBoxes) =>
+        Object.fromEntries(
+          Object.keys(prevInfoBoxes).map((key) => [key, false])
+        )
+      );
+    }
+  }, [showOverlay, polygons]);
 
   const setMapViewport = () => {
     if (!map || !searchBox) {
@@ -161,25 +193,29 @@ const Heatmap = () => {
   };
 
   const handlePolygonMouseOver = (townName: string) => {
-    polygons[townName as Town]?.setOptions({
-      fillOpacity: 0.4,
-      strokeOpacity: 1,
-    });
-    setInfoBoxes((prevInfoBoxes) => ({
-      ...prevInfoBoxes,
-      [townName]: true,
-    }));
+    if (!showOverlay) {
+      polygons[townName as Town]?.setOptions({
+        fillOpacity: 0.4,
+        strokeOpacity: 1,
+      });
+      setInfoBoxes((prevInfoBoxes) => ({
+        ...prevInfoBoxes,
+        [townName]: true,
+      }));
+    }
   };
 
   const handlePolygonMouseOut = (townName: string) => {
-    polygons[townName as Town]?.setOptions({
-      fillOpacity: 0,
-      strokeOpacity: 0,
-    });
-    setInfoBoxes((prevInfoBoxes) => ({
-      ...prevInfoBoxes,
-      [townName]: false,
-    }));
+    if (!showOverlay) {
+      polygons[townName as Town]?.setOptions({
+        fillOpacity: 0,
+        strokeOpacity: 0,
+      });
+      setInfoBoxes((prevInfoBoxes) => ({
+        ...prevInfoBoxes,
+        [townName]: false,
+      }));
+    }
   };
 
   return isLoaded ? (
@@ -236,10 +272,14 @@ const Heatmap = () => {
                 position={townCoordinates[townName as Town]}
                 options={{
                   ...infoBoxOptions,
-                  visible:
-                    town === 'Islandwide' &&
-                    (infoBoxes[townName as Town] ?? false),
+                  visible: town === 'Islandwide' && infoBoxes[townName as Town],
                 }}
+                onLoad={() =>
+                  setInfoBoxes((prevInfoBoxes) => ({
+                    ...prevInfoBoxes,
+                    [townName]: false,
+                  }))
+                }
               >
                 <Card
                   sx={{
@@ -317,6 +357,19 @@ const Heatmap = () => {
                         max: currentYear,
                         type: 'number',
                       }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          value={showOverlay}
+                          onChange={(event) =>
+                            setShowOverlay(event.target.checked)
+                          }
+                        />
+                      }
+                      label="Show towns/prices"
                     />
                   </Grid>
                 </Grid>
