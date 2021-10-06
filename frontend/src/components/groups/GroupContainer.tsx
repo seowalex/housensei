@@ -24,7 +24,7 @@ const AddGroupCard = styled(Card)(({ theme }) => ({
   height: '100%',
 }));
 
-const GroupList = () => {
+const GroupContainer = () => {
   const dispatch = useDispatch();
   const groups = useAppSelector(selectGroups);
   const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
@@ -86,4 +86,4 @@ const GroupList = () => {
   );
 };
 
-export default GroupList;
+export default GroupContainer;

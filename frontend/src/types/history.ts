@@ -1,11 +1,18 @@
 import { GroupFilters } from './groups';
 
-interface PriceHistoryDataPoint {
+interface PriceDataPoint {
   date: string;
   price: number;
 }
 
+interface BTOProject {
+  name: string;
+  price: number;
+  date: string;
+}
+
 export interface PriceHistory {
   filters: GroupFilters;
-  history: PriceHistoryDataPoint[];
+  history: PriceDataPoint[];
+  projects: BTOProject[];
 }

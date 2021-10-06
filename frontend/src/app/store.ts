@@ -17,6 +17,7 @@ import {
 import storage from 'redux-persist/lib/storage';
 
 import groups from '../reducers/groups';
+import history from '../reducers/history';
 import settings from '../reducers/settings';
 
 const persistConfig = {
@@ -26,6 +27,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   groups,
+  history,
   settings,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
