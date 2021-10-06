@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import {
   Autocomplete,
   Box,
@@ -17,14 +17,22 @@ import {
 import {
   GoogleMap,
   HeatmapLayer,
+  InfoBox,
   Polygon,
-  TransitLayer,
   StandaloneSearchBox,
+  TransitLayer,
   useJsApiLoader,
 } from '@react-google-maps/api';
 import { UseLoadScriptOptions } from '@react-google-maps/api/src/useJsApiLoader';
+import { InfoBoxOptions } from '@react-google-maps/infobox';
 
-import { townBoundaries, townCoordinates } from '../app/constants';
+import { getPolygonCenter } from '../app/utils';
+import {
+  googleMapsApiKey,
+  singaporeCoordinates,
+  townBoundaries,
+  townCoordinates,
+} from '../app/constants';
 import { Town } from '../app/types';
 
 const mapTheme = createTheme({
@@ -50,15 +58,12 @@ const mapTheme = createTheme({
 });
 
 const apiOptions: UseLoadScriptOptions = {
-  googleMapsApiKey: 'AIzaSyAG6A2F0zMMHkLByBzBe0SUGeO8r8ICWEY',
+  googleMapsApiKey,
   libraries: ['places', 'visualization'],
 };
 
 const mapOptions: google.maps.MapOptions = {
-  center: {
-    lat: 1.352083,
-    lng: 103.819836,
-  },
+  center: singaporeCoordinates,
   clickableIcons: false,
   disableDefaultUI: true,
   zoom: 12,
@@ -75,6 +80,15 @@ const polygonOptions: google.maps.PolygonOptions = {
   strokeColor: '#d32f2f',
   strokeWeight: 2,
   strokeOpacity: 0,
+};
+
+const infoBoxOptions: InfoBoxOptions = {
+  boxStyle: {
+    overflow: 'visible',
+  },
+  closeBoxURL: '',
+  enableEventPropagation: true,
+  visible: false,
 };
 
 const currentYear = new Date().getFullYear();
@@ -95,6 +109,9 @@ const Heatmap = () => {
   const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox>();
   const [polygons, setPolygons] = useState<{
     [K in Town]?: google.maps.Polygon;
+  }>({});
+  const [infoBoxes, setInfoBoxes] = useState<{
+    [K in Town]?: boolean;
   }>({});
   const [town, setTown] = useState<Town | 'Islandwide'>('Islandwide');
   const [year, setYear] = useState(currentYear);
@@ -135,64 +152,100 @@ const Heatmap = () => {
     }
   };
 
+  const handlePolygonMouseOver = (townName: string) => {
+    polygons[townName as Town]?.setOptions({
+      fillOpacity: 0.4,
+      strokeOpacity: 1,
+    });
+    setInfoBoxes((prevInfoBoxes) => ({
+      ...prevInfoBoxes,
+      [townName]: true,
+    }));
+  };
+
+  const handlePolygonMouseOut = (townName: string) => {
+    polygons[townName as Town]?.setOptions({
+      fillOpacity: 0,
+      strokeOpacity: 0,
+    });
+    setInfoBoxes((prevInfoBoxes) => ({
+      ...prevInfoBoxes,
+      [townName]: false,
+    }));
+  };
+
   return isLoaded ? (
-    <Container
-      sx={{
-        position: 'relative',
-        height: {
-          xs: 'calc(100vh - 56px)',
-          sm: 'calc(100vh - 64px)',
-        },
-        p: {
-          xs: 0,
-          sm: 0,
-        },
-        maxWidth: {
-          lg: 'none',
-        },
-      }}
-    >
-      <GoogleMap
-        mapContainerStyle={{ height: '100%' }}
-        options={mapOptions}
-        onBoundsChanged={() => searchBox?.setBounds(map?.getBounds() ?? null)}
-        onLoad={setMap}
+    <ThemeProvider theme={mapTheme}>
+      <Container
+        sx={{
+          position: 'relative',
+          height: {
+            xs: 'calc(100vh - 56px)',
+            sm: 'calc(100vh - 64px)',
+          },
+          p: {
+            xs: 0,
+            sm: 0,
+          },
+          maxWidth: {
+            lg: 'none',
+          },
+        }}
       >
-        <TransitLayer />
-        <HeatmapLayer
-          data={Object.values(townCoordinates).map(
-            (coordinates: google.maps.LatLngLiteral) => ({
-              location: new google.maps.LatLng(coordinates),
-              weight: Math.random(),
-            })
-          )}
-          options={heatmapLayerOptions}
-        />
-        {Object.entries(townBoundaries).map(([key, paths]) => (
-          <Polygon
-            paths={paths}
-            key={key}
-            options={polygonOptions}
-            onLoad={(polygon) =>
-              setPolygons((oldPolygons) => ({ ...oldPolygons, [key]: polygon }))
-            }
-            onMouseOver={() =>
-              polygons[key as Town]?.setOptions({
-                fillOpacity: 0.4,
-                strokeOpacity: 1,
+        <GoogleMap
+          mapContainerStyle={{ height: '100%' }}
+          options={mapOptions}
+          onBoundsChanged={() => searchBox?.setBounds(map?.getBounds() ?? null)}
+          onLoad={setMap}
+        >
+          <TransitLayer />
+          <HeatmapLayer
+            data={Object.values(townCoordinates).map(
+              (coordinates: google.maps.LatLngLiteral) => ({
+                location: new google.maps.LatLng(coordinates),
+                weight: Math.random(),
               })
-            }
-            onMouseOut={() =>
-              polygons[key as Town]?.setOptions({
-                fillOpacity: 0,
-                strokeOpacity: 0,
-              })
-            }
-            onClick={() => setTown(key as Town)}
+            )}
+            options={heatmapLayerOptions}
           />
-        ))}
-      </GoogleMap>
-      <ThemeProvider theme={mapTheme}>
+          {Object.entries(townBoundaries).map(([townName, paths]) => (
+            <Fragment key={townName}>
+              <Polygon
+                paths={paths}
+                options={polygonOptions}
+                onLoad={(polygon) =>
+                  setPolygons((prevPolygons) => ({
+                    ...prevPolygons,
+                    [townName]: polygon,
+                  }))
+                }
+                onMouseOver={() => handlePolygonMouseOver(townName)}
+                onMouseOut={() => handlePolygonMouseOut(townName)}
+                onClick={() => setTown(townName as Town)}
+              />
+              <InfoBox
+                position={getPolygonCenter(polygons[townName as Town])}
+                options={{
+                  ...infoBoxOptions,
+                  visible: infoBoxes[townName as Town] ?? false,
+                }}
+              >
+                <Card
+                  sx={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    textAlign: 'center',
+                    m: '-25% 50% 0 -50%',
+                  }}
+                >
+                  <CardContent sx={{ p: '8px !important' }}>
+                    <Typography variant="subtitle2">{townName}</Typography>
+                    <Typography variant="caption">S$123,456</Typography>
+                  </CardContent>
+                </Card>
+              </InfoBox>
+            </Fragment>
+          ))}
+        </GoogleMap>
         <Grid container spacing={2} sx={{ position: 'absolute', top: 0, p: 2 }}>
           <Grid item xs={12} md="auto">
             <StandaloneSearchBox
@@ -260,8 +313,8 @@ const Heatmap = () => {
             </Card>
           </Grid>
         </Grid>
-      </ThemeProvider>
-    </Container>
+      </Container>
+    </ThemeProvider>
   ) : (
     <Container
       sx={{

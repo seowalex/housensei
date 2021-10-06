@@ -1,5 +1,12 @@
 import { Town } from './types';
 
+export const googleMapsApiKey = 'AIzaSyAG6A2F0zMMHkLByBzBe0SUGeO8r8ICWEY';
+
+export const singaporeCoordinates = {
+  lat: 1.352083,
+  lng: 103.819836,
+};
+
 export const townCoordinates = {
   [Town.AMK]: {
     lat: 1.3691,

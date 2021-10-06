@@ -45,7 +45,6 @@ const Routes = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
-  const handleDarkModeToggle = () => dispatch(setDarkMode(!darkMode));
 
   const drawer = (
     <>
@@ -126,7 +125,7 @@ const Routes = () => {
           <Tooltip title="Toggle dark mode" placement="bottom-start">
             <IconButton
               size={isDesktop ? 'large' : 'medium'}
-              onClick={handleDarkModeToggle}
+              onClick={() => dispatch(setDarkMode(!darkMode))}
             >
               {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
             </IconButton>
