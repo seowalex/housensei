@@ -150,7 +150,7 @@ async function seedResale() {
       );
       resale.minStorey = minStorey;
       resale.maxStorey = maxStorey;
-      resale.leaseCommenceYear = new Date(row[LEASE_COMMENCE_DATE]);
+      resale.leaseCommenceYear = new Date(row[LEASE_COMMENCE_DATE].toString());
       if (!isOldFormat) {
         resale.remainingLease = parseRemainingLease(
           row[REMAINING_LEASE as number] as string
@@ -158,7 +158,6 @@ async function seedResale() {
       }
 
       resale.resalePrice = Math.floor(row[RESALE_PRICE] as number);
-
       return resale;
     });
 
