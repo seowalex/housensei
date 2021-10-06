@@ -96,8 +96,6 @@ const parseStoreyRange = (range: string): number[] => {
 };
 
 async function seedResale() {
-  await dbConnection;
-
   await getRepository(Resale).clear();
 
   let totalEntries = 0;

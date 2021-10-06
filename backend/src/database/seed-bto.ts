@@ -98,8 +98,6 @@ const combineBTOs = (
 };
 
 const seedBTOs = async () => {
-  await dbConnection;
-
   const file = 'src/database/data/HDB-BTO-Prices-List.xls';
   const workbook = XLSX.readFile(file, {
     cellDates: true,
