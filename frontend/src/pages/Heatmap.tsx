@@ -108,9 +108,7 @@ const yearMarks = [
 const formatPrice = (price?: number) =>
   price ? currencyFormatter.format(price) : '';
 
-const normaliseHeatmap = (
-  heatmap?: [{ resalePrice: number; [key: string]: any }]
-) => {
+const normaliseHeatmap = <T extends { resalePrice: number }>(heatmap?: T[]) => {
   if (!heatmap) {
     return [];
   }
@@ -127,7 +125,7 @@ const normaliseHeatmap = (
           : value,
       ])
     )
-  );
+  ) as T[];
 };
 
 const Heatmap = () => {
