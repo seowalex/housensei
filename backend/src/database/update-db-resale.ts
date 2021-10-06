@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { getRepository } from 'typeorm';
 import { FlatType, Town } from '../utils/model';
-import ResaleFlat from '../models/resale';
+import Resale from '../models/resale';
 import dbConnection from './connection';
 import { ResaleRecord } from '../utils/resaleRecord';
 import { ResaleResponse } from '../utils/resaleResponse';
@@ -62,50 +62,48 @@ const formatRoomType = (type: string) => {
   return capitalizeEachWord(type).replace(' ', '-');
 };
 
-const parseRemainingLease = (
-  remainingLease: string | undefined
-): number | undefined => {
-  if (remainingLease === undefined) {
-    return undefined;
-  }
+// const parseRemainingLease = (
+//   remainingLease: string | undefined
+// ): number | undefined => {
+//   if (remainingLease === undefined) {
+//     return undefined;
+//   }
 
-  let remainingLeaseYear = 0;
-  let remainingLeaseMonth = 0;
+//   let remainingLeaseYear = 0;
+//   let remainingLeaseMonth = 0;
 
-  remainingLeaseYear = parseInt(remainingLease, 10);
-  if (Number.isNaN(remainingLeaseYear)) {
-    if (remainingLease.includes('years')) {
-      remainingLeaseYear = parseInt(
-        remainingLease.split('years')[0].trim(),
-        10
-      );
-    } else if (remainingLease.includes('year')) {
-      remainingLeaseYear = 1;
-    }
-  }
+//   remainingLeaseYear = parseInt(remainingLease, 10);
+//   if (Number.isNaN(remainingLeaseYear)) {
+//     if (remainingLease.includes('years')) {
+//       remainingLeaseYear = parseInt(
+//         remainingLease.split('years')[0].trim(),
+//         10
+//       );
+//     } else if (remainingLease.includes('year')) {
+//       remainingLeaseYear = 1;
+//     }
+//   }
 
-  if (remainingLease.includes('months')) {
-    remainingLeaseMonth = parseInt(
-      remainingLease.split('months')[0].trim(),
-      10
-    );
-  } else if (remainingLease.includes('month')) {
-    remainingLeaseMonth = 1;
-  }
+//   if (remainingLease.includes('months')) {
+//     remainingLeaseMonth = parseInt(
+//       remainingLease.split('months')[0].trim(),
+//       10
+//     );
+//   } else if (remainingLease.includes('month')) {
+//     remainingLeaseMonth = 1;
+//   }
 
-  return remainingLeaseYear * 12 + remainingLeaseMonth;
-};
+//   return remainingLeaseYear * 12 + remainingLeaseMonth;
+// };
 
-function transformRecord(record: ResaleRecord): ResaleFlat {
+function transformRecord(record: ResaleRecord): Resale {
   const storeyRangeSplit = record.storey_range.split('TO');
   const minStorey = parseInt(storeyRangeSplit[0].trim(), 10);
   const maxStorey = parseInt(storeyRangeSplit[1].trim(), 10);
 
-  const remainingLease = parseRemainingLease(record.remaining_lease);
-
-  const resale = new ResaleFlat();
+  const resale = new Resale();
   resale.transactionDate = new Date(record.month);
-  resale.location = parseLocation(record.town) as Town;
+  resale.town = parseLocation(record.town) as Town;
   resale.flatType = formatRoomType(record.flat_type) as FlatType;
   resale.flatModel = record.flat_model;
   resale.block = record.block;
@@ -114,9 +112,6 @@ function transformRecord(record: ResaleRecord): ResaleFlat {
   resale.minStorey = minStorey;
   resale.maxStorey = maxStorey;
   resale.leaseCommenceYear = new Date(record.lease_commence_date);
-  if (remainingLease !== undefined) {
-    resale.remainingLease = remainingLease;
-  }
 
   resale.resalePrice = parseInt(record.resale_price, 10);
   return resale;
@@ -127,7 +122,7 @@ async function updateResale() {
   await dbConnection;
 
   // find a better way to update
-  await getRepository(ResaleFlat).clear();
+  await getRepository(Resale).clear();
 
   for (let i = 0; i < resourceIds.length; i += 1) {
     let offset = 0;
@@ -145,7 +140,7 @@ async function updateResale() {
     // eslint-disable-next-line no-console
     console.log(`Total: ${total}`);
 
-    const allFlats: ResaleFlat[] = [];
+    const allFlats: Resale[] = [];
 
     try {
       while (offset < total) {
@@ -170,7 +165,7 @@ async function updateResale() {
 
     try {
       // eslint-disable-next-line no-await-in-loop
-      await getRepository(ResaleFlat).save(allFlats);
+      await getRepository(Resale).save(allFlats);
       // eslint-disable-next-line no-console
       console.info(`Updated batch ${i + 1}`);
     } catch (error) {

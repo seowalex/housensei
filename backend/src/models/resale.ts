@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { FlatType, Town } from '../utils/model';
 
 @Entity()
-export default class ResaleFlat {
+export default class Resale {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -10,7 +10,7 @@ export default class ResaleFlat {
   transactionDate: Date; // yyyy-MM
 
   @Column('enum', { enum: Town })
-  location: Town;
+  town: Town;
 
   @Column('enum', { enum: FlatType })
   flatType: FlatType;
@@ -35,9 +35,6 @@ export default class ResaleFlat {
 
   @Column('date')
   leaseCommenceYear: Date; // year
-
-  @Column('int', { nullable: true })
-  remainingLease: number; // months
 
   @Column('int')
   resalePrice: number;
