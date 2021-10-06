@@ -2,7 +2,6 @@ import * as XLSX from 'xlsx';
 import { getRepository } from 'typeorm';
 import Resale from '../models/resale';
 import { FlatType, Town } from '../utils/model';
-import dbConnection from './connection';
 
 const filePaths = [
   'src/database/data/resale-flat-prices-based-on-approval-date-1990-1999.xlsx',

@@ -15,8 +15,6 @@ const getResales = async (queries: QueryResale): Promise<Array<ResaleFlat>> => {
       typeof queries.years === 'string' || typeof queries.years === 'number'
         ? [Number(queries.years)]
         : queries.years.map((year) => Number(year));
-    // `EXTRACT(YEAR FROM TIMESTAMP ${transactionDate}) IN (:...years)`,
-    // `${transactionDate}::DATE IN (:...years)`,
 
     conditions.transactionDate = Raw(
       (transactionDate) =>
@@ -28,7 +26,7 @@ const getResales = async (queries: QueryResale): Promise<Array<ResaleFlat>> => {
   }
 
   if (queries.town) {
-    conditions.location = queries.town;
+    conditions.town = queries.town;
   }
 
   return getRepository(ResaleFlat).find({
