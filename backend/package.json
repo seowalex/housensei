@@ -60,7 +60,7 @@
     "db:drop": "ts-node src/database/drop-db.ts",
     "db:seed": "npm run db:drop && npm run db:create && ts-node src/database/seed-db.ts",
     "db:update-bto": "ts-node src/database/update-db-bto.ts",
-    "db:update": "ts-node src/database/update-db-resale.ts"
+    "db:update-resale": "ts-node src/database/update-db-resale.ts"
   },
   "repository": {
     "type": "git",

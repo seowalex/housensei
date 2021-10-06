@@ -46,10 +46,15 @@ npm run db:seed
 npm run dev
 ```
 
-4. [In Long Term] To clear and import new data into BTO table
-Specify file path to excel file in command line arguments
+#### Update data
+- To update BTO table, import new BTO excel file to file path src/database/data/HDB-BTO-Prices-List.xls. Then run
 ```bash
-npm run db:seed-bto src/database/data/HDB-BTO-Prices-List.xls
+npm run db:update-bto src/database/data/HDB-BTO-Prices-List.xls
+```
+
+- To update Resale table, run
+```bash
+npm run db:update-resale
 ```
 
 ### Frontend
