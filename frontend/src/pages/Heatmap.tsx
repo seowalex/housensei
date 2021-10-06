@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import {
   Autocomplete,
   Box,
@@ -26,6 +26,7 @@ import {
 import { UseLoadScriptOptions } from '@react-google-maps/api/src/useJsApiLoader';
 import { InfoBoxOptions } from '@react-google-maps/infobox';
 
+import { useDebounce } from '../app/utils';
 import {
   googleMapsApiKey,
   singaporeCoordinates,
@@ -115,6 +116,14 @@ const Heatmap = () => {
   const [town, setTown] = useState<Town | 'Islandwide'>('Islandwide');
   const [year, setYear] = useState(currentYear);
 
+  const debouncedYear = useDebounce(year, 500);
+
+  useEffect(() => {
+    map?.setCenter(townCoordinates[town as Town] ?? singaporeCoordinates);
+    map?.setZoom(town === 'Islandwide' ? 12 : 15);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [town]);
+
   const setMapViewport = () => {
     if (!map || !searchBox) {
       return;
@@ -144,7 +153,7 @@ const Heatmap = () => {
   };
 
   const handleYearBlur = () => {
-    if (year < 1990) {
+    if (Number.isNaN(year) || year < 1990) {
       setYear(1990);
     } else if (year > currentYear) {
       setYear(currentYear);
@@ -221,12 +230,15 @@ const Heatmap = () => {
                 onMouseOver={() => handlePolygonMouseOver(townName)}
                 onMouseOut={() => handlePolygonMouseOut(townName)}
                 onClick={() => setTown(townName as Town)}
+                visible={town === 'Islandwide'}
               />
               <InfoBox
                 position={townCoordinates[townName as Town]}
                 options={{
                   ...infoBoxOptions,
-                  visible: infoBoxes[townName as Town] ?? false,
+                  visible:
+                    town === 'Islandwide' &&
+                    (infoBoxes[townName as Town] ?? false),
                 }}
               >
                 <Card
