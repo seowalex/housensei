@@ -10,12 +10,12 @@ import {
 import { useState } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { removeGroup, updateGroup } from '../../reducers/history';
-import { GroupFilters } from '../../types/history';
+import { removeGroup, updateGroup } from '../../reducers/groups';
+import { GroupFilters } from '../../types/groups';
 import {
   mapFiltersToFormValues,
   mapFormValuesToFilters,
-} from '../../utils/history';
+} from '../../utils/groups';
 import GroupForm, { FormPaper, GroupFormValues } from './GroupForm';
 
 interface Props {

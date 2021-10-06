@@ -1,5 +1,5 @@
 import { Container } from '@mui/material';
-import GroupList from '../components/history/GroupList';
+import GroupList from '../components/groups/GroupList';
 
 const History = () => (
   <Container sx={{ p: 3 }}>

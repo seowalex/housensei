@@ -1,14 +1,11 @@
-import { FlatType, Town } from './property';
+import { GroupFilters } from './groups';
 
-export interface GroupFilters {
-  towns: Town[];
-  flatTypes: FlatType[];
-  minStorey?: number;
-  maxStorey?: number;
-  minFloorArea?: number;
-  maxFloorArea?: number;
-  minLeasePeriod?: number;
-  maxLeasePeriod?: number;
-  startYear?: number;
-  endYear?: number;
+interface PriceHistoryDataPoint {
+  date: string;
+  price: number;
+}
+
+export interface PriceHistory {
+  filters: GroupFilters;
+  history: PriceHistoryDataPoint[];
 }

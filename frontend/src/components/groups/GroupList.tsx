@@ -13,8 +13,8 @@ import { useState } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../../app/hooks';
-import { createGroup, selectGroups } from '../../reducers/history';
-import { mapFormValuesToFilters } from '../../utils/history';
+import { createGroup, selectGroups } from '../../reducers/groups';
+import { mapFormValuesToFilters } from '../../utils/groups';
 import GroupCard from './GroupCard';
 import GroupForm, { FormPaper, GroupFormValues } from './GroupForm';
 
@@ -63,7 +63,7 @@ const GroupList = () => {
             </AddGroupCard>
           </Grid>
           {groups.map((group, index) => (
-            <Grid item xs={6} md={3} key={group}>
+            <Grid item xs={6} md={3}>
               <GroupCard
                 name={`Group ${index + 1}`}
                 index={index}

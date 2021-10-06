@@ -1,5 +1,5 @@
-import { GroupFormValues } from '../components/history/GroupForm';
-import { GroupFilters } from '../types/history';
+import { GroupFormValues } from '../components/groups/GroupForm';
+import { GroupFilters } from '../types/groups';
 
 export const mapFiltersToFormValues = (
   filters: GroupFilters
