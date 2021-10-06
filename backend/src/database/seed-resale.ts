@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import { getRepository } from 'typeorm';
-import ResaleFlat from '../models/resale';
+import Resale from '../models/resale';
 import { FlatType, Town } from '../utils/model';
 import dbConnection from './connection';
 
@@ -60,33 +60,33 @@ const formatRoomType = (type: string) => {
   return type.toLowerCase().replace(' ', '-');
 };
 
-const parseRemainingLease = (remainingLease: string): number => {
-  let remainingLeaseYear = 0;
-  let remainingLeaseMonth = 0;
+// const parseRemainingLease = (remainingLease: string): number => {
+//   let remainingLeaseYear = 0;
+//   let remainingLeaseMonth = 0;
 
-  remainingLeaseYear = parseInt(remainingLease, 10);
-  if (Number.isNaN(remainingLeaseYear)) {
-    if (remainingLease.includes('years')) {
-      remainingLeaseYear = parseInt(
-        remainingLease.split('years')[0].trim(),
-        10
-      );
-    } else if (remainingLease.includes('year')) {
-      remainingLeaseYear = 1;
-    }
+//   remainingLeaseYear = parseInt(remainingLease, 10);
+//   if (Number.isNaN(remainingLeaseYear)) {
+//     if (remainingLease.includes('years')) {
+//       remainingLeaseYear = parseInt(
+//         remainingLease.split('years')[0].trim(),
+//         10
+//       );
+//     } else if (remainingLease.includes('year')) {
+//       remainingLeaseYear = 1;
+//     }
 
-    if (remainingLease.includes('months')) {
-      remainingLeaseMonth = parseInt(
-        remainingLease.split('months')[0].trim(),
-        10
-      );
-    } else if (remainingLease.includes('month')) {
-      remainingLeaseMonth = 1;
-    }
-  }
+//     if (remainingLease.includes('months')) {
+//       remainingLeaseMonth = parseInt(
+//         remainingLease.split('months')[0].trim(),
+//         10
+//       );
+//     } else if (remainingLease.includes('month')) {
+//       remainingLeaseMonth = 1;
+//     }
+//   }
 
-  return remainingLeaseYear * 12 + remainingLeaseMonth;
-};
+//   return remainingLeaseYear * 12 + remainingLeaseMonth;
+// };
 
 const parseStoreyRange = (range: string): number[] => {
   const storeyRangeSplit = range.split('TO');
@@ -98,7 +98,7 @@ const parseStoreyRange = (range: string): number[] => {
 async function seedResale() {
   await dbConnection;
 
-  await getRepository(ResaleFlat).clear();
+  await getRepository(Resale).clear();
 
   let totalEntries = 0;
 
@@ -130,16 +130,15 @@ async function seedResale() {
     const FLOOR_AREA_SQM = 6;
     const FLAT_MODEL = 7;
     const LEASE_COMMENCE_DATE = 8;
-    const REMAINING_LEASE = isOldFormat ? undefined : 9;
     const RESALE_PRICE = isOldFormat ? 9 : 10;
 
     const dataRows = data.slice(1);
 
     // Map to correct database format
     const allResale = dataRows.map((row) => {
-      const resale = new ResaleFlat();
+      const resale = new Resale();
       resale.transactionDate = new Date(row[MONTH]);
-      resale.location = parseLocation(row[TOWN] as string) as Town;
+      resale.town = parseLocation(row[TOWN] as string) as Town;
       resale.flatType = formatRoomType(row[FLAT_TYPE] as string) as FlatType;
       resale.flatModel = row[FLAT_MODEL] as string;
       resale.block = row[BLOCK] as string;
@@ -150,15 +149,9 @@ async function seedResale() {
       );
       resale.minStorey = minStorey;
       resale.maxStorey = maxStorey;
-      resale.leaseCommenceYear = new Date(row[LEASE_COMMENCE_DATE]);
-      if (!isOldFormat) {
-        resale.remainingLease = parseRemainingLease(
-          row[REMAINING_LEASE as number] as string
-        );
-      }
+      resale.leaseCommenceYear = new Date(row[LEASE_COMMENCE_DATE].toString());
 
       resale.resalePrice = Math.floor(row[RESALE_PRICE] as number);
-
       return resale;
     });
 
@@ -170,7 +163,7 @@ async function seedResale() {
         Math.min(seededResale + 1000, allResale.length)
       );
       // eslint-disable-next-line no-await-in-loop
-      await getRepository(ResaleFlat).save(resaleToSeed);
+      await getRepository(Resale).save(resaleToSeed);
       seededResale += resaleToSeed.length;
     }
 
