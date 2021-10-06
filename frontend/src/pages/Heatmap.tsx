@@ -26,7 +26,6 @@ import {
 import { UseLoadScriptOptions } from '@react-google-maps/api/src/useJsApiLoader';
 import { InfoBoxOptions } from '@react-google-maps/infobox';
 
-import { getPolygonCenter } from '../app/utils';
 import {
   googleMapsApiKey,
   singaporeCoordinates,
@@ -224,7 +223,7 @@ const Heatmap = () => {
                 onClick={() => setTown(townName as Town)}
               />
               <InfoBox
-                position={getPolygonCenter(polygons[townName as Town])}
+                position={townCoordinates[townName as Town]}
                 options={{
                   ...infoBoxOptions,
                   visible: infoBoxes[townName as Town] ?? false,
