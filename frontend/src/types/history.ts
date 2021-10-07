@@ -16,3 +16,8 @@ export interface PriceHistory {
   history: PriceDataPoint[];
   projects: BTOProject[];
 }
+
+export interface ChartDataPoint {
+  date: string;
+  [groupName: string]: string | number;
+}

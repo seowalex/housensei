@@ -13,6 +13,15 @@ export interface GroupFilters {
   endYear?: number;
 }
 
+export interface BTOGroupFilters {
+  towns: Town[];
+  flatTypes: FlatType[];
+  minFloorArea?: number;
+  maxFloorArea?: number;
+  startYear?: number;
+  endYear?: number;
+}
+
 export interface Group {
   name: string;
   color: GroupColor;
