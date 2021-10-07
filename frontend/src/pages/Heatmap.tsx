@@ -27,8 +27,12 @@ import {
 } from '@react-google-maps/api';
 import { UseLoadScriptOptions } from '@react-google-maps/api/src/useJsApiLoader';
 import { InfoBoxOptions } from '@react-google-maps/infobox';
+import { skipToken } from '@reduxjs/toolkit/query/react';
 
-import { useGetIslandHeatmapQuery } from '../api/heatmap';
+import {
+  useGetIslandHeatmapQuery,
+  useGetTownHeatmapQuery,
+} from '../api/heatmap';
 
 import { currencyFormatter, useDebounce } from '../app/utils';
 import {
@@ -147,7 +151,17 @@ const Heatmap = () => {
 
   const debouncedYear = useDebounce(year, 500);
 
-  const { data: islandHeatmap } = useGetIslandHeatmapQuery(debouncedYear);
+  const { data: islandHeatmap } = useGetIslandHeatmapQuery(
+    town === 'Islandwide' ? debouncedYear : skipToken
+  );
+  const { data: townHeatmap } = useGetTownHeatmapQuery(
+    town === 'Islandwide'
+      ? skipToken
+      : {
+          year: debouncedYear,
+          town,
+        }
+  );
 
   useEffect(() => {
     map?.setCenter(townCoordinates[town as Town] ?? singaporeCoordinates);
@@ -271,12 +285,16 @@ const Heatmap = () => {
         >
           <TransitLayer />
           <HeatmapLayer
-            data={normaliseHeatmap(islandHeatmap).map((point) => ({
-              location: new google.maps.LatLng(
-                townCoordinates[point.town as Town]
-              ),
-              weight: point.resalePrice,
-            }))}
+            data={
+              town === 'Islandwide'
+                ? normaliseHeatmap(islandHeatmap).map((point) => ({
+                    location: new google.maps.LatLng(
+                      townCoordinates[point.town as Town]
+                    ),
+                    weight: point.resalePrice,
+                  }))
+                : []
+            }
             options={heatmapLayerOptions}
           />
           {Object.entries(townBoundaries).map(([townName, paths]) => (
