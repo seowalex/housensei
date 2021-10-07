@@ -107,7 +107,7 @@ function transformRecord(record: ResaleRecord): Resale {
   resale.flatType = formatRoomType(record.flat_type) as FlatType;
   resale.flatModel = record.flat_model;
   resale.block = record.block;
-  resale.streetName = record.street_name;
+  resale.streetName = capitalizeEachWord(record.street_name);
   resale.floorArea = parseInt(record.floor_area_sqm, 10);
   resale.minStorey = minStorey;
   resale.maxStorey = maxStorey;

@@ -139,7 +139,7 @@ async function seedResale() {
       resale.flatType = formatRoomType(row[FLAT_TYPE] as string) as FlatType;
       resale.flatModel = row[FLAT_MODEL] as string;
       resale.block = row[BLOCK] as string;
-      resale.streetName = row[STREET_NAME] as string;
+      resale.streetName = capitalizeEachWord(row[STREET_NAME] as string);
       resale.floorArea = Math.floor(row[FLOOR_AREA_SQM] as number);
       const [minStorey, maxStorey] = parseStoreyRange(
         row[STOREY_RANGE] as string
