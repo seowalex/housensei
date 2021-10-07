@@ -17,7 +17,7 @@ const getResalesByIsland = async (
   getRepository(Resale)
     .createQueryBuilder('resale')
     .select('resale.town', 'town')
-    .addSelect('AVG(resale.resalePrice)', 'resalePrice')
+    .addSelect('CAST(AVG(resale.resalePrice) AS int)', 'resalePrice')
     .where('date_part(\'year\', "transactionDate") IN (:...years)', {
       years: queries.years,
     })
@@ -30,7 +30,7 @@ const getResalesByTown = async (
   getRepository(Resale)
     .createQueryBuilder('resale')
     .select("CONCAT (resale.block, ' ', resale.streetName)", 'address')
-    .addSelect('AVG(resale.resalePrice)', 'resalePrice')
+    .addSelect('CAST(AVG(resale.resalePrice) AS int)', 'resalePrice')
     .where('date_part(\'year\', "transactionDate") IN (:...years)', {
       years: queries.years,
     })
