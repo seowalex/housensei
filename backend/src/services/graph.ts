@@ -7,8 +7,19 @@ import {
   MoreThanOrEqual,
   Raw,
 } from 'typeorm';
+import BTO from '../models/bto';
 import { QueryResale } from '../utils/resaleRecord';
 import Resale from '../models/resale';
+import { Town, FlatType } from '../utils/model';
+
+export type QueryBto = {
+  towns?: Town[] | Town;
+  flatTypes?: FlatType[] | FlatType;
+  minFloorArea?: number;
+  maxFloorArea?: number;
+  startDate?: number;
+  endDate?: number;
+};
 
 const getResales = async (queries: QueryResale): Promise<Resale[]> => {
   const conditions: FindConditions<Resale> = {};
@@ -109,10 +120,62 @@ const getResales = async (queries: QueryResale): Promise<Resale[]> => {
     order: {
       transactionDate: 'ASC',
     },
-    // take: 20,
+  });
+};
+
+const getBtos = async (queries: QueryBto): Promise<BTO[]> => {
+  const conditions: FindConditions<BTO> = {};
+  if (queries.towns) {
+    conditions.town =
+      queries.towns instanceof Array ? In(queries.towns) : queries.towns;
+  }
+
+  if (queries.flatTypes) {
+    conditions.flatType =
+      queries.flatTypes instanceof Array
+        ? In(queries.flatTypes)
+        : queries.flatTypes;
+  }
+
+  if (queries.minFloorArea) {
+    conditions.minInternalFloorArea = MoreThanOrEqual(queries.minFloorArea);
+  }
+
+  if (queries.maxFloorArea) {
+    conditions.maxInternalFloorArea = LessThanOrEqual(queries.maxFloorArea);
+  }
+
+  if (queries.startDate && queries.endDate) {
+    const endYear = (Number(queries.endDate) + 1).toString();
+    conditions.launchDate = Raw(
+      (launch) => `${launch} >= :start AND ${launch} < :end`,
+      {
+        start: new Date(queries.startDate),
+        end: new Date(endYear),
+      }
+    );
+  } else if (queries.startDate) {
+    conditions.launchDate = Raw((launch) => `${launch} >= :start`, {
+      start: new Date(queries.startDate),
+    });
+  } else if (queries.endDate) {
+    const endYear = (Number(queries.endDate) + 1).toString();
+    conditions.launchDate = Raw((launch) => `${launch} < :end`, {
+      end: new Date(endYear),
+    });
+  }
+
+  return getRepository(BTO).find({
+    where: conditions,
+    cache: true,
+    order: {
+      name: 'ASC',
+    },
+    take: 20,
   });
 };
 
 export default {
   getResales,
+  getBtos,
 };
