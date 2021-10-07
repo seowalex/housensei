@@ -1,13 +1,71 @@
-import { FindConditions, getRepository, Raw } from 'typeorm';
+import {
+  createQueryBuilder,
+  FindConditions,
+  getRepository,
+  Raw,
+} from 'typeorm';
 import Resale from '../models/resale';
 import { Town } from '../utils/model';
 
-export type QueryResale = {
-  years?: number[] | number;
-  town?: Town;
+export type QueryResaleByTown = {
+  years: number[];
+  town: Town;
 };
 
-const getResales = async (queries: QueryResale): Promise<Array<Resale>> => {
+export type QueryResaleByIsland = {
+  years: number[];
+};
+
+const getResalesByIsland = async (
+  queries: QueryResaleByIsland
+): Promise<Array<{ town: Town; resalePrice: number }>> => {
+  const hii = 'rqwrw';
+  return (
+    getRepository(Resale)
+      .createQueryBuilder('resale')
+      // .select(['resale.town'])
+      .select('resale.town', 'town')
+      // .select('resale.id', 'resale.id')
+      // .addSelect('resale.transactionDate', 'transaction_date')
+      // .addSelect('resale.town', 'town')
+      .addSelect('AVG(resale.resalePrice)', 'resalePrice')
+      .where('date_part(\'year\', "transactionDate") IN (:...years)', {
+        years: queries.years,
+      })
+      .groupBy('town')
+      .getRawMany()
+    // .getMany()
+  );
+
+  // .map((value: Array<Resale>, key: Town) => ({
+  //   town: key,
+  //   resalePrice: _.meanBy(value, (resale) => resale.resalePrice),
+  // }));
+};
+
+// { address: string; resalePrice: number }
+const getResalesByTown = async (
+  queries: QueryResaleByTown
+): Promise<Array<{ town: Town; resalePrice: number }>> => {
+  const hii = 'rqwrw';
+  console.log(hii);
+  console.log(queries);
+  return getRepository(Resale)
+    .createQueryBuilder('resale')
+    .select("CONCAT (resale.block, ' ', resale.streetName)", 'address')
+    .addSelect('AVG(resale.resalePrice)', 'resalePrice')
+    .where('date_part(\'year\', "transactionDate") IN (:...years)', {
+      years: queries.years,
+    })
+    .andWhere({ town: queries.town })
+    .groupBy('address')
+    .getRawMany();
+  // .getRawMany()
+};
+
+const getResales = async (
+  queries: QueryResaleByTown
+): Promise<Array<Resale>> => {
   const conditions: FindConditions<Resale> = {};
   if (queries.years) {
     // check that each ResaleFlat's transactionDate's year is one of years specified
@@ -36,5 +94,7 @@ const getResales = async (queries: QueryResale): Promise<Array<Resale>> => {
 };
 
 export default {
+  getResalesByIsland,
+  getResalesByTown,
   getResales,
 };

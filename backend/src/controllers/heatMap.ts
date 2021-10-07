@@ -1,41 +1,29 @@
 import Koa from 'koa';
-import _ from 'lodash';
 import resaleService from '../services/resale';
-import Resale from '../models/resale';
 import { Town } from '../utils/model';
 
-const getByIsland = async (ctx: Koa.Context): Promise<void> => {
-  const resales = await resaleService.getResales(ctx.query); // { years: int }
+const getResalesByIsland = async (ctx: Koa.Context): Promise<void> => {
+  const resales = await resaleService.getResalesByIsland({
+    years: Array.isArray(ctx.query.years)
+      ? ctx.query.years.map((year) => Number(year))
+      : [Number(ctx.query.years)],
+  });
 
-  const townPrices = _.chain(resales)
-    .groupBy('town')
-    .map((value: Array<Resale>, key: Town) => ({
-      town: key,
-      resalePrice: _.meanBy(value, (resale) => resale.resalePrice),
-    }));
-
-  ctx.body = { data: townPrices };
+  ctx.body = { data: resales };
 };
 
-const getByTown = async (ctx: Koa.Context): Promise<void> => {
-  const resales = await resaleService.getResales(ctx.query); // { years: [int], town: Town }
-
-  const blockPrices = _.chain(
-    resales.map((resale) => ({
-      address: `Blk ${resale.block} ${resale.streetName}`,
-      resalePrice: resale.resalePrice,
-    }))
-  )
-    .groupBy('address')
-    .map((value: Array<Resale>, key: string) => ({
-      address: key,
-      resalePrice: _.meanBy(value, (resale) => resale.resalePrice),
-    }));
+const getResalesByTown = async (ctx: Koa.Context): Promise<void> => {
+  const blockPrices = await resaleService.getResalesByTown({
+    years: Array.isArray(ctx.query.years)
+      ? ctx.query.years.map((year) => Number(year))
+      : [Number(ctx.query.years)],
+    town: ctx.query.town as Town,
+  });
 
   ctx.body = { data: blockPrices };
 };
 
 export default {
-  getByIsland,
-  getByTown,
+  getResalesByIsland,
+  getResalesByTown,
 };
