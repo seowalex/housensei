@@ -189,7 +189,7 @@ const seedBTOs = async () => {
   const interestedRows = data.slice(headerRows, -footerRows);
   interestedRows.forEach((row) => {
     let town = row[TOWN] as Town;
-    if ((town as any) === 'Kallang/Whampoa') {
+    if ((town as any) === 'Kallang-Whampoa') {
       // it could be kallang-whampoa or kallang/whampoa - this is a hack
       town = Town.KAL;
     }

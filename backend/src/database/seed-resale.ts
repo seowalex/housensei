@@ -37,8 +37,8 @@ const parseLocation = (text: string) => {
     return 'Central';
   }
 
-  if (formatted === 'Kallang/Whampoa') {
-    return 'Kallang-Whampoa';
+  if (formatted === 'Kallang-Whampoa') {
+    return 'Kallang/Whampoa';
   }
 
   return formatted;

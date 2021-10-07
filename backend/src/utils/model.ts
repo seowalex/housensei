@@ -17,7 +17,7 @@ export enum Town {
   HOU = 'Hougang',
   JRE = 'Jurong East',
   JRW = 'Jurong West',
-  KAL = 'Kallang-Whampoa',
+  KAL = 'Kallang/Whampoa',
   LCK = 'Lim Chu Kang',
   MRP = 'Marine Parade',
   PGL = 'Punggol',
