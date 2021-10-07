@@ -13,9 +13,8 @@ import {
   Stack,
   Switch,
   TextField,
-  ThemeProvider,
   Typography,
-  createTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   GoogleMap,
@@ -30,6 +29,8 @@ import { UseLoadScriptOptions } from '@react-google-maps/api/src/useJsApiLoader'
 import { InfoBoxOptions } from '@react-google-maps/infobox';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 
+import { useAppSelector } from '../app/hooks';
+import { selectDarkMode } from '../reducers/settings';
 import {
   useGetIslandHeatmapQuery,
   useGetTownHeatmapQuery,
@@ -44,28 +45,9 @@ import {
 } from '../app/constants';
 import { Town } from '../app/types';
 
-const mapTheme = createTheme({
-  components: {
-    MuiInputBase: {
-      styleOverrides: {
-        root: {
-          backgroundColor: '#fff',
-        },
-      },
-    },
-  },
-});
-
 const apiOptions: UseLoadScriptOptions = {
   googleMapsApiKey,
   libraries: ['places', 'visualization'],
-};
-
-const mapOptions: google.maps.MapOptions = {
-  center: singaporeCoordinates,
-  clickableIcons: false,
-  disableDefaultUI: true,
-  zoom: 12,
 };
 
 const heatmapLayerOptions: google.maps.visualization.HeatmapLayerOptions = {
@@ -127,6 +109,9 @@ const Heatmap = () => {
   const { google } = window;
   const { isLoaded } = useJsApiLoader(apiOptions);
 
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const darkMode = useAppSelector(selectDarkMode) ?? prefersDarkMode;
+
   const [map, setMap] = useState<google.maps.Map>();
   const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox>();
   const [polygons, setPolygons] = useState<{
@@ -152,6 +137,17 @@ const Heatmap = () => {
           year: debouncedYear,
           town,
         }
+  );
+
+  const mapOptions: google.maps.MapOptions = useMemo(
+    () => ({
+      mapId: darkMode ? '9bc9cb34c7dac68c' : '',
+      center: singaporeCoordinates,
+      clickableIcons: false,
+      disableDefaultUI: true,
+      zoom: 12,
+    }),
+    [darkMode]
   );
 
   const heatmapData = useMemo(
@@ -264,224 +260,230 @@ const Heatmap = () => {
   };
 
   return isLoaded ? (
-    <ThemeProvider theme={mapTheme}>
-      <Container
-        sx={{
-          position: 'relative',
-          height: {
-            xs: 'calc(100vh - 56px)',
-            sm: 'calc(100vh - 64px)',
-          },
-          p: {
-            xs: 0,
-            sm: 0,
-          },
-          maxWidth: {
-            lg: 'none',
-          },
-        }}
+    <Container
+      sx={{
+        position: 'relative',
+        height: {
+          xs: 'calc(100vh - 56px)',
+          sm: 'calc(100vh - 64px)',
+        },
+        p: {
+          xs: 0,
+          sm: 0,
+        },
+        maxWidth: {
+          lg: 'none',
+        },
+      }}
+    >
+      <GoogleMap
+        mapContainerStyle={{ height: '100%' }}
+        options={mapOptions}
+        onBoundsChanged={() => searchBox?.setBounds(map?.getBounds() ?? null)}
+        onLoad={setMap}
       >
-        <GoogleMap
-          mapContainerStyle={{ height: '100%' }}
-          options={mapOptions}
-          onBoundsChanged={() => searchBox?.setBounds(map?.getBounds() ?? null)}
-          onLoad={setMap}
-        >
-          <TransitLayer />
-          <HeatmapLayer data={heatmapData} options={heatmapLayerOptions} />
-          {Object.entries(townBoundaries).map(([townName, paths]) => (
-            <Fragment key={townName}>
-              <Polygon
-                paths={paths}
-                options={polygonOptions}
-                onLoad={(polygon) =>
-                  setPolygons((prevPolygons) => ({
-                    ...prevPolygons,
-                    [townName]: polygon,
-                  }))
-                }
-                onMouseOver={() => handlePolygonMouseOver(townName)}
-                onMouseOut={() => handlePolygonMouseOut(townName)}
-                onClick={() => setTown(townName as Town)}
-                visible={town === 'Islandwide'}
-              />
-              <InfoBox
-                position={townCoordinates[townName as Town]}
-                options={{
-                  ...infoBoxOptions,
-                  visible: town === 'Islandwide' && infoBoxes[townName as Town],
-                }}
-                onLoad={() =>
-                  setInfoBoxes((prevInfoBoxes) => ({
-                    ...prevInfoBoxes,
-                    [townName]: false,
-                  }))
-                }
-              >
-                <Card
-                  sx={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                    textAlign: 'center',
-                    m: '-25% 50% 0 -50%',
-                  }}
-                >
-                  <CardContent sx={{ p: '8px !important' }}>
-                    <Typography variant="subtitle2">{townName}</Typography>
-                    <Typography variant="caption">
-                      {formatPrice(
-                        islandHeatmap?.find((point) => point.town === townName)
-                          ?.resalePrice
-                      )}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </InfoBox>
-            </Fragment>
-          ))}
-        </GoogleMap>
-        <Grid container spacing={2} sx={{ position: 'absolute', top: 0, p: 2 }}>
-          <Grid item xs={12} md="auto">
-            <StandaloneSearchBox
-              onPlacesChanged={setMapViewport}
-              onLoad={setSearchBox}
+        <TransitLayer />
+        <HeatmapLayer data={heatmapData} options={heatmapLayerOptions} />
+        {Object.entries(townBoundaries).map(([townName, paths]) => (
+          <Fragment key={townName}>
+            <Polygon
+              paths={paths}
+              options={polygonOptions}
+              onLoad={(polygon) =>
+                setPolygons((prevPolygons) => ({
+                  ...prevPolygons,
+                  [townName]: polygon,
+                }))
+              }
+              onMouseOver={() => handlePolygonMouseOver(townName)}
+              onMouseOut={() => handlePolygonMouseOut(townName)}
+              onClick={() => setTown(townName as Town)}
+              visible={town === 'Islandwide'}
+            />
+            <InfoBox
+              position={townCoordinates[townName as Town]}
+              options={{
+                ...infoBoxOptions,
+                visible: town === 'Islandwide' && infoBoxes[townName as Town],
+              }}
+              onLoad={() =>
+                setInfoBoxes((prevInfoBoxes) => ({
+                  ...prevInfoBoxes,
+                  [townName]: false,
+                }))
+              }
             >
-              <TextField
-                placeholder="Search..."
+              <Card
                 sx={{
-                  width: {
-                    xs: '100%',
-                    md: 400,
-                  },
+                  backgroundColor: darkMode
+                    ? 'rgba(18, 18, 18, 0.8)'
+                    : 'rgba(255, 255, 255, 0.8)',
+                  textAlign: 'center',
+                  m: '-25% 50% 0 -50%',
                 }}
-              />
-            </StandaloneSearchBox>
-          </Grid>
-          <Grid item xs={12} md="auto">
-            <Autocomplete
-              options={['Islandwide'].concat(
-                Object.values(Town).sort((a, b) => a.localeCompare(b))
-              )}
-              renderInput={(params) => <TextField label="Town" {...params} />}
-              value={town}
-              onChange={(_, value) => setTown(value as Town | 'Islandwide')}
-              blurOnSelect
-              disableClearable
+              >
+                <CardContent sx={{ p: '8px !important' }}>
+                  <Typography variant="subtitle2">{townName}</Typography>
+                  <Typography variant="caption">
+                    {formatPrice(
+                      islandHeatmap?.find((point) => point.town === townName)
+                        ?.resalePrice
+                    )}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </InfoBox>
+          </Fragment>
+        ))}
+      </GoogleMap>
+      <Grid container spacing={2} sx={{ position: 'absolute', top: 0, p: 2 }}>
+        <Grid item xs={12} md="auto">
+          <StandaloneSearchBox
+            onPlacesChanged={setMapViewport}
+            onLoad={setSearchBox}
+          >
+            <TextField
+              placeholder="Search..."
               sx={{
                 width: {
                   xs: '100%',
-                  md: 200,
+                  md: 400,
+                },
+                '.MuiInputBase-root': {
+                  backgroundColor: darkMode ? '#121212' : '#fff',
                 },
               }}
             />
-          </Grid>
-          <Grid item xs={12} md="auto">
-            <Card
-              sx={{
-                width: {
-                  xs: '100%',
-                  md: 600,
-                },
-              }}
-            >
-              <CardContent sx={{ pb: '8px !important' }}>
-                <Grid container columnSpacing={2}>
-                  <Grid item xs={12}>
-                    <Typography gutterBottom>Year</Typography>
-                  </Grid>
-                  <Grid item xs>
-                    <Box sx={{ px: 2 }}>
-                      <Slider
-                        min={1990}
-                        max={currentYear}
-                        marks={yearMarks}
-                        value={year}
-                        onChange={(_, value) => setYear(value as number)}
-                        valueLabelDisplay="auto"
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item>
-                    <OutlinedInput
-                      value={year}
-                      size="small"
-                      onChange={(event) =>
-                        setYear(parseInt(event.target.value, 10))
-                      }
-                      onBlur={handleYearBlur}
-                      inputProps={{
-                        min: 1990,
-                        max: currentYear,
-                        type: 'number',
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <FormControlLabel
-                      control={
-                        <Switch
-                          value={showOverlay}
-                          onChange={(event) =>
-                            setShowOverlay(event.target.checked)
-                          }
-                        />
-                      }
-                      label="Show towns/prices"
-                    />
-                  </Grid>
+          </StandaloneSearchBox>
+        </Grid>
+        <Grid item xs={12} md="auto">
+          <Autocomplete
+            options={['Islandwide'].concat(
+              Object.values(Town).sort((a, b) => a.localeCompare(b))
+            )}
+            renderInput={(params) => <TextField label="Town" {...params} />}
+            value={town}
+            onChange={(_, value) => setTown(value as Town | 'Islandwide')}
+            blurOnSelect
+            disableClearable
+            sx={{
+              width: {
+                xs: '100%',
+                md: 200,
+              },
+              '.MuiInputBase-root': {
+                backgroundColor: darkMode ? '#121212' : '#fff',
+              },
+            }}
+          />
+        </Grid>
+        <Grid item xs={12} md="auto">
+          <Card
+            sx={{
+              width: {
+                xs: '100%',
+                md: 600,
+              },
+            }}
+          >
+            <CardContent sx={{ pb: '8px !important' }}>
+              <Grid container columnSpacing={2}>
+                <Grid item xs={12}>
+                  <Typography gutterBottom>Year</Typography>
                 </Grid>
-              </CardContent>
-            </Card>
-          </Grid>
+                <Grid item xs>
+                  <Box sx={{ px: 2 }}>
+                    <Slider
+                      min={1990}
+                      max={currentYear}
+                      marks={yearMarks}
+                      value={year}
+                      onChange={(_, value) => setYear(value as number)}
+                      valueLabelDisplay="auto"
+                    />
+                  </Box>
+                </Grid>
+                <Grid item>
+                  <OutlinedInput
+                    value={year}
+                    size="small"
+                    onChange={(event) =>
+                      setYear(parseInt(event.target.value, 10))
+                    }
+                    onBlur={handleYearBlur}
+                    inputProps={{
+                      min: 1990,
+                      max: currentYear,
+                      type: 'number',
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        value={showOverlay}
+                        onChange={(event) =>
+                          setShowOverlay(event.target.checked)
+                        }
+                      />
+                    }
+                    label="Show towns/prices"
+                  />
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
         </Grid>
-        <Grid container sx={{ position: 'absolute', bottom: 0, p: 2 }}>
-          <Grid item xs={12}>
-            <Card
-              sx={{
-                width: {
-                  xs: '100%',
-                  md: 600,
-                },
-              }}
-            >
-              <CardContent sx={{ p: '12px !important' }}>
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="subtitle2" gutterBottom>
-                    {town === 'Islandwide'
-                      ? currencyFormatter.format(
-                          Math.min(
-                            ...(islandHeatmap?.map(
-                              (point) => point.resalePrice
-                            ) ?? [])
-                          )
+      </Grid>
+      <Grid container sx={{ position: 'absolute', bottom: 0, p: 2 }}>
+        <Grid item xs={12}>
+          <Card
+            sx={{
+              width: {
+                xs: '100%',
+                md: 600,
+              },
+            }}
+          >
+            <CardContent sx={{ p: '12px !important' }}>
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="subtitle2" gutterBottom>
+                  {town === 'Islandwide'
+                    ? currencyFormatter.format(
+                        Math.min(
+                          ...(islandHeatmap?.map(
+                            (point) => point.resalePrice
+                          ) ?? [])
                         )
-                      : ''}
-                  </Typography>
-                  <Typography variant="subtitle2" gutterBottom>
-                    {town === 'Islandwide'
-                      ? currencyFormatter.format(
-                          Math.max(
-                            ...(islandHeatmap?.map(
-                              (point) => point.resalePrice
-                            ) ?? [])
-                          )
+                      )
+                    : ''}
+                </Typography>
+                <Typography variant="subtitle2" gutterBottom>
+                  {town === 'Islandwide'
+                    ? currencyFormatter.format(
+                        Math.max(
+                          ...(islandHeatmap?.map(
+                            (point) => point.resalePrice
+                          ) ?? [])
                         )
-                      : ''}
-                  </Typography>
-                </Stack>
-                <Box
-                  sx={{
-                    height: 16,
-                    width: '100%',
-                    background:
-                      'linear-gradient(to right, rgba(102, 255, 0, 1), rgba(147, 255, 0, 1), rgba(193, 255, 0, 1), rgba(238, 255, 0, 1), rgba(244, 227, 0, 1), rgba(249, 198, 0, 1), rgba(255, 170, 0, 1), rgba(255, 113, 0, 1), rgba(255, 57, 0, 1), rgba(255, 0, 0, 1))',
-                  }}
-                />
-              </CardContent>
-            </Card>
-          </Grid>
+                      )
+                    : ''}
+                </Typography>
+              </Stack>
+              <Box
+                sx={{
+                  height: 16,
+                  width: '100%',
+                  background:
+                    'linear-gradient(to right, rgba(102, 255, 0, 1), rgba(147, 255, 0, 1), rgba(193, 255, 0, 1), rgba(238, 255, 0, 1), rgba(244, 227, 0, 1), rgba(249, 198, 0, 1), rgba(255, 170, 0, 1), rgba(255, 113, 0, 1), rgba(255, 57, 0, 1), rgba(255, 0, 0, 1))',
+                }}
+              />
+            </CardContent>
+          </Card>
         </Grid>
-      </Container>
-    </ThemeProvider>
+      </Grid>
+    </Container>
   ) : (
     <Container
       sx={{
