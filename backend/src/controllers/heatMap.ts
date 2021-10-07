@@ -1,5 +1,5 @@
 import Koa from 'koa';
-import resaleService from '../services/resale';
+import resaleService from '../services/heatMap';
 import { Town } from '../utils/model';
 
 const parseYears = (queryYears: string | string[] | undefined) =>
