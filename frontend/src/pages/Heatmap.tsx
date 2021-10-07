@@ -19,7 +19,6 @@ import {
 import {
   GoogleMap,
   HeatmapLayer,
-  HeatmapLayerProps,
   InfoBox,
   Polygon,
   StandaloneSearchBox,
