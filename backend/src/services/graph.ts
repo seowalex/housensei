@@ -8,7 +8,6 @@ import {
   Raw,
 } from 'typeorm';
 import BTO from '../models/bto';
-import { QueryResale } from '../utils/resaleRecord';
 import Resale from '../models/resale';
 import { Town, FlatType } from '../utils/model';
 
@@ -19,6 +18,19 @@ export type QueryBto = {
   maxFloorArea?: number;
   startDate?: number;
   endDate?: number;
+};
+
+export type QueryResale = {
+  towns?: Town[] | Town;
+  flatTypes?: FlatType[] | FlatType;
+  minStorey?: number;
+  maxStorey?: number;
+  minFloorArea?: number;
+  maxFloorArea?: number;
+  minLeasePeriod?: number;
+  maxLeasePeriod?: number;
+  startYear?: number;
+  endYear?: number;
 };
 
 const getResales = async (queries: QueryResale): Promise<Resale[]> => {
@@ -171,7 +183,6 @@ const getBtos = async (queries: QueryBto): Promise<BTO[]> => {
     order: {
       name: 'ASC',
     },
-    take: 20,
   });
 };
 

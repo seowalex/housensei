@@ -3,18 +3,9 @@ import _ from 'lodash';
 import BTO from '../models/bto';
 import Resale from '../models/resale';
 import graphServices from '../services/graph';
-// import { QueryResale } from '../utils/resaleRecord';
 
 const getResale = async (ctx: Koa.Context): Promise<void> => {
-  // const { params } = ctx
-
-  // const queryResale: QueryResale = {
-
-  // }
-
   const resales = await graphServices.getResales(ctx.query);
-
-  // console.log(resales);
 
   const averagePriceByDate = _.chain(resales)
     .groupBy('transactionDate')
@@ -30,8 +21,6 @@ const getResale = async (ctx: Koa.Context): Promise<void> => {
 
 const getBto = async (ctx: Koa.Context): Promise<void> => {
   const btos = await graphServices.getBtos(ctx.query);
-
-  console.log(btos);
 
   const averagePriceByProject = _.chain(btos)
     .groupBy('name')
