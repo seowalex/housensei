@@ -3,7 +3,6 @@ import { getRepository } from 'typeorm';
 import classValidate from '../utils/validate';
 import BTO from '../models/bto';
 import { FlatType, Town } from '../utils/model';
-import dbConnection from './connection';
 
 const headerRows = 22; // ignore rows above row 22
 const footerRows = 20; // ignore last 20 rows
@@ -98,8 +97,6 @@ const combineBTOs = (
 };
 
 const seedBTOs = async () => {
-  await dbConnection;
-
   const file = 'src/database/data/HDB-BTO-Prices-List.xls';
   const workbook = XLSX.readFile(file, {
     cellDates: true,

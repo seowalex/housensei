@@ -8,4 +8,9 @@ export default defineConfig({
       localsConvention: 'dashesOnly',
     },
   },
+  server: {
+    proxy: {
+      '/api': 'http://localhost:5000',
+    },
+  },
 });
