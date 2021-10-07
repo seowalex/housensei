@@ -30,6 +30,7 @@ import { useState } from 'react';
 import { Link, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 
 import { useAppDispatch, useAppSelector } from './app/hooks';
+import Heatmap from './pages/Heatmap';
 import History from './pages/History';
 import NotFound from './pages/NotFound';
 import { selectDarkMode, setDarkMode } from './reducers/settings';
@@ -38,12 +39,12 @@ const drawerWidth = 240;
 
 const Routes = () => {
   const dispatch = useAppDispatch();
+  const isDesktop = useMediaQuery('(min-width: 600px)');
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const darkMode = useAppSelector(selectDarkMode) ?? prefersDarkMode;
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
-  const handleDarkModeToggle = () => dispatch(setDarkMode(!darkMode));
 
   const drawer = (
     <>
@@ -122,7 +123,10 @@ const Routes = () => {
             Housensei
           </Typography>
           <Tooltip title="Toggle dark mode" placement="bottom-start">
-            <IconButton size="large" onClick={handleDarkModeToggle}>
+            <IconButton
+              size={isDesktop ? 'large' : 'medium'}
+              onClick={() => dispatch(setDarkMode(!darkMode))}
+            >
               {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
             </IconButton>
           </Tooltip>
@@ -185,27 +189,7 @@ const Routes = () => {
             <History />
           </Route>
           <Route path="/heatmap">
-            <Container sx={{ p: 3 }}>
-              <Typography variant="h4" gutterBottom>
-                HDB Property Price Heatmap
-              </Typography>
-              <Typography paragraph>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                Rhoncus dolor purus non enim praesent elementum facilisis leo
-                vel. Risus at ultrices mi tempus imperdiet. Semper risus in
-                hendrerit gravida rutrum quisque non tellus. Convallis convallis
-                tellus id interdum velit laoreet id donec ultrices. Odio morbi
-                quis commodo odio aenean sed adipiscing. Amet nisl suscipit
-                adipiscing bibendum est ultricies integer quis. Cursus euismod
-                quis viverra nibh cras. Metus vulputate eu scelerisque felis
-                imperdiet proin fermentum leo. Mauris commodo quis imperdiet
-                massa tincidunt. Cras tincidunt lobortis feugiat vivamus at
-                augue. At augue eget arcu dictum varius duis at consectetur
-                lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa
-                sapien faucibus et molestie ac.
-              </Typography>
-            </Container>
+            <Heatmap />
           </Route>
           <Route>
             <NotFound />
