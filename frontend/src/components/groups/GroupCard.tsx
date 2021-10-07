@@ -1,4 +1,4 @@
-import { Circle } from '@mui/icons-material';
+import { Circle as CircleIcon } from '@mui/icons-material';
 import {
   Card,
   CardActionArea,
@@ -10,7 +10,7 @@ import {
 import { useState } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { removeGroup, resetGroups, updateGroup } from '../../reducers/groups';
+import { removeGroup, updateGroup } from '../../reducers/groups';
 import { Group } from '../../types/groups';
 import { mapGroupToFormValues, mapFormValuesToGroup } from '../../utils/groups';
 import GroupDetails from './GroupDetails';
@@ -58,13 +58,15 @@ const GroupCard = (props: Props) => {
           onClick={() => setShowUpdateForm(true)}
         >
           <CardContent>
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <Circle sx={{ fill: color }} />
-              <Typography variant="h5" component="div">
-                {name}
-              </Typography>
+            <Stack spacing={0.5}>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <CircleIcon sx={{ fill: color }} />
+                <Typography variant="h5" component="div">
+                  {name}
+                </Typography>
+              </Stack>
+              <GroupDetails filters={filters} />
             </Stack>
-            <GroupDetails filters={filters} />
           </CardContent>
         </CardActionArea>
       </Card>

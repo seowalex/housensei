@@ -21,11 +21,11 @@ export interface Group {
 
 export enum GroupColor {
   Color1 = '#ffb74d',
-  Color2 = '#ff8684',
-  Color3 = '#e37ac3',
-  Color4 = '#7486db',
-  Color5 = '#ff9c64',
-  Color6 = '#ff7aa5',
-  Color7 = '#b280d6',
+  Color2 = '#e37ac3',
+  Color3 = '#ff9c64',
+  Color4 = '#b280d6',
+  Color5 = '#ff8684',
+  Color6 = '#7486db',
+  Color7 = '#ff7aa5',
   Color8 = '#0288d1',
 }

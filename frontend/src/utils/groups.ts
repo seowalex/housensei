@@ -4,44 +4,38 @@ import { Group, GroupColor, GroupFilters } from '../types/groups';
 export const mapGroupToFormValues = (group: Group): GroupFormValues => {
   const { name, filters } = group;
 
-  const isStoreyRangeEnabled =
-    filters.minStorey != null && filters.maxStorey != null;
-  const isFloorAreaRangeEnabled =
-    filters.minFloorArea != null && filters.maxFloorArea != null;
-  const isLeasePeriodRangeEnabled =
-    filters.minLeasePeriod != null && filters.maxLeasePeriod != null;
-  const isYearRangeEnabled =
-    filters.startYear != null && filters.endYear != null;
-
   const groupFormValues: GroupFormValues = {
     name,
     towns: filters.towns,
     flatTypes: filters.flatTypes,
-    isStoreyRangeEnabled,
-    isFloorAreaRangeEnabled,
-    isLeasePeriodRangeEnabled,
-    isYearRangeEnabled,
+    isStoreyRangeEnabled:
+      filters.minStorey != null && filters.maxStorey != null,
+    isFloorAreaRangeEnabled:
+      filters.minFloorArea != null && filters.maxFloorArea != null,
+    isLeasePeriodRangeEnabled:
+      filters.minLeasePeriod != null && filters.maxLeasePeriod != null,
+    isYearRangeEnabled: filters.startYear != null && filters.endYear != null,
   };
 
-  if (isStoreyRangeEnabled) {
+  if (filters.minStorey != null && filters.maxStorey != null) {
     groupFormValues.storeyRange = {
       lower: filters.minStorey,
       upper: filters.maxStorey,
     };
   }
-  if (isFloorAreaRangeEnabled) {
+  if (filters.minFloorArea != null && filters.maxFloorArea != null) {
     groupFormValues.floorAreaRange = {
       lower: filters.minFloorArea,
       upper: filters.maxFloorArea,
     };
   }
-  if (isLeasePeriodRangeEnabled) {
+  if (filters.minLeasePeriod != null && filters.maxLeasePeriod != null) {
     groupFormValues.leasePeriodRange = {
       lower: filters.minLeasePeriod,
       upper: filters.maxLeasePeriod,
     };
   }
-  if (isYearRangeEnabled) {
+  if (filters.startYear != null && filters.endYear != null) {
     groupFormValues.yearRange = {
       lower: filters.startYear,
       upper: filters.endYear,

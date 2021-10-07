@@ -5,7 +5,7 @@ interface PriceDataPoint {
   price: number;
 }
 
-interface BTOProject {
+export interface BTOProject {
   name: string;
   price: number;
   date: string;
