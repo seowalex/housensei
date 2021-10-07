@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import {
   Autocomplete,
   Box,
@@ -19,6 +19,7 @@ import {
 import {
   GoogleMap,
   HeatmapLayer,
+  HeatmapLayerProps,
   InfoBox,
   Polygon,
   StandaloneSearchBox,
@@ -163,6 +164,19 @@ const Heatmap = () => {
         }
   );
 
+  const heatmapData = useMemo(
+    () =>
+      town === 'Islandwide'
+        ? normaliseHeatmap(islandHeatmap).map((point) => ({
+            location: new google.maps.LatLng(
+              townCoordinates[point.town as Town]
+            ),
+            weight: point.resalePrice,
+          }))
+        : [],
+    [google, town, islandHeatmap]
+  );
+
   useEffect(() => {
     map?.setCenter(townCoordinates[town as Town] ?? singaporeCoordinates);
     map?.setZoom(town === 'Islandwide' ? 12 : 15);
@@ -284,19 +298,7 @@ const Heatmap = () => {
           onLoad={setMap}
         >
           <TransitLayer />
-          <HeatmapLayer
-            data={
-              town === 'Islandwide'
-                ? normaliseHeatmap(islandHeatmap).map((point) => ({
-                    location: new google.maps.LatLng(
-                      townCoordinates[point.town as Town]
-                    ),
-                    weight: point.resalePrice,
-                  }))
-                : []
-            }
-            options={heatmapLayerOptions}
-          />
+          <HeatmapLayer data={heatmapData} options={heatmapLayerOptions} />
           {Object.entries(townBoundaries).map(([townName, paths]) => (
             <Fragment key={townName}>
               <Polygon
