@@ -141,7 +141,7 @@ const Heatmap = () => {
 
   const mapOptions: google.maps.MapOptions = useMemo(
     () => ({
-      mapId: darkMode ? '9bc9cb34c7dac68c' : '',
+      mapId: darkMode ? '9bc9cb34c7dac68c' : null,
       center: singaporeCoordinates,
       clickableIcons: false,
       disableDefaultUI: true,
