@@ -2,10 +2,14 @@ import Koa from 'koa';
 import resaleService from '../services/heatMap';
 import { Town } from '../utils/model';
 
-const parseYears = (queryYears: string | string[] | undefined) =>
-  Array.isArray(queryYears)
+const parseYears = (queryYears: string | string[] | undefined) => {
+  if (!queryYears) {
+    return undefined;
+  }
+  return Array.isArray(queryYears)
     ? queryYears.map((year) => Number(year))
     : [Number(queryYears)];
+};
 
 const getResalesByIsland = async (ctx: Koa.Context): Promise<void> => {
   const resales = await resaleService.getResalesByIsland({
