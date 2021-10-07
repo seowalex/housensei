@@ -10,6 +10,7 @@ import {
 import BTO from '../models/bto';
 import Resale from '../models/resale';
 import { Town, FlatType } from '../utils/model';
+import hdbLease from '../utils/constants';
 
 export type QueryBto = {
   towns?: Town[] | Town;
@@ -63,8 +64,6 @@ const getResales = async (queries: QueryResale): Promise<Resale[]> => {
   } else if (queries.minFloorArea) {
     conditions.floorArea = MoreThanOrEqual(queries.minFloorArea);
   }
-
-  const hdbLease = 99;
 
   if (queries.minLeasePeriod && queries.maxLeasePeriod) {
     const currentDate = new Date();
