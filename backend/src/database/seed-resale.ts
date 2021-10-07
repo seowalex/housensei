@@ -1,7 +1,9 @@
 import * as XLSX from 'xlsx';
 import { getRepository } from 'typeorm';
+
 import Resale from '../models/resale';
 import { FlatType, Town } from '../utils/model';
+import getCoordinates from './get-coordinates';
 
 const filePaths = [
   'src/database/data/resale-flat-prices-based-on-approval-date-1990-1999.xlsx',
@@ -99,8 +101,13 @@ async function seedResale() {
 
   let totalEntries = 0;
 
+  const BLOCK = 3;
+  const STREET_NAME = 4;
+
+  // all files
+  const files = {};
+  let allDataRows: Array<Array<string | number>> = [];
   for (let i = 0; i < filePaths.length; i += 1) {
-    const isOldFormat = i < 3;
     const filePath = filePaths[i];
 
     const workbook = XLSX.readFile(filePath, {
@@ -112,27 +119,46 @@ async function seedResale() {
 
     /* Convert array of arrays */
     const ws = workbook.Sheets[sheets[0]];
-    const data = XLSX.utils.sheet_to_json(ws, {
-      header: 1,
-      defval: '',
-    }) as Array<Array<string | number>>;
+    const data = XLSX.utils
+      .sheet_to_json(ws, {
+        header: 1,
+        defval: '',
+      })
+      .slice(1) as Array<Array<string | number>>;
+
+    files[filePath] = data;
+    allDataRows = allDataRows.concat(data);
+  }
+
+  const allCoordinates = await getCoordinates(
+    allDataRows.map((row) => ({
+      block: row[BLOCK] as string,
+      streetName: capitalizeEachWord(row[STREET_NAME] as string),
+    }))
+  );
+
+  console.log(allCoordinates);
+
+  for (let i = 0; i < filePaths.length; i += 1) {
+    const isOldFormat = i < 3;
+    const filePath = filePaths[i];
+
+    const dataRows = files[filePath];
 
     // indexes
     const MONTH = 0;
     const TOWN = 1;
     const FLAT_TYPE = 2;
-    const BLOCK = 3;
-    const STREET_NAME = 4;
+
     const STOREY_RANGE = 5;
     const FLOOR_AREA_SQM = 6;
     const FLAT_MODEL = 7;
     const LEASE_COMMENCE_DATE = 8;
     const RESALE_PRICE = isOldFormat ? 9 : 10;
 
-    const dataRows = data.slice(1);
-
     // Map to correct database format
-    const allResale = dataRows.map((row) => {
+    // eslint-disable-next-line no-await-in-loop
+    const allResale: Resale[] = dataRows.map((row) => {
       const resale = new Resale();
       resale.transactionDate = new Date(row[MONTH]);
       resale.town = parseLocation(row[TOWN] as string) as Town;
@@ -149,6 +175,13 @@ async function seedResale() {
       resale.leaseCommenceYear = new Date(row[LEASE_COMMENCE_DATE].toString());
 
       resale.resalePrice = Math.floor(row[RESALE_PRICE] as number);
+
+      // add geom
+      const coordinates = allCoordinates[resale.streetName][resale.block];
+      if (coordinates) {
+        resale.coordinates = coordinates;
+      }
+
       return resale;
     });
 
