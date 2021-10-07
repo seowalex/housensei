@@ -1,9 +1,9 @@
 import { GroupFormValues } from '../components/groups/GroupForm';
-import { GroupFilters } from '../types/groups';
+import { Group, GroupColor, GroupFilters } from '../types/groups';
 
-export const mapFiltersToFormValues = (
-  filters: GroupFilters
-): GroupFormValues => {
+export const mapGroupToFormValues = (group: Group): GroupFormValues => {
+  const { name, filters } = group;
+
   const isStoreyRangeEnabled =
     filters.minStorey != null && filters.maxStorey != null;
   const isFloorAreaRangeEnabled =
@@ -14,6 +14,7 @@ export const mapFiltersToFormValues = (
     filters.startYear != null && filters.endYear != null;
 
   const groupFormValues: GroupFormValues = {
+    name,
     towns: filters.towns,
     flatTypes: filters.flatTypes,
     isStoreyRangeEnabled,
@@ -50,7 +51,10 @@ export const mapFiltersToFormValues = (
   return groupFormValues;
 };
 
-export const mapFormValuesToFilters = (data: GroupFormValues): GroupFilters => {
+export const mapFormValuesToGroup = (
+  data: GroupFormValues,
+  color: GroupColor
+): Group => {
   const groupFilters: GroupFilters = {
     towns: data.towns,
     flatTypes: data.flatTypes,
@@ -76,5 +80,24 @@ export const mapFormValuesToFilters = (data: GroupFormValues): GroupFilters => {
     groupFilters.endYear = data.yearRange.upper;
   }
 
-  return groupFilters;
+  return {
+    name: data.name,
+    color,
+    filters: groupFilters,
+  };
+};
+
+export const getGroupColor = (index: number): GroupColor => {
+  const colors = [
+    GroupColor.Color1,
+    GroupColor.Color2,
+    GroupColor.Color3,
+    GroupColor.Color4,
+    GroupColor.Color5,
+    GroupColor.Color6,
+    GroupColor.Color7,
+    GroupColor.Color8,
+  ];
+
+  return colors[index % 8];
 };

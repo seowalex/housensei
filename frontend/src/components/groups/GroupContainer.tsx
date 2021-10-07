@@ -14,7 +14,7 @@ import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../../app/hooks';
 import { createGroup, selectGroups } from '../../reducers/groups';
-import { mapFormValuesToFilters } from '../../utils/groups';
+import { getGroupColor, mapFormValuesToGroup } from '../../utils/groups';
 import GroupCard from './GroupCard';
 import GroupForm, { FormPaper, GroupFormValues } from './GroupForm';
 
@@ -32,8 +32,11 @@ const GroupContainer = () => {
   const handleCreateGroup: SubmitHandler<GroupFormValues> = (
     data: GroupFormValues
   ) => {
-    const groupFilters = mapFormValuesToFilters(data);
-    dispatch(createGroup(groupFilters));
+    const createdGroup = mapFormValuesToGroup(
+      data,
+      getGroupColor(groups.length)
+    );
+    dispatch(createGroup(createdGroup));
     setShowCreateForm(false);
   };
 
@@ -64,11 +67,7 @@ const GroupContainer = () => {
           </Grid>
           {groups.map((group, index) => (
             <Grid item xs={6} md={3}>
-              <GroupCard
-                name={`Group ${index + 1}`}
-                index={index}
-                filters={group}
-              />
+              <GroupCard index={index} group={group} />
             </Grid>
           ))}
         </Grid>

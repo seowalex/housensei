@@ -1,4 +1,4 @@
-import { GroupFilters } from './groups';
+import { Group } from './groups';
 
 interface PriceDataPoint {
   date: string;
@@ -12,7 +12,7 @@ interface BTOProject {
 }
 
 export interface PriceHistory {
-  filters: GroupFilters;
+  group: Group;
   history: PriceDataPoint[];
   projects: BTOProject[];
 }

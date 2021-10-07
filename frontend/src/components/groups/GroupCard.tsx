@@ -1,8 +1,8 @@
+import { Circle } from '@mui/icons-material';
 import {
   Card,
   CardActionArea,
   CardContent,
-  Chip,
   Modal,
   Stack,
   Typography,
@@ -10,45 +10,32 @@ import {
 import { useState } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { removeGroup, updateGroup } from '../../reducers/groups';
-import { GroupFilters } from '../../types/groups';
-import {
-  mapFiltersToFormValues,
-  mapFormValuesToFilters,
-} from '../../utils/groups';
+import { removeGroup, resetGroups, updateGroup } from '../../reducers/groups';
+import { Group } from '../../types/groups';
+import { mapGroupToFormValues, mapFormValuesToGroup } from '../../utils/groups';
+import GroupDetails from './GroupDetails';
 import GroupForm, { FormPaper, GroupFormValues } from './GroupForm';
 
 interface Props {
-  name: string;
   index: number;
-  filters: GroupFilters;
+  group: Group;
 }
 
 const GroupCard = (props: Props) => {
   const dispatch = useDispatch();
-  const { name, index, filters } = props;
-  const {
-    towns,
-    flatTypes,
-    minStorey,
-    maxStorey,
-    minFloorArea,
-    maxFloorArea,
-    minLeasePeriod,
-    maxLeasePeriod,
-    startYear,
-    endYear,
-  } = filters;
+  const { index, group } = props;
+  const { name, color, filters } = group;
   const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false);
 
   const handleUpdateGroup: SubmitHandler<GroupFormValues> = (
     data: GroupFormValues
   ) => {
-    const groupFilters = mapFormValuesToFilters(data);
+    const updatedGroup = mapFormValuesToGroup(data, color);
+
     dispatch(
       updateGroup({
         index,
-        filters: groupFilters,
+        group: updatedGroup,
       })
     );
     setShowUpdateForm(false);
@@ -71,72 +58,13 @@ const GroupCard = (props: Props) => {
           onClick={() => setShowUpdateForm(true)}
         >
           <CardContent>
-            <Typography variant="h5" component="div">
-              {name}
-            </Typography>
-            <Stack
-              direction="row"
-              spacing={1}
-              sx={{ p: '0.2rem 0rem' }}
-              alignItems="center"
-            >
-              {towns.length > 0 ? (
-                <>
-                  {towns.slice(0, 2).map((town) => (
-                    <Chip label={town} key={town} />
-                  ))}
-                  <Typography>
-                    {towns.length > 2 ? `+${towns.length - 2}` : ''}
-                  </Typography>
-                </>
-              ) : (
-                <Chip label="Any Location" />
-              )}
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Circle sx={{ fill: color }} />
+              <Typography variant="h5" component="div">
+                {name}
+              </Typography>
             </Stack>
-            <Stack
-              direction="row"
-              spacing={1}
-              sx={{ p: '0.2rem 0rem' }}
-              alignItems="center"
-            >
-              {flatTypes.length > 0 ? (
-                <>
-                  {flatTypes.slice(0, 3).map((flatType) => (
-                    <Chip
-                      label={flatType}
-                      size="small"
-                      variant="outlined"
-                      key={flatType}
-                    />
-                  ))}
-                  <Typography>
-                    {flatTypes.length > 3 ? `+${flatTypes.length - 3}` : ''}
-                  </Typography>
-                </>
-              ) : (
-                <Chip label="Any Flat Type" size="small" variant="outlined" />
-              )}
-            </Stack>
-            {minStorey && maxStorey && (
-              <Typography variant="body2">
-                {`Storey: ${minStorey} to ${maxStorey}`}
-              </Typography>
-            )}
-            {minFloorArea && maxFloorArea && (
-              <Typography variant="body2">
-                {`Floor Area: ${minFloorArea} to ${maxFloorArea} sqm`}
-              </Typography>
-            )}
-            {minLeasePeriod && maxLeasePeriod && (
-              <Typography variant="body2">
-                {`Remaining Lease: ${minLeasePeriod} to ${maxLeasePeriod} years`}
-              </Typography>
-            )}
-            {startYear && endYear && (
-              <Typography variant="body2">
-                {`Year of Sale: ${startYear} to ${endYear}`}
-              </Typography>
-            )}
+            <GroupDetails filters={filters} />
           </CardContent>
         </CardActionArea>
       </Card>
@@ -146,7 +74,7 @@ const GroupCard = (props: Props) => {
             onSubmit={handleUpdateGroup}
             handleClose={() => setShowUpdateForm(false)}
             submitText="Edit Group"
-            currentData={mapFiltersToFormValues(filters)}
+            currentData={mapGroupToFormValues(group)}
             resetOnCancel
             onDelete={handleDeleteGroup}
           />

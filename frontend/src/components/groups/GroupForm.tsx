@@ -1,10 +1,12 @@
 import { Button, CircularProgress, Grid, Paper, Stack } from '@mui/material';
 import { styled } from '@mui/system';
 import { Control, FieldValues, SubmitHandler, useForm } from 'react-hook-form';
+import { GroupColor } from '../../types/groups';
 import { FlatType, Town } from '../../types/property';
 import FormAutocompleteInput from '../forms/FormAutocompleteInput';
 import FormSliderInput from '../forms/FormSliderInput';
 import FormSwitchInput from '../forms/FormSwitchInput';
+import FormTextInput from '../forms/FormTextInput';
 
 interface Range<T> {
   lower: T;
@@ -12,6 +14,7 @@ interface Range<T> {
 }
 
 export interface GroupFormValues {
+  name: string;
   towns: Town[];
   flatTypes: FlatType[];
   storeyRange?: Range<number>;
@@ -43,6 +46,7 @@ interface Props {
 }
 
 const defaultFormValues: GroupFormValues = {
+  name: '',
   towns: [],
   flatTypes: [],
   isStoreyRangeEnabled: false,
@@ -78,6 +82,14 @@ const GroupForm = (props: Props) => {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <FormTextInput
+            name="name"
+            control={control as Control<FieldValues>}
+            label="Group Name"
+            placeholder="Group 1"
+          />
+        </Grid>
         <Grid item xs={12} lg={6}>
           <FormAutocompleteInput
             name="towns"
