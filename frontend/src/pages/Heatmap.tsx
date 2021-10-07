@@ -10,6 +10,7 @@ import {
   Grid,
   OutlinedInput,
   Slider,
+  Stack,
   Switch,
   TextField,
   ThemeProvider,
@@ -45,16 +46,6 @@ import { Town } from '../app/types';
 
 const mapTheme = createTheme({
   components: {
-    MuiFormControl: {
-      defaultProps: {
-        sx: {
-          width: {
-            xs: '100%',
-            md: 400,
-          },
-        },
-      },
-    },
     MuiInputBase: {
       styleOverrides: {
         root: {
@@ -354,7 +345,15 @@ const Heatmap = () => {
               onPlacesChanged={setMapViewport}
               onLoad={setSearchBox}
             >
-              <TextField placeholder="Search..." />
+              <TextField
+                placeholder="Search..."
+                sx={{
+                  width: {
+                    xs: '100%',
+                    md: 400,
+                  },
+                }}
+              />
             </StandaloneSearchBox>
           </Grid>
           <Grid item xs={12} md="auto">
@@ -367,6 +366,12 @@ const Heatmap = () => {
               onChange={(_, value) => setTown(value as Town | 'Islandwide')}
               blurOnSelect
               disableClearable
+              sx={{
+                width: {
+                  xs: '100%',
+                  md: 200,
+                },
+              }}
             />
           </Grid>
           <Grid item xs={12} md="auto">
@@ -424,6 +429,53 @@ const Heatmap = () => {
                     />
                   </Grid>
                 </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+        <Grid container sx={{ position: 'absolute', bottom: 0, p: 2 }}>
+          <Grid item xs={12}>
+            <Card
+              sx={{
+                width: {
+                  xs: '100%',
+                  md: 600,
+                },
+              }}
+            >
+              <CardContent sx={{ p: '12px !important' }}>
+                <Stack direction="row" justifyContent="space-between">
+                  <Typography variant="subtitle2" gutterBottom>
+                    {town === 'Islandwide'
+                      ? currencyFormatter.format(
+                          Math.min(
+                            ...(islandHeatmap?.map(
+                              (point) => point.resalePrice
+                            ) ?? [])
+                          )
+                        )
+                      : ''}
+                  </Typography>
+                  <Typography variant="subtitle2" gutterBottom>
+                    {town === 'Islandwide'
+                      ? currencyFormatter.format(
+                          Math.max(
+                            ...(islandHeatmap?.map(
+                              (point) => point.resalePrice
+                            ) ?? [])
+                          )
+                        )
+                      : ''}
+                  </Typography>
+                </Stack>
+                <Box
+                  sx={{
+                    height: 16,
+                    width: '100%',
+                    background:
+                      'linear-gradient(to right, rgba(102, 255, 0, 1), rgba(147, 255, 0, 1), rgba(193, 255, 0, 1), rgba(238, 255, 0, 1), rgba(244, 227, 0, 1), rgba(249, 198, 0, 1), rgba(255, 170, 0, 1), rgba(255, 113, 0, 1), rgba(255, 57, 0, 1), rgba(255, 0, 0, 1))',
+                  }}
+                />
               </CardContent>
             </Card>
           </Grid>
