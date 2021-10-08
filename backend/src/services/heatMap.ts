@@ -37,7 +37,8 @@ const getResalesByTown = async (
 ): Promise<Array<{ address: string; resalePrice: number }>> => {
   const queryBuilder = getRepository(Resale)
     .createQueryBuilder('resale')
-    .select("CONCAT (resale.block, ' ', resale.streetName)", 'address')
+    .select('MAX(resale.coordinates)', 'coordinates')
+    .addSelect("CONCAT(resale.block, ' ', resale.streetName)", 'address')
     .addSelect('CAST(AVG(resale.resalePrice) AS int)', 'resalePrice');
 
   if (queries.years) {

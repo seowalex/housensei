@@ -38,4 +38,7 @@ export default class Resale {
 
   @Column('int')
   resalePrice: number;
+
+  @Column({ type: 'float', array: true, nullable: true })
+  coordinates: [number, number];
 }
