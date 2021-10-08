@@ -21,6 +21,7 @@ const FormTextInput = (props: Props) => {
           onChange={onChange}
           label={label}
           placeholder={placeholder}
+          sx={{ width: '100%' }}
         />
       )}
     />

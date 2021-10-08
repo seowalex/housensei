@@ -15,7 +15,10 @@ const getResale = async (ctx: Koa.Context): Promise<void> => {
     }));
 
   ctx.body = {
-    data: averagePriceByDate,
+    data: {
+      id: ctx.query.id,
+      data: averagePriceByDate,
+    },
   };
 };
 
@@ -32,7 +35,10 @@ const getBto = async (ctx: Koa.Context): Promise<void> => {
       date: value[0].launchDate,
     }));
   ctx.body = {
-    data: averagePriceByProject,
+    data: {
+      id: ctx.query.id,
+      data: averagePriceByProject,
+    },
   };
 };
 

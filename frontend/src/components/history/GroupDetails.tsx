@@ -1,4 +1,5 @@
 import { Chip, Stack, Typography } from '@mui/material';
+import { Box } from '@mui/system';
 import { GroupFilters } from '../../types/groups';
 
 interface Props {
@@ -21,7 +22,7 @@ const GroupDetails = (props: Props) => {
   } = filters;
 
   return (
-    <>
+    <Box>
       <Stack
         direction="row"
         spacing={1}
@@ -85,7 +86,7 @@ const GroupDetails = (props: Props) => {
           {`Year of Sale: ${startYear} to ${endYear}`}
         </Typography>
       )}
-    </>
+    </Box>
   );
 };
 

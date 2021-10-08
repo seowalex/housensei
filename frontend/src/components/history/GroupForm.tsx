@@ -1,8 +1,21 @@
-import { Button, CircularProgress, Grid, Paper, Stack } from '@mui/material';
-import { styled } from '@mui/system';
-import { Control, FieldValues, SubmitHandler, useForm } from 'react-hook-form';
-import { GroupColor } from '../../types/groups';
-import { FlatType, Town } from '../../types/property';
+import {
+  Button,
+  ButtonGroup,
+  CircularProgress,
+  Collapse,
+  Grid,
+  Stack,
+  Typography,
+} from '@mui/material';
+import { Box } from '@mui/system';
+import {
+  Control,
+  Controller,
+  FieldValues,
+  SubmitHandler,
+  useForm,
+} from 'react-hook-form';
+import { FlatType, Town } from '../../types/groups';
 import FormAutocompleteInput from '../forms/FormAutocompleteInput';
 import FormSliderInput from '../forms/FormSliderInput';
 import FormSwitchInput from '../forms/FormSwitchInput';
@@ -15,6 +28,7 @@ interface Range<T> {
 
 export interface GroupFormValues {
   name: string;
+  type: 'resale' | 'bto';
   towns: Town[];
   flatTypes: FlatType[];
   storeyRange?: Range<number>;
@@ -27,26 +41,16 @@ export interface GroupFormValues {
   isYearRangeEnabled: boolean;
 }
 
-export const FormPaper = styled(Paper)({
-  position: 'absolute' as const,
-  top: '50%',
-  left: '50%',
-  width: '75%',
-  transform: 'translate(-50%, -50%)',
-  padding: '1rem',
-});
-
 interface Props {
+  formType: 'create' | 'update';
   onSubmit: SubmitHandler<GroupFormValues>;
   handleClose: () => void;
-  submitText?: string;
   currentData?: GroupFormValues;
-  resetOnCancel?: boolean;
-  onDelete?: () => void;
 }
 
 const defaultFormValues: GroupFormValues = {
   name: '',
+  type: 'resale',
   towns: [],
   flatTypes: [],
   isStoreyRangeEnabled: false,
@@ -56,14 +60,7 @@ const defaultFormValues: GroupFormValues = {
 };
 
 const GroupForm = (props: Props) => {
-  const {
-    onSubmit,
-    handleClose,
-    submitText,
-    currentData,
-    resetOnCancel,
-    onDelete,
-  } = props;
+  const { formType, onSubmit, handleClose, currentData } = props;
   const {
     formState: { isSubmitting },
     watch,
@@ -74,21 +71,61 @@ const GroupForm = (props: Props) => {
   } = useForm<GroupFormValues>({
     defaultValues: currentData || defaultFormValues,
   });
+  const watchType = watch('type');
   const watchStoreyRangeEnabled = watch('isStoreyRangeEnabled');
   const watchFloorAreaRangeEnabled = watch('isFloorAreaRangeEnabled');
   const watchLeasePeriodRangeEnabled = watch('isLeasePeriodRangeEnabled');
   const watchYearRangeEnabled = watch('isYearRangeEnabled');
 
+  const submitText = formType === 'create' ? 'Add Group' : 'Edit Group';
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={3}>
         <Grid item xs={12}>
+          <Box sx={{ p: '0.5rem 0rem' }}>
+            <Typography variant="h4" sx={{ textAlign: 'center' }}>
+              {formType === 'create' ? 'Create Group' : 'Edit Group'}
+            </Typography>
+          </Box>
+        </Grid>
+        <Grid item xs={12} lg={6}>
           <FormTextInput
             name="name"
             control={control as Control<FieldValues>}
             label="Group Name"
             placeholder="Group 1"
           />
+        </Grid>
+        <Grid item xs={12} lg={6}>
+          <Stack
+            direction="row"
+            spacing={2}
+            alignItems="center"
+            sx={{ height: '100%' }}
+          >
+            <Typography>Group Type: </Typography>
+            <Controller
+              name="type"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <ButtonGroup size="large">
+                  <Button
+                    variant={value === 'resale' ? 'contained' : 'outlined'}
+                    onClick={() => onChange('resale')}
+                  >
+                    Resale
+                  </Button>
+                  <Button
+                    variant={value === 'bto' ? 'contained' : 'outlined'}
+                    onClick={() => onChange('bto')}
+                  >
+                    BTO
+                  </Button>
+                </ButtonGroup>
+              )}
+            />
+          </Stack>
         </Grid>
         <Grid item xs={12} lg={6}>
           <FormAutocompleteInput
@@ -114,25 +151,6 @@ const GroupForm = (props: Props) => {
         </Grid>
         <Grid item xs={12} lg={6}>
           <FormSwitchInput
-            name="isStoreyRangeEnabled"
-            control={control as Control<FieldValues>}
-            disabled={isSubmitting}
-            label="Storey"
-          />
-          <FormSliderInput
-            name="storeyRange"
-            control={control as Control<FieldValues>}
-            setValue={setValue}
-            min={1}
-            max={61}
-            step={3}
-            marks
-            inputFields
-            disabled={!watchStoreyRangeEnabled || isSubmitting}
-          />
-        </Grid>
-        <Grid item xs={12} lg={6}>
-          <FormSwitchInput
             name="isFloorAreaRangeEnabled"
             control={control as Control<FieldValues>}
             disabled={isSubmitting}
@@ -146,23 +164,6 @@ const GroupForm = (props: Props) => {
             max={200}
             inputFields
             disabled={!watchFloorAreaRangeEnabled || isSubmitting}
-          />
-        </Grid>
-        <Grid item xs={12} lg={6}>
-          <FormSwitchInput
-            name="isLeasePeriodRangeEnabled"
-            control={control as Control<FieldValues>}
-            disabled={isSubmitting}
-            label="Remaining Lease Period (years)"
-          />
-          <FormSliderInput
-            name="leasePeriodRange"
-            control={control as Control<FieldValues>}
-            setValue={setValue}
-            min={1}
-            max={99}
-            inputFields
-            disabled={!watchLeasePeriodRangeEnabled || isSubmitting}
           />
         </Grid>
         <Grid item xs={12} lg={6}>
@@ -199,26 +200,53 @@ const GroupForm = (props: Props) => {
             disabled={!watchYearRangeEnabled || isSubmitting}
           />
         </Grid>
+        <Grid item xs={12} lg={6}>
+          <Collapse in={watchType === 'resale'}>
+            <FormSwitchInput
+              name="isLeasePeriodRangeEnabled"
+              control={control as Control<FieldValues>}
+              disabled={isSubmitting}
+              label="Remaining Lease Period (years)"
+            />
+            <FormSliderInput
+              name="leasePeriodRange"
+              control={control as Control<FieldValues>}
+              setValue={setValue}
+              min={1}
+              max={99}
+              inputFields
+              disabled={!watchLeasePeriodRangeEnabled || isSubmitting}
+            />
+          </Collapse>
+        </Grid>
+        <Grid item xs={12} lg={6}>
+          <Collapse in={watchType === 'resale'}>
+            <FormSwitchInput
+              name="isStoreyRangeEnabled"
+              control={control as Control<FieldValues>}
+              disabled={isSubmitting}
+              label="Storey"
+            />
+            <FormSliderInput
+              name="storeyRange"
+              control={control as Control<FieldValues>}
+              setValue={setValue}
+              min={1}
+              max={61}
+              step={3}
+              marks
+              inputFields
+              disabled={!watchStoreyRangeEnabled || isSubmitting}
+            />
+          </Collapse>
+        </Grid>
         <Grid item container xs={12} justifyContent="space-between">
           <Grid item>
             <Stack direction="row" spacing={1}>
-              {onDelete && (
-                <Button
-                  variant="contained"
-                  type="button"
-                  onClick={() => {
-                    onDelete();
-                    handleClose();
-                  }}
-                  color="error"
-                >
-                  {isSubmitting ? <CircularProgress /> : 'Delete Group'}
-                </Button>
-              )}
               <Button
                 variant="outlined"
                 type="button"
-                onClick={() => reset(defaultFormValues)}
+                onClick={() => reset({ ...defaultFormValues, type: watchType })}
                 color="error"
               >
                 {isSubmitting ? <CircularProgress /> : 'Clear All'}
@@ -231,7 +259,7 @@ const GroupForm = (props: Props) => {
                 variant="outlined"
                 type="button"
                 onClick={() => {
-                  if (resetOnCancel) {
+                  if (formType === 'update') {
                     reset(currentData || defaultFormValues);
                   }
                   handleClose();
@@ -240,7 +268,7 @@ const GroupForm = (props: Props) => {
                 {isSubmitting ? <CircularProgress /> : 'Cancel'}
               </Button>
               <Button variant="contained" type="submit">
-                {isSubmitting ? <CircularProgress /> : submitText ?? 'Submit'}
+                {isSubmitting ? <CircularProgress /> : submitText}
               </Button>
             </Stack>
           </Grid>
@@ -251,10 +279,7 @@ const GroupForm = (props: Props) => {
 };
 
 GroupForm.defaultProps = {
-  submitText: 'Submit',
   currentData: undefined,
-  resetOnCancel: false,
-  onDelete: undefined,
 };
 
 export default GroupForm;

@@ -1,4 +1,4 @@
-import { Collapse, Grid, Input, Slider } from '@mui/material';
+import { Grid, Input, Slider } from '@mui/material';
 import { styled } from '@mui/system';
 import { ChangeEvent, useEffect, useState } from 'react';
 import {
@@ -87,57 +87,55 @@ const FormSliderInput = (props: Props) => {
       name={name}
       control={control}
       render={({ field, fieldState, formState }) => (
-        <Collapse in={!disabled}>
-          <Grid container spacing={2} alignItems="center">
-            {inputFields && (
-              <Grid item>
-                <SmallInput
-                  value={sliderValue[0]}
-                  size="small"
-                  onChange={handleLowerInputChange}
-                  onBlur={handleInputBlur}
-                  inputProps={{
-                    step,
-                    min,
-                    max,
-                  }}
-                  disabled={disabled}
-                />
-              </Grid>
-            )}
-            <Grid item xs>
-              <Slider
-                onChange={handleSliderChange}
-                value={[
-                  sliderValue[0] === '' ? min : sliderValue[0],
-                  sliderValue[1] === '' ? max : sliderValue[1],
-                ]}
-                valueLabelDisplay="auto"
-                min={min}
-                max={max}
-                marks={marks}
-                step={step ?? 1}
+        <Grid container spacing={2} alignItems="center">
+          {inputFields && (
+            <Grid item>
+              <SmallInput
+                value={sliderValue[0]}
+                size="small"
+                onChange={handleLowerInputChange}
+                onBlur={handleInputBlur}
+                inputProps={{
+                  step,
+                  min,
+                  max,
+                }}
                 disabled={disabled}
               />
             </Grid>
-            {inputFields && (
-              <Grid item>
-                <SmallInput
-                  value={sliderValue[1]}
-                  size="small"
-                  onChange={handleUpperInputChange}
-                  onBlur={handleInputBlur}
-                  inputProps={{
-                    step,
-                    min,
-                    max,
-                  }}
-                  disabled={disabled}
-                />
-              </Grid>
-            )}
+          )}
+          <Grid item xs>
+            <Slider
+              onChange={handleSliderChange}
+              value={[
+                sliderValue[0] === '' ? min : sliderValue[0],
+                sliderValue[1] === '' ? max : sliderValue[1],
+              ]}
+              valueLabelDisplay="auto"
+              min={min}
+              max={max}
+              marks={marks}
+              step={step ?? 1}
+              disabled={disabled}
+            />
           </Grid>
-        </Collapse>
+          {inputFields && (
+            <Grid item>
+              <SmallInput
+                value={sliderValue[1]}
+                size="small"
+                onChange={handleUpperInputChange}
+                onBlur={handleInputBlur}
+                inputProps={{
+                  step,
+                  min,
+                  max,
+                }}
+                disabled={disabled}
+              />
+            </Grid>
+          )}
+        </Grid>
       )}
     />
   );

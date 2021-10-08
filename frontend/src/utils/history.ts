@@ -1,5 +1,6 @@
 import { compareAsc, parseISO } from 'date-fns';
-import { ChartDataPoint, PriceHistory } from '../types/history';
+import { Group } from '../types/groups';
+import { ChartDataPoint, PriceDataPoint } from '../types/history';
 
 export const convertStringToDate = (string: string): Date => parseISO(string);
 
@@ -16,15 +17,22 @@ const upsertMap = (
   }
 };
 
-export const getChartData = (histories: PriceHistory[]): ChartDataPoint[] => {
+export const getChartData = (
+  rawData: {
+    [id: string]: PriceDataPoint[];
+  },
+  groups: Record<string, Group>
+): ChartDataPoint[] => {
   const dateToDataMap = new Map<
     string,
     Array<{ groupName: string; price: number }>
   >();
 
-  histories.forEach(({ group, history }) => {
-    history.forEach(({ date, price }) => {
-      const dataPoint = { groupName: group.name, price };
+  Object.entries(rawData).forEach(([id, dataPoints]) => {
+    const { name } = groups[id];
+
+    dataPoints.forEach(({ price, date }) => {
+      const dataPoint = { groupName: name, price };
       upsertMap(dateToDataMap, date, [dataPoint], (array) => [
         ...array,
         dataPoint,
