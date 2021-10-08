@@ -1,29 +1,15 @@
 import axios from 'axios';
 import _ from 'lodash';
-import {
-  cacheAdapterEnhancer,
-  throttleAdapterEnhancer,
-} from 'axios-extensions';
-import fs from 'fs';
+import axiosThrottle from 'axios-request-throttle';
 import Resale from '../models/resale';
 import {
   CoordinatesResponse,
   COORDINATES_API,
 } from '../utils/coordinatesResponse';
 
-/// 1000 ms 250 req
 type Address = Pick<Resale, 'block' | 'streetName'>;
 const getCoordinates = async (addresses: Array<Address>) => {
-  // enhance the original axios adapter with throttle and cache enhancer
-  if (!axios.defaults.adapter) {
-    throw new Error('no axois????');
-  }
-  const http = axios.create({
-    adapter: throttleAdapterEnhancer(
-      cacheAdapterEnhancer(axios.defaults.adapter),
-      { threshold: 4 }
-    ),
-  });
+  axiosThrottle.use(axios, { requestsPerSecond: 250 });
 
   const result: Record<string, Record<string, [number, number] | null>> = {};
 
@@ -45,20 +31,16 @@ const getCoordinates = async (addresses: Array<Address>) => {
   const uniqAddresses: Address[] = [];
 
   _.forEach(result, (values, streetName) => {
-    _.forEach(values, (_, block) => {
+    _.forEach(values, (_nullValue, block) => {
       uniqAddresses.push({ streetName, block });
     });
   });
 
-  // there are 9469 unqiue addresses -> should take around 40 mins
-
-  console.log(uniqAddresses.length); // takes abt 40 seconds to reach here
-
-  // uniqAddresses = uniqAddresses.slice(250, 350);
+  // takes abt 40 seconds to reach here
 
   await Promise.all(
-    uniqAddresses.map(async (addr, idx) => {
-      const response = await http.get<CoordinatesResponse>(COORDINATES_API, {
+    uniqAddresses.map(async (addr) => {
+      const response = await axios.get<CoordinatesResponse>(COORDINATES_API, {
         params: {
           searchVal: `${addr.block} ${addr.streetName}`,
           returnGeom: 'Y',
@@ -68,8 +50,6 @@ const getCoordinates = async (addresses: Array<Address>) => {
       });
 
       const firstResult = response.data.results[0];
-      // console.log(firstResult);
-      console.log(idx);
       if (firstResult) {
         result[addr.streetName][addr.block] = [
           parseFloat(firstResult.LATITUDE),
@@ -79,15 +59,15 @@ const getCoordinates = async (addresses: Array<Address>) => {
     })
   );
 
-  const data = JSON.stringify(result, null, 4);
+  // const data = JSON.stringify(result, null, 4);
 
-  // write JSON string to a file
-  fs.writeFile('src/database/data/coordinates.json', data, (err) => {
-    if (err) {
-      throw err;
-    }
-    console.log('JSON data is saved.');
-  });
+  // // write JSON string to a file
+  // fs.writeFile('src/database/data/coordinates.json', data, (err) => {
+  //   if (err) {
+  //     throw err;
+  //   }
+  //   console.log('JSON data is saved.');
+  // });
 
   return result;
 };
