@@ -39,7 +39,8 @@ const getResalesByTown = async (
     .createQueryBuilder('resale')
     .select('MAX(resale.coordinates)', 'coordinates')
     .addSelect("CONCAT(resale.block, ' ', resale.streetName)", 'address')
-    .addSelect('CAST(AVG(resale.resalePrice) AS int)', 'resalePrice');
+    .addSelect('CAST(AVG(resale.resalePrice) AS int)', 'resalePrice')
+    .where('coordinates IS NOT NULL');
 
   if (queries.years) {
     queryBuilder.where(
