@@ -51,7 +51,7 @@ const GroupList = (props: Props) => {
   };
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} sx={{ width: '100%' }}>
       <Button
         variant="contained"
         size="large"

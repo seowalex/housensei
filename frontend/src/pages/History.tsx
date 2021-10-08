@@ -1,4 +1,12 @@
-import { Container, Grid, Paper } from '@mui/material';
+import {
+  Button,
+  ButtonGroup,
+  Container,
+  Grid,
+  Paper,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import {
   CartesianGrid,
@@ -16,13 +24,21 @@ import { BTOProject } from '../types/history';
 import GroupList from '../components/history/GroupList';
 import {
   selectBTOProjectsRecord,
-  selectChartData,
+  selectMonthlyChartData,
   selectGroups,
+  selectYearlyChartData,
 } from '../reducers/history';
+import { formatDate, formatPrice } from '../utils/history';
+
+enum ChartMode {
+  Monthly,
+  Yearly,
+}
 
 const History = () => {
   const groups = useAppSelector(selectGroups);
-  const chartData = useAppSelector(selectChartData);
+  const monthlyChartData = useAppSelector(selectMonthlyChartData);
+  const yearlyChartData = useAppSelector(selectYearlyChartData);
   const btoProjects = useAppSelector(selectBTOProjectsRecord);
   const [selectedGroup, setSelectedGroup] = useState<string | undefined>(
     undefined
@@ -30,6 +46,9 @@ const History = () => {
   const [projectsState, setProjectsState] = useState<
     Record<string, BTOProject[]>
   >({});
+  const [chartMode, setChartMode] = useState<ChartMode>(ChartMode.Monthly);
+  const chartData =
+    chartMode === ChartMode.Monthly ? monthlyChartData : yearlyChartData;
 
   useEffect(() => {
     setProjectsState((s) => {
@@ -64,22 +83,36 @@ const History = () => {
       <LineChart
         data={chartData}
         height={300}
-        margin={{ top: 20, left: 30, bottom: 10, right: 10 }}
+        margin={{ top: 20, left: 20, bottom: 10, right: 10 }}
       >
         <CartesianGrid />
-        <XAxis dataKey="date" tick={chartData.length > 0}>
-          <Label value="Year" position="insideBottom" offset={-10} />
+        <XAxis
+          dataKey="date"
+          tick={chartData.length > 0}
+          tickFormatter={
+            chartMode === ChartMode.Monthly ? formatDate : undefined
+          }
+        >
+          <Label
+            value={chartMode === ChartMode.Monthly ? 'Month' : 'Year'}
+            position="insideBottom"
+            offset={-10}
+          />
         </XAxis>
-        <YAxis>
+        <YAxis tickFormatter={(value, index) => formatPrice(value)}>
           <Label
             value="Average Price (SGD)"
             position="insideLeft"
             angle={-90}
-            offset={-20}
+            offset={-10}
             style={{ textAnchor: 'middle' }}
           />
         </YAxis>
-        <ChartTooltip />
+        <ChartTooltip
+          labelFormatter={
+            chartMode === ChartMode.Monthly ? formatDate : undefined
+          }
+        />
         {groups.map(({ id, name, color }) => (
           <Line
             type="linear"
@@ -122,12 +155,36 @@ const History = () => {
             {graph}
           </Grid>
           <Grid item xs={12} md={4}>
-            <GroupList
-              selectedGroup={selectedGroup}
-              onChangeSelectedGroup={handleChangeSelectedGroup}
-              projectsState={projectsState}
-              onChangeProject={handleChangeProject}
-            />
+            <Stack
+              alignItems="center"
+              justifyContent="space-between"
+              sx={{ height: '100%' }}
+            >
+              <GroupList
+                selectedGroup={selectedGroup}
+                onChangeSelectedGroup={handleChangeSelectedGroup}
+                projectsState={projectsState}
+                onChangeProject={handleChangeProject}
+              />
+              <ButtonGroup>
+                <Button
+                  variant={
+                    chartMode === ChartMode.Monthly ? 'contained' : 'outlined'
+                  }
+                  onClick={() => setChartMode(ChartMode.Monthly)}
+                >
+                  Monthly
+                </Button>
+                <Button
+                  variant={
+                    chartMode === ChartMode.Yearly ? 'contained' : 'outlined'
+                  }
+                  onClick={() => setChartMode(ChartMode.Yearly)}
+                >
+                  Yearly
+                </Button>
+              </ButtonGroup>
+            </Stack>
           </Grid>
         </Grid>
       </Paper>

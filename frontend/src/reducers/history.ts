@@ -13,14 +13,16 @@ import { getChartData } from '../utils/history';
 interface HistoryState {
   groups: Record<string, Group>;
   resaleRawData: Record<string, PriceDataPoint[]>;
-  chartData: ChartDataPoint[];
+  monthlyChartData: ChartDataPoint[];
+  yearlyChartData: ChartDataPoint[];
   btoProjectsRecord: Record<string, BTOProject[]>;
 }
 
 const initialState: HistoryState = {
   groups: {},
   resaleRawData: {},
-  chartData: [],
+  monthlyChartData: [],
+  yearlyChartData: [],
   btoProjectsRecord: {},
 };
 
@@ -42,7 +44,12 @@ const slice = createSlice({
       delete state.groups[action.payload];
       if (type === 'resale') {
         delete state.resaleRawData[action.payload];
-        state.chartData = getChartData(state.resaleRawData, state.groups);
+        const [monthlyData, yearlyData] = getChartData(
+          state.resaleRawData,
+          state.groups
+        );
+        state.monthlyChartData = monthlyData;
+        state.yearlyChartData = yearlyData;
       } else {
         delete state.btoProjectsRecord[action.payload];
       }
@@ -57,7 +64,12 @@ const slice = createSlice({
         getResaleGraph.matchFulfilled,
         (state, action: PayloadAction<ResaleGraphDataResponse>) => {
           state.resaleRawData[action.payload.id] = action.payload.data;
-          state.chartData = getChartData(state.resaleRawData, state.groups);
+          const [monthlyData, yearlyData] = getChartData(
+            state.resaleRawData,
+            state.groups
+          );
+          state.monthlyChartData = monthlyData;
+          state.yearlyChartData = yearlyData;
         }
       )
       .addMatcher(
@@ -77,8 +89,10 @@ export const selectGroups = (state: RootState): Group[] =>
     left.name.localeCompare(right.name)
   );
 
-export const selectChartData = (state: RootState): ChartDataPoint[] =>
-  state.history.chartData;
+export const selectMonthlyChartData = (state: RootState): ChartDataPoint[] =>
+  state.history.monthlyChartData;
+export const selectYearlyChartData = (state: RootState): ChartDataPoint[] =>
+  state.history.yearlyChartData;
 export const selectBTOProjectsRecord = (
   state: RootState
 ): Record<string, BTOProject[]> => state.history.btoProjectsRecord;
