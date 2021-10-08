@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import { getRepository } from 'typeorm';
-
+import fs from 'fs';
 import Resale from '../models/resale';
 import { FlatType, Town } from '../utils/model';
 import getCoordinates from './get-coordinates';
@@ -130,14 +130,30 @@ async function seedResale() {
     allDataRows = allDataRows.concat(data);
   }
 
-  const allCoordinates = await getCoordinates(
-    allDataRows.map((row) => ({
-      block: row[BLOCK] as string,
-      streetName: capitalizeEachWord(row[STREET_NAME] as string),
-    }))
-  );
+  // const allCoordinates = await getCoordinates(
+  //   allDataRows.map((row) => ({
+  //     block: row[BLOCK] as string,
+  //     streetName: capitalizeEachWord(row[STREET_NAME] as string),
+  //   }))
+  // );
 
-  console.log(allCoordinates);
+  let allCoordinates;
+
+  fs.readFile('src/database/data/coordinates.json', 'utf-8', (err, data) => {
+    if (!err) {
+      // parse JSON object
+      allCoordinates = JSON.parse(data.toString());
+    }
+  });
+
+  if (!allCoordinates) {
+    allCoordinates = await getCoordinates(
+      allDataRows.map((row) => ({
+        block: row[BLOCK] as string,
+        streetName: capitalizeEachWord(row[STREET_NAME] as string),
+      }))
+    );
+  }
 
   for (let i = 0; i < filePaths.length; i += 1) {
     const isOldFormat = i < 3;
@@ -158,6 +174,7 @@ async function seedResale() {
 
     // Map to correct database format
     // eslint-disable-next-line no-await-in-loop
+    // eslint-disable-next-line no-loop-func
     const allResale: Resale[] = dataRows.map((row) => {
       const resale = new Resale();
       resale.transactionDate = new Date(row[MONTH]);
