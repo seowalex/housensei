@@ -1,5 +1,5 @@
 import api from './base';
-import type { Town } from '../app/types';
+import type { Town } from '../types/towns';
 
 interface IslandHeatmapResponse {
   town: string;
@@ -13,6 +13,7 @@ interface TownHeatmapRequest {
 
 interface TownHeatmapResponse {
   address: string;
+  coordinates: [number, number];
   resalePrice: number;
 }
 

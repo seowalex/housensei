@@ -1,4 +1,4 @@
-import { Town } from './types';
+import { Town } from '../types/towns';
 
 export const googleMapsApiKey = 'AIzaSyAG6A2F0zMMHkLByBzBe0SUGeO8r8ICWEY';
 

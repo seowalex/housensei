@@ -43,16 +43,11 @@ import {
   townBoundaries,
   townCoordinates,
 } from '../app/constants';
-import { Town } from '../app/types';
+import { Town } from '../types/towns';
 
 const apiOptions: UseLoadScriptOptions = {
   googleMapsApiKey,
   libraries: ['places', 'visualization'],
-};
-
-const heatmapLayerOptions: google.maps.visualization.HeatmapLayerOptions = {
-  dissipating: false,
-  radius: 0.035,
 };
 
 const polygonOptions: google.maps.PolygonOptions = {
@@ -150,18 +145,33 @@ const Heatmap = () => {
     [darkMode]
   );
 
-  const heatmapData = useMemo(
-    () =>
-      town === 'Islandwide'
-        ? normaliseHeatmap(islandHeatmap).map((point) => ({
-            location: new google.maps.LatLng(
-              townCoordinates[point.town as Town]
-            ),
-            weight: point.resalePrice,
-          }))
-        : [],
-    [google, town, islandHeatmap]
-  );
+  const heatmapLayerOptions: google.maps.visualization.HeatmapLayerOptions =
+    useMemo(
+      () => ({
+        dissipating: false,
+        radius: town === 'Islandwide' ? 0.035 : 0.001,
+      }),
+      [town]
+    );
+
+  const heatmapData = useMemo(() => {
+    if (!google) {
+      return [];
+    }
+
+    return town === 'Islandwide'
+      ? normaliseHeatmap(islandHeatmap).map((point) => ({
+          location: new google.maps.LatLng(townCoordinates[point.town as Town]),
+          weight: point.resalePrice,
+        }))
+      : normaliseHeatmap(townHeatmap).map((point) => ({
+          location: new google.maps.LatLng({
+            lat: point.coordinates[0],
+            lng: point.coordinates[1],
+          }),
+          weight: point.resalePrice,
+        }));
+  }, [google, town, islandHeatmap, townHeatmap]);
 
   useEffect(() => {
     map?.setCenter(townCoordinates[town as Town] ?? singaporeCoordinates);
@@ -336,7 +346,11 @@ const Heatmap = () => {
           </Fragment>
         ))}
       </GoogleMap>
-      <Grid container spacing={2} sx={{ position: 'absolute', top: 0, p: 2 }}>
+      <Grid
+        container
+        spacing={2}
+        sx={{ position: 'absolute', top: 0, p: 2, pointerEvents: 'none' }}
+      >
         <Grid item xs={12} md="auto">
           <StandaloneSearchBox
             onPlacesChanged={setMapViewport}
@@ -349,6 +363,7 @@ const Heatmap = () => {
                   xs: '100%',
                   md: 400,
                 },
+                pointerEvents: 'auto',
                 '.MuiInputBase-root': {
                   backgroundColor: darkMode ? '#121212' : '#fff',
                 },
@@ -371,6 +386,7 @@ const Heatmap = () => {
                 xs: '100%',
                 md: 200,
               },
+              pointerEvents: 'auto',
               '.MuiInputBase-root': {
                 backgroundColor: darkMode ? '#121212' : '#fff',
               },
@@ -384,6 +400,7 @@ const Heatmap = () => {
                 xs: '100%',
                 md: 600,
               },
+              pointerEvents: 'auto',
             }}
           >
             <CardContent sx={{ pb: '8px !important' }}>
@@ -436,7 +453,10 @@ const Heatmap = () => {
           </Card>
         </Grid>
       </Grid>
-      <Grid container sx={{ position: 'absolute', bottom: 0, p: 2 }}>
+      <Grid
+        container
+        sx={{ position: 'absolute', bottom: 0, p: 2, pointerEvents: 'none' }}
+      >
         <Grid item xs={12}>
           <Card
             sx={{
@@ -444,6 +464,7 @@ const Heatmap = () => {
                 xs: '100%',
                 md: 600,
               },
+              pointerEvents: 'auto',
             }}
           >
             <CardContent sx={{ p: '12px !important' }}>
@@ -457,7 +478,12 @@ const Heatmap = () => {
                           ) ?? [])
                         )
                       )
-                    : ''}
+                    : currencyFormatter.format(
+                        Math.min(
+                          ...(townHeatmap?.map((point) => point.resalePrice) ??
+                            [])
+                        )
+                      )}
                 </Typography>
                 <Typography variant="subtitle2" gutterBottom>
                   {town === 'Islandwide'
@@ -468,7 +494,12 @@ const Heatmap = () => {
                           ) ?? [])
                         )
                       )
-                    : ''}
+                    : currencyFormatter.format(
+                        Math.max(
+                          ...(townHeatmap?.map((point) => point.resalePrice) ??
+                            [])
+                        )
+                      )}
                 </Typography>
               </Stack>
               <Box
