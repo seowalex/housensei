@@ -7,7 +7,7 @@ export enum Town {
   BKM = 'Bukit Merah',
   BKP = 'Bukit Panjang',
   BKT = 'Bukit Timah',
-  CEN = 'Central Area',
+  CEN = 'Central',
   CCK = 'Choa Chu Kang',
   CLM = 'Clementi',
   GEY = 'Geylang',
