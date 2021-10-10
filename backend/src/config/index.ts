@@ -4,12 +4,17 @@ dotenv.config({ path: '.env' });
 
 const config = {
   port: Number(process.env.PORT) || 5000,
-  env: process.env.ENV ?? 'development',
+  env: process.env.NODE_ENV ?? 'development',
   dbPort: Number(process.env.DB_PORT) || 5432,
   host: process.env.DB_HOST ?? 'localhost',
   user: process.env.DB_USER ?? 'postgres',
   password: process.env.DB_PASS ?? 'postgres',
   dbName: process.env.DB_NAME ?? 'housensei',
+  dbUrl: process.env.DATABASE_URL ?? '',
+  dataFilePath:
+    process.env.NODE_ENV === 'development'
+      ? 'src/database/data/'
+      : 'backend/src/database/data/',
 };
 
 export default config;

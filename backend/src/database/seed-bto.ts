@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
 import { getRepository } from 'typeorm';
+import config from '../config/index';
 import classValidate from '../utils/validate';
 import BTO from '../models/bto';
 import { FlatType, Town } from '../utils/model';
@@ -97,8 +98,8 @@ const combineBTOs = (
 };
 
 const seedBTOs = async () => {
-  const file = 'src/database/data/HDB-BTO-Prices-List.xls';
-  const workbook = XLSX.readFile(file, {
+  const file = 'HDB-BTO-Prices-List.xls';
+  const workbook = XLSX.readFile(config.dataFilePath + file, {
     cellDates: true,
     cellNF: false,
     cellText: false,
