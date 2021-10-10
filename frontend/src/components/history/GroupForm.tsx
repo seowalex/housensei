@@ -15,7 +15,8 @@ import {
   SubmitHandler,
   useForm,
 } from 'react-hook-form';
-import { FlatType, Town } from '../../types/groups';
+import { FlatType } from '../../types/groups';
+import { Town } from '../../types/towns';
 import FormAutocompleteInput from '../forms/FormAutocompleteInput';
 import FormSliderInput from '../forms/FormSliderInput';
 import FormSwitchInput from '../forms/FormSwitchInput';
