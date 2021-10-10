@@ -37,14 +37,6 @@ const capitalizeEachWord = (text: string) => {
 const parseLocation = (text: string) => {
   const formatted = capitalizeEachWord(text);
 
-  if (formatted === 'Central Area') {
-    return 'Central';
-  }
-
-  if (formatted === 'Kallang-Whampoa') {
-    return 'Kallang/Whampoa';
-  }
-
   return formatted;
 };
 

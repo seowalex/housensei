@@ -193,6 +193,17 @@ const seedBTOs = async () => {
       // it could be kallang-whampoa or kallang/whampoa - this is a hack
       town = Town.KAL;
     }
+
+    if ((town as any) === 'Central') {
+      // Central refers to Central Area
+      town = Town.CEN;
+    }
+
+    if ((town as any) === 'Bidadari') {
+      // Bidadari is actually in Toa Payoh
+      town = Town.TAP;
+    }
+
     // if (!Object.values(Town).includes(town)) {
     //   console.log(town);
     //   return;
