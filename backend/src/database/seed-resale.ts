@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
 import { getRepository } from 'typeorm';
+import fs from 'fs';
 import Resale from '../models/resale';
 import { FlatType, Town } from '../utils/model';
 import getCoordinates from './get-coordinates';
@@ -11,6 +12,8 @@ const filePaths = [
   'src/database/data/resale-flat-prices-based-on-registration-date-from-jan-2015-to-dec-2016.xlsx',
   'src/database/data/resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.xlsx',
 ];
+
+const coordinatesFilePath = 'src/database/data/coordinates.json';
 
 const capitalizeEachWord = (text: string) => {
   let newText = '';
@@ -129,12 +132,18 @@ async function seedResale() {
     allDataRows = allDataRows.concat(data);
   }
 
-  const allCoordinates = await getCoordinates(
-    allDataRows.map((row) => ({
-      block: row[BLOCK] as string,
-      streetName: capitalizeEachWord(row[STREET_NAME] as string),
-    }))
-  );
+  let allCoordinates;
+
+  if (fs.existsSync(coordinatesFilePath)) {
+    allCoordinates = JSON.parse(fs.readFileSync(coordinatesFilePath, 'utf8'));
+  } else {
+    allCoordinates = await getCoordinates(
+      allDataRows.map((row) => ({
+        block: row[BLOCK] as string,
+        streetName: capitalizeEachWord(row[STREET_NAME] as string),
+      }))
+    );
+  }
 
   for (let i = 0; i < filePaths.length; i += 1) {
     const isOldFormat = i < 3;
