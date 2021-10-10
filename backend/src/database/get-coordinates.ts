@@ -1,6 +1,7 @@
 import axios from 'axios';
 import _ from 'lodash';
 import axiosThrottle from 'axios-request-throttle';
+import fs from 'fs';
 import Resale from '../models/resale';
 import {
   CoordinatesResponse,
@@ -59,15 +60,10 @@ const getCoordinates = async (addresses: Array<Address>) => {
     })
   );
 
-  // const data = JSON.stringify(result, null, 4);
+  const data = JSON.stringify(result, null, 4);
 
-  // // write JSON string to a file
-  // fs.writeFile('src/database/data/coordinates.json', data, (err) => {
-  //   if (err) {
-  //     throw err;
-  //   }
-  //   console.log('JSON data is saved.');
-  // });
+  // write JSON string to a file
+  fs.writeFileSync('src/database/data/coordinates.json', data);
 
   return result;
 };
