@@ -3,8 +3,8 @@ import { Town } from '../types/towns';
 export const googleMapsApiKey = 'AIzaSyAG6A2F0zMMHkLByBzBe0SUGeO8r8ICWEY';
 
 export const singaporeCoordinates = {
-  lat: 1.283333,
-  lng: 103.833333,
+  lat: 1.352083,
+  lng: 103.819836,
 };
 
 export const townCoordinates = {
@@ -69,8 +69,8 @@ export const townCoordinates = {
     lng: 103.865556,
   },
   [Town.LCK]: {
-    lat: 1.416667,
-    lng: 103.7,
+    lat: 1.4305,
+    lng: 103.7173,
   },
   [Town.MPR]: {
     lat: 1.303056,
