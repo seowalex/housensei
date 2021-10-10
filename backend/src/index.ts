@@ -21,7 +21,11 @@ dbConnection.then(() => {
   console.info('db listening on port: ', config.dbPort);
 });
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 
 app.use(bodyParser());
 app.use(json());
