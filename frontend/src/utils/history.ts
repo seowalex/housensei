@@ -10,6 +10,18 @@ export const convertStringToDate = (dateString: string): Date | undefined => {
   return date;
 };
 
+export const compareDates = (left: string, right: string): number => {
+  const leftDate = convertStringToDate(left);
+  const rightDate = convertStringToDate(right);
+  if (leftDate == null) {
+    return -1;
+  }
+  if (rightDate == null) {
+    return 1;
+  }
+  return compareAsc(leftDate, rightDate);
+};
+
 export const formatDate = (dateString: string): string => {
   const date = convertStringToDate(dateString);
   if (date == null) {
@@ -86,17 +98,7 @@ export const getChartData = (
     monthlyChartData.push(chartDataPoint);
   });
 
-  monthlyChartData.sort((left, right) => {
-    const leftDate = convertStringToDate(left.date);
-    const rightDate = convertStringToDate(right.date);
-    if (leftDate == null) {
-      return -1;
-    }
-    if (rightDate == null) {
-      return 1;
-    }
-    return compareAsc(leftDate, rightDate);
-  });
+  monthlyChartData.sort((left, right) => compareDates(left.date, right.date));
 
   yearlyDateToDataMap.forEach((value, key) => {
     const chartDataPoint: ChartDataPoint = {

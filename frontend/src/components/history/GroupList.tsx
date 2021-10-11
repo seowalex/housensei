@@ -15,9 +15,7 @@ import ResaleGroupAccordion from './ResaleGroupAccordion';
 
 interface Props {
   selectedGroup: string | undefined;
-  onChangeSelectedGroup: (
-    id: string
-  ) => (event: SyntheticEvent, isExpanded: boolean) => void;
+  onChangeSelectedGroup: (id: string) => (isExpanded: boolean) => void;
   projectsState: Record<string, BTOProject[]>;
   onChangeProject: (
     id: string
@@ -39,15 +37,29 @@ const GroupList = (props: Props) => {
     data: GroupFormValues
   ) => {
     const filters: GroupFilters = mapFormValuesToGroupFilters(data);
+    const groupId = uuidv4();
     const group: Group = {
       type: data.type,
-      id: uuidv4(),
-      name: data.name,
+      id: groupId,
+      name: data.name === '' ? `Group ${groups.length + 1}` : data.name,
       color: getGroupColor(groups.length),
       filters,
     };
     dispatch(createGroup(group));
+    onChangeSelectedGroup(groupId)(true);
     setShowCreateForm(false);
+  };
+
+  const handleDuplicateGroup = (group: Group) => {
+    const groupId = uuidv4();
+    const duplicatedGroup: Group = {
+      ...group,
+      id: groupId,
+      name: `${group.name} (Copy)`,
+      color: getGroupColor(groups.length),
+    };
+    dispatch(createGroup(duplicatedGroup));
+    onChangeSelectedGroup(groupId)(true);
   };
 
   return (
@@ -66,6 +78,7 @@ const GroupList = (props: Props) => {
               group={group as ResaleGroup}
               expanded={selectedGroup === group.id}
               onChangeSelectedGroup={onChangeSelectedGroup(group.id)}
+              onDuplicateGroup={handleDuplicateGroup}
             />
           ) : (
             <BTOGroupAccordion
@@ -74,16 +87,25 @@ const GroupList = (props: Props) => {
               onChangeSelectedGroup={onChangeSelectedGroup(group.id)}
               projectsState={projectsState[group.id]}
               onChangeSelectedProjects={onChangeProject(group.id)}
+              onDuplicateGroup={handleDuplicateGroup}
             />
           )
         )}
       </Stack>
-      <Modal open={showCreateForm} onClose={() => setShowCreateForm(false)}>
+      <Modal
+        open={showCreateForm}
+        onClose={(event, reason) => {
+          if (reason !== 'backdropClick') {
+            setShowCreateForm(false);
+          }
+        }}
+      >
         <FormPaper>
           <GroupForm
             formType="create"
             onSubmit={handleCreateGroup}
             handleClose={() => setShowCreateForm(false)}
+            groupNamePlaceholder={`Group ${groups.length + 1}`}
           />
         </FormPaper>
       </Modal>

@@ -1,20 +1,25 @@
 import {
-  DeleteRounded,
+  ControlPointDuplicateRounded as ControlPointDuplicateRoundedIcon,
+  DeleteRounded as DeleteRoundedIcon,
   EditRounded as EditRoundedIcon,
   ExpandMoreRounded as ExpandMoreRoundedIcon,
+  WarningRounded as WarningRoundedIcon,
 } from '@mui/icons-material';
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Alert,
+  AlertTitle,
   Button,
   Grid,
   IconButton,
   Modal,
   Stack,
+  Tooltip,
   Typography,
 } from '@mui/material';
-import { SyntheticEvent, useState } from 'react';
+import { useState } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useGetResaleGraphQuery } from '../../api/history';
@@ -24,7 +29,7 @@ import {
   mapFormValuesToGroupFilters,
   mapGroupToFormValues,
 } from '../../utils/groups';
-import { ModalPaper } from '../styled';
+import { FormPaper, ModalPaper } from '../styled';
 import GroupDetails from './GroupDetails';
 import GroupForm, { GroupFormValues } from './GroupForm';
 import GroupSummary from './GroupSummary';
@@ -38,13 +43,17 @@ enum DisplayedModal {
 interface Props {
   group: ResaleGroup;
   expanded: boolean;
-  onChangeSelectedGroup: (event: SyntheticEvent, isExpanded: boolean) => void;
+  onChangeSelectedGroup: (isExpanded: boolean) => void;
+  onDuplicateGroup: (group: Group) => void;
 }
 
 const ResaleGroupAccordion = (props: Props) => {
   const dispatch = useDispatch();
-  const { group, expanded, onChangeSelectedGroup } = props;
-  useGetResaleGraphQuery({ ...group.filters, id: group.id });
+  const { group, expanded, onChangeSelectedGroup, onDuplicateGroup } = props;
+  const { data: queryResponse } = useGetResaleGraphQuery({
+    ...group.filters,
+    id: group.id,
+  });
   const [displayedModal, setDisplayedModal] = useState<DisplayedModal>(
     DisplayedModal.Hidden
   );
@@ -55,7 +64,7 @@ const ResaleGroupAccordion = (props: Props) => {
     const updatedGroup: Group = {
       ...group,
       type: data.type,
-      name: data.name,
+      name: data.name === '' ? group.name : data.name,
       filters: mapFormValuesToGroupFilters(data),
     };
 
@@ -65,57 +74,80 @@ const ResaleGroupAccordion = (props: Props) => {
         group: updatedGroup,
       })
     );
+    setDisplayedModal(DisplayedModal.Hidden);
   };
 
   const onDeleteGroup = () => {
     dispatch(removeGroup(group.id));
+    setDisplayedModal(DisplayedModal.Hidden);
+    onChangeSelectedGroup(false);
   };
 
   return (
     <>
       <Accordion
         expanded={expanded}
-        onChange={onChangeSelectedGroup}
+        onChange={(e, isExpanded) => onChangeSelectedGroup(isExpanded)}
         elevation={2}
       >
         <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />}>
           <GroupSummary group={group} />
         </AccordionSummary>
         <AccordionDetails>
-          <Grid container>
-            <Grid item xs>
-              <GroupDetails filters={group.filters} />
+          <Grid container spacing={1}>
+            <Grid item container xs={12}>
+              <Grid item xs>
+                <GroupDetails filters={group.filters} />
+              </Grid>
+              <Grid item>
+                <Stack justifyContent="flex-end" sx={{ height: '100%' }}>
+                  <Tooltip title="Duplicate" placement="left" arrow>
+                    <IconButton onClick={() => onDuplicateGroup(group)}>
+                      <ControlPointDuplicateRoundedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <IconButton
+                    onClick={() => setDisplayedModal(DisplayedModal.Update)}
+                  >
+                    <EditRoundedIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => setDisplayedModal(DisplayedModal.Delete)}
+                    color="error"
+                  >
+                    <DeleteRoundedIcon fontSize="small" />
+                  </IconButton>
+                </Stack>
+              </Grid>
             </Grid>
-            <Grid item>
-              <Stack justifyContent="flex-end" sx={{ height: '100%' }}>
-                <IconButton
-                  onClick={() => setDisplayedModal(DisplayedModal.Update)}
-                >
-                  <EditRoundedIcon fontSize="small" />
-                </IconButton>
-                <IconButton
-                  onClick={() => setDisplayedModal(DisplayedModal.Delete)}
-                  color="error"
-                >
-                  <DeleteRounded fontSize="small" />
-                </IconButton>
-              </Stack>
-            </Grid>
+            {queryResponse?.data.length === 0 && (
+              <Grid item>
+                <Alert severity="warning" icon={<WarningRoundedIcon />}>
+                  <AlertTitle>No data found!</AlertTitle>
+                  Try changing your filters with the{' '}
+                  <EditRoundedIcon fontSize="small" /> icon to be less specific.
+                </Alert>
+              </Grid>
+            )}
           </Grid>
         </AccordionDetails>
       </Accordion>
       <Modal
         open={displayedModal === DisplayedModal.Update}
-        onClose={() => setDisplayedModal(DisplayedModal.Hidden)}
+        onClose={(event, reason) => {
+          if (reason !== 'backdropClick') {
+            setDisplayedModal(DisplayedModal.Hidden);
+          }
+        }}
       >
-        <ModalPaper sx={{ width: '75%' }}>
+        <FormPaper>
           <GroupForm
             formType="update"
             onSubmit={onUpdateGroup}
             handleClose={() => setDisplayedModal(DisplayedModal.Hidden)}
             currentData={mapGroupToFormValues(group)}
           />
-        </ModalPaper>
+        </FormPaper>
       </Modal>
       <Modal
         open={displayedModal === DisplayedModal.Delete}

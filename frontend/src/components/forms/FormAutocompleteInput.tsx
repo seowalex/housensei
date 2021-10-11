@@ -1,10 +1,12 @@
-import { Autocomplete, TextField } from '@mui/material';
+import { CheckRounded as CheckRoundedIcon } from '@mui/icons-material';
+import { Autocomplete, Stack, TextField } from '@mui/material';
 import { Control, Controller, FieldValues } from 'react-hook-form';
 
 interface Props {
   name: string;
   control: Control<FieldValues>;
   options: string[];
+  groupBy?: (options: any) => string;
   disabled?: boolean;
   label?: string;
   placeholder?: string;
@@ -12,8 +14,16 @@ interface Props {
 }
 
 const FormAutocompleteInput = (props: Props) => {
-  const { name, control, options, disabled, label, placeholder, limitTags } =
-    props;
+  const {
+    name,
+    control,
+    options,
+    groupBy,
+    disabled,
+    label,
+    placeholder,
+    limitTags,
+  } = props;
   return (
     <Controller
       name={name}
@@ -26,6 +36,7 @@ const FormAutocompleteInput = (props: Props) => {
           disabled={disabled}
           limitTags={limitTags}
           options={options}
+          groupBy={groupBy}
           disableCloseOnSelect
           renderInput={(params) => (
             <TextField
@@ -39,6 +50,20 @@ const FormAutocompleteInput = (props: Props) => {
               }}
             />
           )}
+          renderOption={(optionProps, option, { selected }) => (
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            <li {...optionProps}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+                sx={{ width: '100%' }}
+              >
+                {option}
+                {selected && <CheckRoundedIcon fontSize="small" />}
+              </Stack>
+            </li>
+          )}
         />
       )}
     />
@@ -46,6 +71,7 @@ const FormAutocompleteInput = (props: Props) => {
 };
 
 FormAutocompleteInput.defaultProps = {
+  groupBy: undefined,
   disabled: false,
   label: '',
   placeholder: '',

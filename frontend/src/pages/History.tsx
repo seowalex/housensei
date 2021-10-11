@@ -5,7 +5,6 @@ import {
   Grid,
   Paper,
   Stack,
-  Typography,
 } from '@mui/material';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import {
@@ -68,10 +67,9 @@ const History = () => {
     });
   }, [btoProjects]);
 
-  const handleChangeSelectedGroup =
-    (id: string) => (event: SyntheticEvent, isExpanded: boolean) => {
-      setSelectedGroup(isExpanded ? id : undefined);
-    };
+  const handleChangeSelectedGroup = (id: string) => (isExpanded: boolean) => {
+    setSelectedGroup(isExpanded ? id : undefined);
+  };
 
   const handleChangeProject =
     (id: string) => (event: SyntheticEvent, value: BTOProject[]) => {
@@ -124,6 +122,8 @@ const History = () => {
                 : color
             }
             strokeWidth={selectedGroup === id ? 3 : 2}
+            connectNulls
+            dot={false}
           />
         ))}
         {groups.map(({ id, color }) => (

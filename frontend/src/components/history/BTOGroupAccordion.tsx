@@ -1,5 +1,8 @@
 import {
+  AttachMoneyRounded,
+  CalendarTodayRounded,
   CheckRounded as CheckRoundedIcon,
+  ControlPointDuplicateRounded,
   DeleteRounded as DeleteRoundedIcon,
   EditRounded as EditRoundedIcon,
   ExpandMoreRounded as ExpandMoreRoundedIcon,
@@ -12,10 +15,10 @@ import {
   Button,
   Grid,
   IconButton,
-  ListItemText,
   Modal,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { SyntheticEvent, useState } from 'react';
@@ -34,7 +37,8 @@ import {
   mapFormValuesToGroupFilters,
   mapGroupToFormValues,
 } from '../../utils/groups';
-import { ModalPaper } from '../styled';
+import { compareDates, formatDate } from '../../utils/history';
+import { FormPaper, ModalPaper } from '../styled';
 import GroupDetails from './GroupDetails';
 import GroupForm, { GroupFormValues } from './GroupForm';
 import GroupSummary from './GroupSummary';
@@ -48,12 +52,13 @@ enum DisplayedModal {
 interface Props {
   group: BTOGroup;
   expanded: boolean;
-  onChangeSelectedGroup: (event: SyntheticEvent, isExpanded: boolean) => void;
+  onChangeSelectedGroup: (isExpanded: boolean) => void;
   projectsState: BTOProject[];
   onChangeSelectedProjects: (
     event: SyntheticEvent,
     projects: BTOProject[]
   ) => void;
+  onDuplicateGroup: (group: Group) => void;
 }
 
 const BTOGroupAccordion = (props: Props) => {
@@ -64,6 +69,7 @@ const BTOGroupAccordion = (props: Props) => {
     onChangeSelectedGroup,
     projectsState,
     onChangeSelectedProjects,
+    onDuplicateGroup,
   } = props;
   useGetBTOGraphQuery({
     ...group.filters,
@@ -80,7 +86,7 @@ const BTOGroupAccordion = (props: Props) => {
     const updatedGroup: Group = {
       ...group,
       type: data.type,
-      name: data.name,
+      name: data.name === '' ? group.name : data.name,
       filters: mapFormValuesToGroupFilters(data),
     };
 
@@ -90,17 +96,22 @@ const BTOGroupAccordion = (props: Props) => {
         group: updatedGroup,
       })
     );
+    setDisplayedModal(DisplayedModal.Hidden);
   };
 
   const onDeleteGroup = () => {
     dispatch(removeGroup(group.id));
+    setDisplayedModal(DisplayedModal.Hidden);
+    onChangeSelectedGroup(false);
   };
 
   return (
     <>
       <Accordion
         expanded={expanded}
-        onChange={onChangeSelectedGroup}
+        onChange={(e, isExpanded) => {
+          onChangeSelectedGroup(isExpanded);
+        }}
         elevation={2}
       >
         <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />}>
@@ -114,7 +125,13 @@ const BTOGroupAccordion = (props: Props) => {
                 value={projectsState ?? []}
                 multiple
                 disableCloseOnSelect
-                options={projects ?? []}
+                options={
+                  projects
+                    ? [...projects].sort(
+                        (left, right) => -compareDates(left.date, right.date)
+                      )
+                    : []
+                }
                 renderOption={(optionProps, option, { selected }) => (
                   // eslint-disable-next-line react/jsx-props-no-spreading
                   <li {...optionProps}>
@@ -124,10 +141,19 @@ const BTOGroupAccordion = (props: Props) => {
                       alignItems="center"
                       sx={{ width: '100%' }}
                     >
-                      <ListItemText
-                        primary={option.name}
-                        secondary={option.price}
-                      />
+                      <Stack spacing={0.5}>
+                        <Typography>{option.name}</Typography>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <CalendarTodayRounded fontSize="small" />
+                          <Typography variant="body2">
+                            {formatDate(option.date)}
+                          </Typography>
+                          <AttachMoneyRounded fontSize="small" />
+                          <Typography variant="body2">
+                            {option.price}
+                          </Typography>
+                        </Stack>
+                      </Stack>
                       {selected && <CheckRoundedIcon fontSize="small" />}
                     </Stack>
                   </li>
@@ -139,8 +165,16 @@ const BTOGroupAccordion = (props: Props) => {
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="BTO Projects"
-                    placeholder="Select a project to show on graph"
+                    label={
+                      projectsState == null || projectsState.length === 0
+                        ? 'Select BTO projects'
+                        : 'Displayed BTO Projects'
+                    }
+                    placeholder={
+                      projectsState == null || projectsState.length === 0
+                        ? 'Select a project to show on chart'
+                        : ''
+                    }
                   />
                 )}
               />
@@ -150,6 +184,11 @@ const BTOGroupAccordion = (props: Props) => {
             </Grid>
             <Grid item>
               <Stack justifyContent="flex-end" sx={{ height: '100%' }}>
+                <Tooltip title="Duplicate" placement="left" arrow>
+                  <IconButton onClick={() => onDuplicateGroup(group)}>
+                    <ControlPointDuplicateRounded fontSize="small" />
+                  </IconButton>
+                </Tooltip>
                 <IconButton
                   onClick={() => setDisplayedModal(DisplayedModal.Update)}
                 >
@@ -168,16 +207,20 @@ const BTOGroupAccordion = (props: Props) => {
       </Accordion>
       <Modal
         open={displayedModal === DisplayedModal.Update}
-        onClose={() => setDisplayedModal(DisplayedModal.Hidden)}
+        onClose={(event, reason) => {
+          if (reason !== 'backdropClick') {
+            setDisplayedModal(DisplayedModal.Hidden);
+          }
+        }}
       >
-        <ModalPaper sx={{ width: '75%' }}>
+        <FormPaper>
           <GroupForm
             formType="update"
             onSubmit={onUpdateGroup}
             handleClose={() => setDisplayedModal(DisplayedModal.Hidden)}
             currentData={mapGroupToFormValues(group)}
           />
-        </ModalPaper>
+        </FormPaper>
       </Modal>
       <Modal
         open={displayedModal === DisplayedModal.Delete}

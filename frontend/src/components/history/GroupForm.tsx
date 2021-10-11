@@ -2,7 +2,6 @@ import {
   Button,
   ButtonGroup,
   CircularProgress,
-  Collapse,
   Grid,
   Stack,
   Typography,
@@ -17,12 +16,15 @@ import {
 } from 'react-hook-form';
 import { FlatType } from '../../types/groups';
 import { Town } from '../../types/towns';
+import { mapTownToRegion } from '../../utils/towns';
 import FormAutocompleteInput from '../forms/FormAutocompleteInput';
 import FormSliderInput from '../forms/FormSliderInput';
-import FormSwitchInput from '../forms/FormSwitchInput';
+import FormSwitchInput, {
+  StaticFormSwitchInput,
+} from '../forms/FormSwitchInput';
 import FormTextInput from '../forms/FormTextInput';
 
-interface Range<T> {
+export interface Range<T> {
   lower: T;
   upper: T;
 }
@@ -47,6 +49,7 @@ interface Props {
   onSubmit: SubmitHandler<GroupFormValues>;
   handleClose: () => void;
   currentData?: GroupFormValues;
+  groupNamePlaceholder?: string;
 }
 
 const defaultFormValues: GroupFormValues = {
@@ -61,7 +64,8 @@ const defaultFormValues: GroupFormValues = {
 };
 
 const GroupForm = (props: Props) => {
-  const { formType, onSubmit, handleClose, currentData } = props;
+  const { formType, onSubmit, handleClose, currentData, groupNamePlaceholder } =
+    props;
   const {
     formState: { isSubmitting },
     watch,
@@ -72,6 +76,7 @@ const GroupForm = (props: Props) => {
   } = useForm<GroupFormValues>({
     defaultValues: currentData || defaultFormValues,
   });
+
   const watchType = watch('type');
   const watchStoreyRangeEnabled = watch('isStoreyRangeEnabled');
   const watchFloorAreaRangeEnabled = watch('isFloorAreaRangeEnabled');
@@ -95,7 +100,7 @@ const GroupForm = (props: Props) => {
             name="name"
             control={control as Control<FieldValues>}
             label="Group Name"
-            placeholder="Group 1"
+            placeholder={groupNamePlaceholder ?? 'Enter a group name'}
           />
         </Grid>
         <Grid item xs={12} lg={6}>
@@ -132,7 +137,15 @@ const GroupForm = (props: Props) => {
           <FormAutocompleteInput
             name="towns"
             control={control as Control<FieldValues>}
-            options={Object.values(Town)}
+            options={Object.values(Town).sort((left, right) => {
+              const leftTown = mapTownToRegion(left);
+              const rightTown = mapTownToRegion(right);
+              if (leftTown.localeCompare(rightTown) === 0) {
+                return left.localeCompare(right);
+              }
+              return leftTown.localeCompare(rightTown);
+            })}
+            groupBy={(town) => mapTownToRegion(town)}
             disabled={isSubmitting}
             label="Locations"
             placeholder="Enter a town name"
@@ -161,6 +174,7 @@ const GroupForm = (props: Props) => {
             name="floorAreaRange"
             control={control as Control<FieldValues>}
             setValue={setValue}
+            currentData={currentData ? currentData.floorAreaRange : undefined}
             min={1}
             max={200}
             inputFields
@@ -178,6 +192,7 @@ const GroupForm = (props: Props) => {
             name="yearRange"
             control={control as Control<FieldValues>}
             setValue={setValue}
+            currentData={currentData ? currentData.yearRange : undefined}
             min={1990}
             max={new Date().getFullYear()}
             marks={[
@@ -198,48 +213,66 @@ const GroupForm = (props: Props) => {
                 label: '2020',
               },
             ]}
+            inputFields
             disabled={!watchYearRangeEnabled || isSubmitting}
+            initialValue={[2010, 2021]}
           />
         </Grid>
         <Grid item xs={12} lg={6}>
-          <Collapse in={watchType === 'resale'}>
-            <FormSwitchInput
-              name="isLeasePeriodRangeEnabled"
-              control={control as Control<FieldValues>}
-              disabled={isSubmitting}
-              label="Remaining Lease Period (years)"
-            />
-            <FormSliderInput
-              name="leasePeriodRange"
-              control={control as Control<FieldValues>}
-              setValue={setValue}
-              min={1}
-              max={99}
-              inputFields
-              disabled={!watchLeasePeriodRangeEnabled || isSubmitting}
-            />
-          </Collapse>
+          {watchType === 'resale' ? (
+            <>
+              <FormSwitchInput
+                name="isLeasePeriodRangeEnabled"
+                control={control as Control<FieldValues>}
+                disabled={isSubmitting}
+                label="Remaining Lease Period (years)"
+              />
+              <FormSliderInput
+                name="leasePeriodRange"
+                control={control as Control<FieldValues>}
+                setValue={setValue}
+                currentData={
+                  currentData ? currentData.leasePeriodRange : undefined
+                }
+                min={1}
+                max={99}
+                inputFields
+                disabled={!watchLeasePeriodRangeEnabled || isSubmitting}
+                initialValue={[50, 99]}
+              />
+            </>
+          ) : (
+            <>
+              <StaticFormSwitchInput label="Lease Period filter unavailable" />
+            </>
+          )}
         </Grid>
         <Grid item xs={12} lg={6}>
-          <Collapse in={watchType === 'resale'}>
-            <FormSwitchInput
-              name="isStoreyRangeEnabled"
-              control={control as Control<FieldValues>}
-              disabled={isSubmitting}
-              label="Storey"
-            />
-            <FormSliderInput
-              name="storeyRange"
-              control={control as Control<FieldValues>}
-              setValue={setValue}
-              min={1}
-              max={61}
-              step={3}
-              marks
-              inputFields
-              disabled={!watchStoreyRangeEnabled || isSubmitting}
-            />
-          </Collapse>
+          {watchType === 'resale' ? (
+            <>
+              <FormSwitchInput
+                name="isStoreyRangeEnabled"
+                control={control as Control<FieldValues>}
+                disabled={isSubmitting}
+                label="Storey"
+              />
+              <FormSliderInput
+                name="storeyRange"
+                control={control as Control<FieldValues>}
+                setValue={setValue}
+                currentData={currentData ? currentData.storeyRange : undefined}
+                min={1}
+                max={60}
+                inputFields
+                disabled={!watchStoreyRangeEnabled || isSubmitting}
+                initialValue={[1, 60]}
+              />
+            </>
+          ) : (
+            <>
+              <StaticFormSwitchInput label="Storey filter unavailable" />
+            </>
+          )}
         </Grid>
         <Grid item container xs={12} justifyContent="space-between">
           <Grid item>
@@ -281,6 +314,7 @@ const GroupForm = (props: Props) => {
 
 GroupForm.defaultProps = {
   currentData: undefined,
+  groupNamePlaceholder: undefined,
 };
 
 export default GroupForm;
