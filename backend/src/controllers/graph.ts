@@ -24,11 +24,13 @@ const getResale = async (ctx: Koa.Context): Promise<void> => {
 
 const getBto = async (ctx: Koa.Context): Promise<void> => {
   const btos = await graphServices.getBtos(ctx.query);
+  const separator = '///';
 
   const averagePriceByProject = _.chain(btos)
-    .groupBy('name')
+    .groupBy((item) => `${item.name}${separator}${item.flatType}`)
     .map((value: BTO[], key: string) => ({
-      name: key,
+      name: key.split(separator)[0],
+      flatType: key.split(separator)[1],
       price: Math.round(
         _.meanBy(value, (bto) => (bto.minPrice + bto.maxPrice) / 2)
       ),
