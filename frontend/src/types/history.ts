@@ -16,3 +16,8 @@ export interface ChartDataPoint {
   date: string;
   [groupName: string]: string | number;
 }
+
+export enum ChartMode {
+  Monthly,
+  Yearly,
+}
