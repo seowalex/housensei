@@ -186,7 +186,7 @@ const GroupForm = (props: Props) => {
             name="isYearRangeEnabled"
             control={control as Control<FieldValues>}
             disabled={isSubmitting}
-            label="Year of Sale"
+            label={watchType === 'resale' ? 'Year of Sale' : 'Year of Launch'}
           />
           <FormSliderInput
             name="yearRange"
