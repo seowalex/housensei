@@ -27,6 +27,20 @@ const FormSwitchInput = (props: Props) => {
   );
 };
 
+interface StaticProps {
+  label: string;
+}
+
+export const StaticFormSwitchInput = (props: StaticProps) => {
+  const { label } = props;
+  return (
+    <FormControlLabel
+      control={<Switch checked={false} disabled />}
+      label={label}
+    />
+  );
+};
+
 FormSwitchInput.defaultProps = {
   disabled: false,
   label: '',

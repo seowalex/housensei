@@ -2,10 +2,6 @@
 export const constructQueryString = (
   params: Record<string, unknown>
 ): string => {
-  if (params === {}) {
-    return '';
-  }
-
   const queryString = new URLSearchParams();
   Object.keys(params).forEach((key) => {
     const value = params[key];

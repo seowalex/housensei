@@ -29,3 +29,11 @@ export enum Town {
   WDL = 'Woodlands',
   YIS = 'Yishun',
 }
+
+export enum Region {
+  Central = 'Central',
+  East = 'East',
+  North = 'North',
+  NorthEast = 'North East',
+  West = 'West',
+}

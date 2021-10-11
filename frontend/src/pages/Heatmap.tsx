@@ -49,6 +49,7 @@ import {
   townCoordinates,
 } from '../app/constants';
 import { Town } from '../types/towns';
+import { mapTownToRegion } from '../utils/towns';
 
 const apiOptions: UseLoadScriptOptions = {
   googleMapsApiKey,
@@ -334,8 +335,21 @@ const Heatmap = () => {
         <Grid item xs={12} md="auto">
           <Autocomplete
             options={['Islandwide'].concat(
-              Object.values(Town).sort((a, b) => a.localeCompare(b))
+              Object.values(Town).sort((left, right) => {
+                const leftTown = mapTownToRegion(left);
+                const rightTown = mapTownToRegion(right);
+                if (leftTown.localeCompare(rightTown) === 0) {
+                  return left.localeCompare(right);
+                }
+                return leftTown.localeCompare(rightTown);
+              })
             )}
+            groupBy={(option) => {
+              if (option === 'Islandwide') {
+                return '';
+              }
+              return mapTownToRegion(option as Town);
+            }}
             renderInput={(params) => <TextField label="Town" {...params} />}
             value={town}
             onChange={(_, value) => setTown(value as Town | 'Islandwide')}
