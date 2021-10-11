@@ -43,7 +43,7 @@ const getResalesByTown = async (
     .where('coordinates IS NOT NULL');
 
   if (queries.years) {
-    queryBuilder.where(
+    queryBuilder.andWhere(
       'date_part(\'year\', "transactionDate") IN (:...years)',
       {
         years: queries.years,
