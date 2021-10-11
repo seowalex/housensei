@@ -1,4 +1,4 @@
-import { GroupFilters } from '../types/groups';
+import { BackendFlatType, GroupFilters } from '../types/groups';
 import { constructQueryString } from '../utils/api';
 import api from './base';
 
@@ -26,6 +26,7 @@ interface BTOGraphDataPoint {
   name: string;
   price: number;
   date: string;
+  flatType: BackendFlatType;
 }
 
 export interface BTOGraphDataResponse {

@@ -97,7 +97,7 @@ const ResaleGroupAccordion = (props: Props) => {
           <Grid container spacing={1}>
             <Grid item container xs={12}>
               <Grid item xs>
-                <GroupDetails filters={group.filters} />
+                <GroupDetails group={group} />
               </Grid>
               <Grid item>
                 <Stack justifyContent="flex-end" sx={{ height: '100%' }}>
@@ -161,7 +161,7 @@ const ResaleGroupAccordion = (props: Props) => {
             <Stack direction="row" justifyContent="center">
               <GroupSummary group={group} />
             </Stack>
-            <GroupDetails filters={group.filters} />
+            <GroupDetails group={group} />
             <Stack direction="row" spacing={2}>
               <Button
                 variant="outlined"

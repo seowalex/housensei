@@ -28,7 +28,9 @@ const convertFlatTypeToBackend = (flatType: FlatType): BackendFlatType => {
   }
 };
 
-const convertFlatTypeToFrontEnd = (flatType: BackendFlatType): FlatType => {
+export const convertFlatTypeToFrontend = (
+  flatType: BackendFlatType
+): FlatType => {
   switch (flatType) {
     case BackendFlatType.ROOM_1:
       return FlatType.ROOM_1;
@@ -57,7 +59,7 @@ export const mapGroupToFormValues = (group: Group): GroupFormValues => {
     type,
     towns: filters.towns,
     flatTypes: filters.flatTypes.map((flatType) =>
-      convertFlatTypeToFrontEnd(flatType)
+      convertFlatTypeToFrontend(flatType)
     ),
     isStoreyRangeEnabled:
       filters.minStorey != null && filters.maxStorey != null,

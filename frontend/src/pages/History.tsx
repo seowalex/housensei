@@ -28,6 +28,7 @@ import {
   selectYearlyChartData,
 } from '../reducers/history';
 import { formatDate, formatPrice } from '../utils/history';
+import { convertFlatTypeToFrontend } from '../utils/groups';
 
 enum ChartMode {
   Monthly,
@@ -129,7 +130,7 @@ const History = () => {
         {groups.map(({ id, color }) => (
           <>
             {projectsState[id] &&
-              projectsState[id].map(({ name, price }) => (
+              projectsState[id].map(({ name, price, flatType }) => (
                 <ReferenceLine
                   y={price}
                   stroke={color}
@@ -138,7 +139,10 @@ const History = () => {
                   ifOverflow="extendDomain"
                 >
                   <Label position="insideLeft" value={price} />
-                  <Label position="insideRight" value={name} />
+                  <Label
+                    position="insideRight"
+                    value={`${name} (${convertFlatTypeToFrontend(flatType)})`}
+                  />
                 </ReferenceLine>
               ))}
           </>

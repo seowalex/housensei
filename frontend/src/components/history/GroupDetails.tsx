@@ -1,13 +1,13 @@
 import { Chip, Stack, Typography } from '@mui/material';
-import { Box } from '@mui/system';
-import { GroupFilters } from '../../types/groups';
+import { Group } from '../../types/groups';
 
 interface Props {
-  filters: GroupFilters;
+  group: Group;
 }
 
 const GroupDetails = (props: Props) => {
-  const { filters } = props;
+  const { group } = props;
+  const { type, filters } = group;
   const {
     towns,
     flatTypes,
@@ -22,7 +22,7 @@ const GroupDetails = (props: Props) => {
   } = filters;
 
   return (
-    <Box>
+    <Stack spacing={0.5}>
       <Stack
         direction="row"
         spacing={1}
@@ -83,10 +83,12 @@ const GroupDetails = (props: Props) => {
       )}
       {startYear && endYear && (
         <Typography variant="body2">
-          {`Year of Sale: ${startYear} to ${endYear}`}
+          {`${
+            type === 'resale' ? 'Year of Sale' : 'Year of Launch'
+          }: ${startYear} to ${endYear}`}
         </Typography>
       )}
-    </Box>
+    </Stack>
   );
 };
 

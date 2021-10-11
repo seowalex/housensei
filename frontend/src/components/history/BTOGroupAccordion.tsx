@@ -1,5 +1,6 @@
 import {
   AttachMoneyRounded,
+  BedroomParentRounded,
   CalendarTodayRounded,
   CheckRounded as CheckRoundedIcon,
   ControlPointDuplicateRounded,
@@ -36,6 +37,7 @@ import { BTOProject } from '../../types/history';
 import {
   mapFormValuesToGroupFilters,
   mapGroupToFormValues,
+  convertFlatTypeToFrontend,
 } from '../../utils/groups';
 import { compareDates, formatDate } from '../../utils/history';
 import { FormPaper, ModalPaper } from '../styled';
@@ -127,9 +129,12 @@ const BTOGroupAccordion = (props: Props) => {
                 disableCloseOnSelect
                 options={
                   projects
-                    ? [...projects].sort(
-                        (left, right) => -compareDates(left.date, right.date)
-                      )
+                    ? [...projects].sort((left, right) => {
+                        if (compareDates(left.date, right.date) === 0) {
+                          return left.flatType.localeCompare(right.flatType);
+                        }
+                        return -compareDates(left.date, right.date);
+                      })
                     : []
                 }
                 renderOption={(optionProps, option, { selected }) => (
@@ -152,6 +157,10 @@ const BTOGroupAccordion = (props: Props) => {
                           <Typography variant="body2">
                             {option.price}
                           </Typography>
+                          <BedroomParentRounded fontSize="small" />
+                          <Typography variant="body2">
+                            {convertFlatTypeToFrontend(option.flatType)}
+                          </Typography>
                         </Stack>
                       </Stack>
                       {selected && <CheckRoundedIcon fontSize="small" />}
@@ -159,7 +168,9 @@ const BTOGroupAccordion = (props: Props) => {
                   </li>
                 )}
                 isOptionEqualToValue={(option, value) =>
-                  option.name === value.name && option.date === value.date
+                  option.name === value.name &&
+                  option.date === value.date &&
+                  option.flatType === value.flatType
                 }
                 getOptionLabel={(option) => option.name}
                 renderInput={(params) => (
@@ -180,7 +191,7 @@ const BTOGroupAccordion = (props: Props) => {
               />
             </Grid>
             <Grid item xs>
-              <GroupDetails filters={group.filters} />
+              <GroupDetails group={group} />
             </Grid>
             <Grid item>
               <Stack justifyContent="flex-end" sx={{ height: '100%' }}>
@@ -234,7 +245,7 @@ const BTOGroupAccordion = (props: Props) => {
             <Stack direction="row" justifyContent="center">
               <GroupSummary group={group} />
             </Stack>
-            <GroupDetails filters={group.filters} />
+            <GroupDetails group={group} />
             <Stack direction="row" spacing={2}>
               <Button
                 variant="outlined"

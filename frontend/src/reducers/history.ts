@@ -70,12 +70,20 @@ const slice = createSlice({
           );
           state.monthlyChartData = monthlyData;
           state.yearlyChartData = yearlyData;
+          delete state.btoProjectsRecord[action.payload.id];
         }
       )
       .addMatcher(
         getBTOGraph.matchFulfilled,
         (state, action: PayloadAction<BTOGraphDataResponse>) => {
           state.btoProjectsRecord[action.payload.id] = action.payload.data;
+          delete state.resaleRawData[action.payload.id];
+          const [monthlyData, yearlyData] = getChartData(
+            state.resaleRawData,
+            state.groups
+          );
+          state.monthlyChartData = monthlyData;
+          state.yearlyChartData = yearlyData;
         }
       );
   },
