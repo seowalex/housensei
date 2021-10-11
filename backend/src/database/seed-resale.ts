@@ -135,7 +135,7 @@ async function seedResale() {
 
   let allCoordinates;
 
-  if (fs.existsSync(coordinatesFilePath)) {
+  if (fs.existsSync(config.dataFilePath + coordinatesFilePath)) {
     allCoordinates = JSON.parse(
       fs.readFileSync(config.dataFilePath + coordinatesFilePath, 'utf8')
     );
