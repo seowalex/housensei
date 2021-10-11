@@ -11,10 +11,7 @@ const config = {
   password: process.env.DB_PASS ?? 'postgres',
   dbName: process.env.DB_NAME ?? 'housensei',
   dbUrl: process.env.DATABASE_URL ?? '',
-  dataFilePath:
-    process.env.NODE_ENV === 'development'
-      ? 'src/database/data/'
-      : 'backend/src/database/data/',
+  dataFilePath: 'src/database/data/',
 };
 
 export default config;

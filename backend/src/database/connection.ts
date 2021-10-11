@@ -15,7 +15,7 @@ export const developmentConnectionOpts: ConnectionOptions = {
 export const productionConnectionOpts: ConnectionOptions = {
   type: 'postgres',
   url: config.dbUrl,
-  entities: [`backend/dist/models/*.js`],
+  entities: [`dist/models/*.js`],
   synchronize: true,
   ssl: true,
   extra: {
