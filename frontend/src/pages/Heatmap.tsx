@@ -380,7 +380,7 @@ const Heatmap = () => {
                     />
                   </Box>
                 </Grid>
-                <Grid item>
+                <Grid item xs="auto">
                   <OutlinedInput
                     value={year}
                     size="small"
@@ -392,6 +392,11 @@ const Heatmap = () => {
                       min: 1990,
                       max: currentYear,
                       type: 'number',
+                    }}
+                    sx={{
+                      '.MuiInputBase-input': {
+                        maxWidth: '70px',
+                      },
                     }}
                   />
                 </Grid>
