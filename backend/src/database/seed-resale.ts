@@ -4,16 +4,17 @@ import fs from 'fs';
 import Resale from '../models/resale';
 import { FlatType, Town } from '../utils/model';
 import getCoordinates from './get-coordinates';
+import config from '../config/index';
 
 const filePaths = [
-  'src/database/data/resale-flat-prices-based-on-approval-date-1990-1999.xlsx',
-  'src/database/data/resale-flat-prices-based-on-approval-date-2000-feb-2012.xlsx',
-  'src/database/data/resale-flat-prices-based-on-registration-date-from-mar-2012-to-dec-2014.xlsx',
-  'src/database/data/resale-flat-prices-based-on-registration-date-from-jan-2015-to-dec-2016.xlsx',
-  'src/database/data/resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.xlsx',
+  'resale-flat-prices-based-on-approval-date-1990-1999.xlsx',
+  'resale-flat-prices-based-on-approval-date-2000-feb-2012.xlsx',
+  'resale-flat-prices-based-on-registration-date-from-mar-2012-to-dec-2014.xlsx',
+  'resale-flat-prices-based-on-registration-date-from-jan-2015-to-dec-2016.xlsx',
+  'resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.xlsx',
 ];
 
-const coordinatesFilePath = 'src/database/data/coordinates.json';
+const coordinatesFilePath = 'coordinates.json';
 
 const capitalizeEachWord = (text: string) => {
   let newText = '';
@@ -104,7 +105,7 @@ async function seedResale() {
   for (let i = 0; i < filePaths.length; i += 1) {
     const filePath = filePaths[i];
 
-    const workbook = XLSX.readFile(filePath, {
+    const workbook = XLSX.readFile(config.dataFilePath + filePath, {
       cellDates: true,
       cellNF: false,
       cellText: false,
@@ -126,8 +127,10 @@ async function seedResale() {
 
   let allCoordinates;
 
-  if (fs.existsSync(coordinatesFilePath)) {
-    allCoordinates = JSON.parse(fs.readFileSync(coordinatesFilePath, 'utf8'));
+  if (fs.existsSync(config.dataFilePath + coordinatesFilePath)) {
+    allCoordinates = JSON.parse(
+      fs.readFileSync(config.dataFilePath + coordinatesFilePath, 'utf8')
+    );
   } else {
     allCoordinates = await getCoordinates(
       allDataRows.map((row) => ({
