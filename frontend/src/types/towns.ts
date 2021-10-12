@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 export enum Town {
   AMK = 'Ang Mo Kio',
   BDK = 'Bedok',
@@ -34,6 +33,6 @@ export enum Region {
   Central = 'Central',
   East = 'East',
   North = 'North',
-  NorthEast = 'North East',
+  NorthEast = 'North-East',
   West = 'West',
 }

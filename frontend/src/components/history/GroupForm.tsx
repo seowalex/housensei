@@ -16,13 +16,13 @@ import {
 } from 'react-hook-form';
 import { FlatType } from '../../types/groups';
 import { Town } from '../../types/towns';
-import { mapTownToRegion } from '../../utils/towns';
 import FormAutocompleteInput from '../forms/FormAutocompleteInput';
 import FormSliderInput from '../forms/FormSliderInput';
 import FormSwitchInput, {
   StaticFormSwitchInput,
 } from '../forms/FormSwitchInput';
 import FormTextInput from '../forms/FormTextInput';
+import { townRegions } from '../../app/constants';
 
 export interface Range<T> {
   lower: T;
@@ -137,15 +137,12 @@ const GroupForm = (props: Props) => {
           <FormAutocompleteInput
             name="towns"
             control={control as Control<FieldValues>}
-            options={Object.values(Town).sort((left, right) => {
-              const leftTown = mapTownToRegion(left);
-              const rightTown = mapTownToRegion(right);
-              if (leftTown.localeCompare(rightTown) === 0) {
-                return left.localeCompare(right);
-              }
-              return leftTown.localeCompare(rightTown);
-            })}
-            groupBy={(town) => mapTownToRegion(town)}
+            options={Object.values(Town).sort(
+              (a, b) =>
+                townRegions[a].localeCompare(townRegions[b]) ||
+                a.localeCompare(b)
+            )}
+            groupBy={(option) => townRegions[option as Town]}
             disabled={isSubmitting}
             label="Locations"
             placeholder="Enter a town name"

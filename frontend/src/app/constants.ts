@@ -1,4 +1,4 @@
-import { Town } from '../types/towns';
+import { Region, Town } from '../types/towns';
 
 export const googleMapsApiKey = 'AIzaSyAG6A2F0zMMHkLByBzBe0SUGeO8r8ICWEY';
 
@@ -120,6 +120,37 @@ export const townCoordinates = {
     lat: 1.43,
     lng: 103.835,
   },
+};
+
+export const townRegions = {
+  [Town.AMK]: Region.NorthEast,
+  [Town.BDK]: Region.East,
+  [Town.BSH]: Region.Central,
+  [Town.BBT]: Region.West,
+  [Town.BKM]: Region.Central,
+  [Town.BKP]: Region.West,
+  [Town.BKT]: Region.Central,
+  [Town.CEN]: Region.Central,
+  [Town.CCK]: Region.West,
+  [Town.CLE]: Region.West,
+  [Town.GEY]: Region.Central,
+  [Town.HGN]: Region.NorthEast,
+  [Town.JRE]: Region.West,
+  [Town.JRW]: Region.West,
+  [Town.KAL]: Region.Central,
+  [Town.LCK]: Region.North,
+  [Town.MPR]: Region.Central,
+  [Town.PSR]: Region.East,
+  [Town.PGL]: Region.NorthEast,
+  [Town.QUE]: Region.Central,
+  [Town.SBW]: Region.North,
+  [Town.SKG]: Region.NorthEast,
+  [Town.SER]: Region.NorthEast,
+  [Town.TAM]: Region.East,
+  [Town.TGH]: Region.West,
+  [Town.TAP]: Region.Central,
+  [Town.WDL]: Region.North,
+  [Town.YIS]: Region.North,
 };
 
 export const townBoundaries = {

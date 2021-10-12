@@ -47,9 +47,9 @@ import {
   singaporeCoordinates,
   townBoundaries,
   townCoordinates,
+  townRegions,
 } from '../app/constants';
 import { Town } from '../types/towns';
-import { mapTownToRegion } from '../utils/towns';
 
 const apiOptions: UseLoadScriptOptions = {
   googleMapsApiKey,
@@ -335,21 +335,13 @@ const Heatmap = () => {
         <Grid item xs={12} md="auto">
           <Autocomplete
             options={['Islandwide'].concat(
-              Object.values(Town).sort((left, right) => {
-                const leftTown = mapTownToRegion(left);
-                const rightTown = mapTownToRegion(right);
-                if (leftTown.localeCompare(rightTown) === 0) {
-                  return left.localeCompare(right);
-                }
-                return leftTown.localeCompare(rightTown);
-              })
+              Object.values(Town).sort(
+                (a, b) =>
+                  townRegions[a].localeCompare(townRegions[b]) ||
+                  a.localeCompare(b)
+              )
             )}
-            groupBy={(option) => {
-              if (option === 'Islandwide') {
-                return '';
-              }
-              return mapTownToRegion(option as Town);
-            }}
+            groupBy={(option) => townRegions[option as Town] ?? ''}
             renderInput={(params) => <TextField label="Town" {...params} />}
             value={town}
             onChange={(_, value) => setTown(value as Town | 'Islandwide')}
@@ -385,6 +377,7 @@ const Heatmap = () => {
                 <Grid item xs>
                   <Box sx={{ px: 2 }}>
                     <Slider
+                      track={false}
                       min={1990}
                       max={currentYear}
                       marks={yearMarks}
