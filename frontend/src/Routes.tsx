@@ -1,33 +1,37 @@
+import { useState } from 'react';
 import {
-  AccountBalance as AccountBalanceIcon,
-  Calculate as CalculateIcon,
-  DarkMode as DarkModeIcon,
-  Home as HomeIcon,
-  LightMode as LightModeIcon,
-  Map as MapIcon,
-  Menu as MenuIcon,
-  Timeline as TimelineIcon,
-} from '@mui/icons-material';
+  BrowserRouter as Router,
+  Link,
+  Redirect,
+  Route,
+  Switch,
+} from 'react-router-dom';
 import {
   AppBar,
   Box,
-  Container,
-  Divider,
-  Drawer,
+  CSSObject,
+  Drawer as MuiDrawer,
   IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  ListSubheader,
+  Theme,
   Toolbar,
   Tooltip,
   Typography,
+  styled,
   useMediaQuery,
 } from '@mui/material';
-import { useState } from 'react';
-import { Link, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+import {
+  Calculate as CalculateIcon,
+  DarkMode as DarkModeIcon,
+  LightMode as LightModeIcon,
+  Map as MapIcon,
+  Menu as MenuIcon,
+  Timeline as TimelineIcon,
+} from '@mui/icons-material';
 
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import Heatmap from './pages/Heatmap';
@@ -37,6 +41,36 @@ import { selectDarkMode, setDarkMode } from './reducers/settings';
 
 const drawerWidth = 240;
 
+const openedMixin = (theme: Theme): CSSObject => ({
+  width: drawerWidth,
+  overflowX: 'hidden',
+  transition: theme.transitions.create('width', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen,
+  }),
+});
+
+const closedMixin = (theme: Theme): CSSObject => ({
+  width: `calc(${theme.spacing(7)} + 1px)`,
+  overflowX: 'hidden',
+  transition: theme.transitions.create('width', {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+});
+
+const Drawer = styled(MuiDrawer)(({ theme, open }) => ({
+  whiteSpace: 'nowrap',
+  ...(open && {
+    ...openedMixin(theme),
+    '.MuiDrawer-paper': openedMixin(theme),
+  }),
+  ...(!open && {
+    ...closedMixin(theme),
+    '.MuiDrawer-paper': closedMixin(theme),
+  }),
+}));
+
 const Routes = () => {
   const dispatch = useAppDispatch();
   const isDesktop = useMediaQuery('(min-width: 600px)');
@@ -44,63 +78,35 @@ const Routes = () => {
   const darkMode = useAppSelector(selectDarkMode) ?? prefersDarkMode;
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
-
   const drawer = (
-    <>
-      <List>
-        <ListItem disablePadding>
-          <ListItemButton component={Link} to="/">
-            <ListItemIcon>
-              <HomeIcon />
-            </ListItemIcon>
-            <ListItemText primary="Home" />
-          </ListItemButton>
-        </ListItem>
-      </List>
+    <List>
+      <ListItem disablePadding>
+        <ListItemButton component={Link} to="/heatmap">
+          <ListItemIcon>
+            <MapIcon />
+          </ListItemIcon>
+          <ListItemText primary="Price Heatmap" />
+        </ListItemButton>
+      </ListItem>
 
-      <Divider />
+      <ListItem disablePadding>
+        <ListItemButton component={Link} to="/history">
+          <ListItemIcon>
+            <TimelineIcon />
+          </ListItemIcon>
+          <ListItemText primary="Price History" />
+        </ListItemButton>
+      </ListItem>
 
-      <List subheader={<ListSubheader>HDB Property Prices</ListSubheader>}>
-        <ListItem disablePadding>
-          <ListItemButton component={Link} to="/history">
-            <ListItemIcon>
-              <TimelineIcon />
-            </ListItemIcon>
-            <ListItemText primary="History" />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton component={Link} to="/heatmap">
-            <ListItemIcon>
-              <MapIcon />
-            </ListItemIcon>
-            <ListItemText primary="Heatmap" />
-          </ListItemButton>
-        </ListItem>
-      </List>
-
-      <Divider />
-
-      <List subheader={<ListSubheader>HDB Property Financing</ListSubheader>}>
-        <ListItem disablePadding>
-          <ListItemButton>
-            <ListItemIcon>
-              <CalculateIcon />
-            </ListItemIcon>
-            <ListItemText primary="Grant Calculator" />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton>
-            <ListItemIcon>
-              <AccountBalanceIcon />
-            </ListItemIcon>
-            <ListItemText primary="Loan Comparison" />
-          </ListItemButton>
-        </ListItem>
-      </List>
-    </>
+      <ListItem disablePadding>
+        <ListItemButton component={Link} to="/grants">
+          <ListItemIcon>
+            <CalculateIcon />
+          </ListItemIcon>
+          <ListItemText primary="Grant Calculator" />
+        </ListItemButton>
+      </ListItem>
+    </List>
   );
 
   return (
@@ -114,8 +120,8 @@ const Routes = () => {
         <Toolbar>
           <IconButton
             edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
+            onClick={() => setDrawerOpen(!drawerOpen)}
+            sx={{ mr: 2 }}
           >
             <MenuIcon />
           </IconButton>
@@ -136,12 +142,9 @@ const Routes = () => {
       <Box sx={{ display: 'flex' }}>
         <Drawer
           variant="permanent"
+          open={drawerOpen}
           sx={{
-            width: drawerWidth,
             display: { xs: 'none', sm: 'block' },
-            '.MuiDrawer-paper': {
-              width: drawerWidth,
-            },
           }}
         >
           <Toolbar />
@@ -150,12 +153,13 @@ const Routes = () => {
         <Drawer
           variant="temporary"
           open={drawerOpen}
-          onClose={handleDrawerToggle}
+          onClose={() => setDrawerOpen(!drawerOpen)}
           ModalProps={{
             keepMounted: true,
           }}
           sx={{
             display: { xs: 'block', sm: 'none' },
+            width: drawerWidth,
             '.MuiDrawer-paper': {
               width: drawerWidth,
             },
@@ -165,31 +169,12 @@ const Routes = () => {
         </Drawer>
 
         <Switch>
-          <Route exact path="/">
-            <Container sx={{ p: 3 }}>
-              <Typography paragraph>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                Rhoncus dolor purus non enim praesent elementum facilisis leo
-                vel. Risus at ultrices mi tempus imperdiet. Semper risus in
-                hendrerit gravida rutrum quisque non tellus. Convallis convallis
-                tellus id interdum velit laoreet id donec ultrices. Odio morbi
-                quis commodo odio aenean sed adipiscing. Amet nisl suscipit
-                adipiscing bibendum est ultricies integer quis. Cursus euismod
-                quis viverra nibh cras. Metus vulputate eu scelerisque felis
-                imperdiet proin fermentum leo. Mauris commodo quis imperdiet
-                massa tincidunt. Cras tincidunt lobortis feugiat vivamus at
-                augue. At augue eget arcu dictum varius duis at consectetur
-                lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa
-                sapien faucibus et molestie ac.
-              </Typography>
-            </Container>
+          <Redirect exact from="/" to="/heatmap" />
+          <Route path="/heatmap">
+            <Heatmap />
           </Route>
           <Route path="/history">
             <History />
-          </Route>
-          <Route path="/heatmap">
-            <Heatmap />
           </Route>
           <Route>
             <NotFound />
