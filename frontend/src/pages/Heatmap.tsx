@@ -62,6 +62,7 @@ const infoBoxOptions: InfoBoxOptions = {
     overflow: 'visible',
   },
   closeBoxURL: '',
+  disableAutoPan: true,
   enableEventPropagation: true,
 };
 
@@ -190,31 +191,18 @@ const Heatmap = () => {
   }, [map, town]);
 
   useEffect(() => {
-    if (showHeatmapPrices) {
-      for (const polygon of Object.values(polygons)) {
-        polygon?.setOptions({
-          fillOpacity: 0.4,
-          strokeOpacity: 1,
-        });
-      }
-
-      setInfoBoxes((prevInfoBoxes) =>
-        Object.fromEntries(Object.keys(prevInfoBoxes).map((key) => [key, true]))
-      );
-    } else {
-      for (const polygon of Object.values(polygons)) {
-        polygon?.setOptions({
-          fillOpacity: 0,
-          strokeOpacity: 0,
-        });
-      }
-
-      setInfoBoxes((prevInfoBoxes) =>
-        Object.fromEntries(
-          Object.keys(prevInfoBoxes).map((key) => [key, false])
-        )
-      );
+    for (const polygon of Object.values(polygons)) {
+      polygon?.setOptions({
+        fillOpacity: showHeatmapPrices ? 0.4 : 0,
+        strokeOpacity: showHeatmapPrices ? 1 : 0,
+      });
     }
+
+    setInfoBoxes(
+      Object.fromEntries(
+        Object.values(Town).map((key) => [key, showHeatmapPrices])
+      )
+    );
   }, [showHeatmapPrices, polygons]);
 
   const handleYearBlur = () => {
@@ -255,10 +243,10 @@ const Heatmap = () => {
     <Container
       sx={{
         position: 'relative',
-        height: {
-          xs: 'calc(100vh - 56px)',
-          sm: 'calc(100vh - 64px)',
-        },
+        height: (theme) => ({
+          xs: `calc(100vh - ${theme.spacing(7)})`,
+          sm: `calc(100vh - ${theme.spacing(8)})`,
+        }),
         p: {
           xs: 0,
           sm: 0,
@@ -277,57 +265,53 @@ const Heatmap = () => {
         {showHeatmap && (
           <HeatmapLayer data={heatmapData} options={heatmapLayerOptions} />
         )}
-        {Object.entries(townBoundaries).map(([townName, paths]) => (
-          <Fragment key={townName}>
-            <Polygon
-              paths={paths}
-              options={polygonOptions}
-              onLoad={(polygon) =>
-                setPolygons((prevPolygons) => ({
-                  ...prevPolygons,
-                  [townName]: polygon,
-                }))
-              }
-              onMouseOver={() => handlePolygonMouseOver(townName)}
-              onMouseOut={() => handlePolygonMouseOut(townName)}
-              onClick={() => dispatch(setTown(townName as Town))}
-              visible={town === 'Islandwide'}
-            />
-            <InfoBox
-              position={townCoordinates[townName as Town]}
-              options={{
-                ...infoBoxOptions,
-                visible: town === 'Islandwide' && infoBoxes[townName as Town],
-              }}
-              onLoad={() =>
-                setInfoBoxes((prevInfoBoxes) => ({
-                  ...prevInfoBoxes,
-                  [townName]: false,
-                }))
-              }
-            >
-              <Card
-                sx={{
-                  backgroundColor: darkMode
-                    ? 'rgba(18, 18, 18, 0.8)'
-                    : 'rgba(255, 255, 255, 0.8)',
-                  textAlign: 'center',
-                  m: '-25% 50% 0 -50%',
+        {town === 'Islandwide' &&
+          Object.entries(townBoundaries).map(([townName, paths]) => (
+            <Fragment key={townName}>
+              <Polygon
+                paths={paths}
+                options={polygonOptions}
+                onLoad={(polygon) =>
+                  setPolygons((prevPolygons) => ({
+                    ...prevPolygons,
+                    [townName]: polygon,
+                  }))
+                }
+                onMouseOver={() => handlePolygonMouseOver(townName)}
+                onMouseOut={() => handlePolygonMouseOut(townName)}
+                onClick={() => dispatch(setTown(townName as Town))}
+              />
+              <InfoBox
+                position={townCoordinates[townName as Town]}
+                options={{
+                  ...infoBoxOptions,
+                  visible: infoBoxes[townName as Town],
                 }}
               >
-                <CardContent sx={{ p: '8px !important' }}>
-                  <Typography variant="subtitle2">{townName}</Typography>
-                  <Typography variant="caption">
-                    {formatPrice(
-                      islandHeatmap?.find((point) => point.town === townName)
-                        ?.resalePrice
-                    )}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </InfoBox>
-          </Fragment>
-        ))}
+                <Card
+                  sx={{
+                    backgroundColor: darkMode
+                      ? 'rgba(18, 18, 18, 0.8)'
+                      : 'rgba(255, 255, 255, 0.8)',
+                    textAlign: 'center',
+                    m: '-25% 50% 0 -50%',
+                  }}
+                >
+                  <CardContent
+                    sx={{ p: (theme) => `${theme.spacing(1)} !important` }}
+                  >
+                    <Typography variant="subtitle2">{townName}</Typography>
+                    <Typography variant="caption">
+                      {formatPrice(
+                        islandHeatmap?.find((point) => point.town === townName)
+                          ?.resalePrice
+                      )}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </InfoBox>
+            </Fragment>
+          ))}
       </GoogleMap>
       <Grid
         container
@@ -358,7 +342,7 @@ const Heatmap = () => {
               },
               pointerEvents: 'auto',
               '.MuiInputBase-root': {
-                backgroundColor: darkMode ? '#121212' : '#fff',
+                backgroundColor: (theme) => theme.palette.background.default,
               },
             }}
           />
@@ -374,10 +358,20 @@ const Heatmap = () => {
               overflow: 'visible',
             }}
           >
-            <CardContent sx={{ p: '0 16px 8px !important' }}>
+            <CardContent
+              sx={{
+                p: (theme) =>
+                  `0 ${theme.spacing(2)} ${theme.spacing(1)} !important`,
+              }}
+            >
               <Stack direction="row" spacing={2} alignItems="center">
                 <Typography gutterBottom>Year</Typography>
-                <Box sx={{ p: '16px 16px 0', flexGrow: 1 }}>
+                <Box
+                  sx={{
+                    p: (theme) => `${theme.spacing(2)} ${theme.spacing(2)} 0`,
+                    flexGrow: 1,
+                  }}
+                >
                   <Slider
                     track={false}
                     min={1990}
@@ -509,10 +503,10 @@ const Heatmap = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        height: {
-          xs: 'calc(100vh - 56px)',
-          sm: 'calc(100vh - 64px)',
-        },
+        height: (theme) => ({
+          xs: `calc(100vh - ${theme.spacing(7)})`,
+          sm: `calc(100vh - ${theme.spacing(8)})`,
+        }),
       }}
     >
       <CircularProgress />
