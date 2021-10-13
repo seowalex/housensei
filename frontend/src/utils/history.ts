@@ -33,7 +33,10 @@ export const formatDate = (dateString: string): string => {
   return format(date, 'MMM yyyy');
 };
 
-export const formatPrice = (price: number): string => {
+export const formatPrice = (price: number): string =>
+  price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+export const formatPriceToThousand = (price: number): string => {
   if (price === 0) {
     return '0';
   }
@@ -53,23 +56,18 @@ const upsertMap = (
   }
 };
 
-export const getChartData = (
-  rawData: {
-    [id: string]: PriceDataPoint[];
-  },
-  groups: Record<string, Group>
-): ChartDataPoint[][] => {
+export const getChartData = (rawData: {
+  [id: string]: PriceDataPoint[];
+}): ChartDataPoint[][] => {
   const monthlyDateToDataMap = new Map<
     string,
-    Array<{ groupName: string; price: number }>
+    Array<{ id: string; price: number }>
   >();
   const yearlyDateToDataMap = new Map<string, Record<string, number[]>>();
 
   Object.entries(rawData).forEach(([id, dataPoints]) => {
-    const { name } = groups[id];
-
     dataPoints.forEach(({ price, date: dateString }) => {
-      const dataPoint = { groupName: name, price };
+      const dataPoint = { id, price };
       upsertMap(monthlyDateToDataMap, dateString, [dataPoint], (array) => [
         ...array,
         dataPoint,
@@ -80,9 +78,9 @@ export const getChartData = (
         return;
       }
       const year = getYear(date).toString();
-      upsertMap(yearlyDateToDataMap, year, { [name]: [price, 1] }, (record) => {
-        const current = record[name] ?? [0, 0];
-        return { ...record, [name]: [current[0] + price, current[1] + 1] };
+      upsertMap(yearlyDateToDataMap, year, { [id]: [price, 1] }, (record) => {
+        const current = record[id] ?? [0, 0];
+        return { ...record, [id]: [current[0] + price, current[1] + 1] };
       });
     });
   });
@@ -94,8 +92,8 @@ export const getChartData = (
     const chartDataPoint: ChartDataPoint = {
       date: key,
     };
-    value.forEach(({ groupName, price }) => {
-      chartDataPoint[groupName] = price;
+    value.forEach(({ id, price }) => {
+      chartDataPoint[id] = price;
     });
     monthlyChartData.push(chartDataPoint);
   });
@@ -106,8 +104,8 @@ export const getChartData = (
     const chartDataPoint: ChartDataPoint = {
       date: key,
     };
-    Object.entries(value).forEach(([groupName, [price, count]]) => {
-      chartDataPoint[groupName] = Math.floor(price / count);
+    Object.entries(value).forEach(([id, [price, count]]) => {
+      chartDataPoint[id] = Math.floor(price / count);
     });
     yearlyChartData.push(chartDataPoint);
   });

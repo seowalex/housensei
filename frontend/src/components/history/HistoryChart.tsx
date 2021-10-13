@@ -11,7 +11,11 @@ import {
   YAxis,
 } from 'recharts';
 import { ChartMode } from '../../types/history';
-import { formatDate, formatPrice } from '../../utils/history';
+import {
+  formatDate,
+  formatPrice,
+  formatPriceToThousand,
+} from '../../utils/history';
 import { convertFlatTypeToFrontend } from '../../utils/groups';
 import { useAppSelector } from '../../app/hooks';
 import {
@@ -40,6 +44,11 @@ const HistoryChart = (props: Props) => {
   const chartData =
     chartMode === ChartMode.Monthly ? monthlyChartData : yearlyChartData;
 
+  const getGroupName = (id: string): string => {
+    const group = groups.filter((g) => g.id === id);
+    return group.length === 0 ? '' : group[0].name;
+  };
+
   return (
     <ResponsiveContainer width="100%" height={650}>
       <LineChart
@@ -62,7 +71,10 @@ const HistoryChart = (props: Props) => {
             offset={10}
           />
         </XAxis>
-        <YAxis tickFormatter={(value) => formatPrice(value)} type="number">
+        <YAxis
+          tickFormatter={(value) => formatPriceToThousand(value)}
+          type="number"
+        >
           <Label
             value="Average Price (SGD)"
             position="insideLeft"
@@ -75,6 +87,10 @@ const HistoryChart = (props: Props) => {
           labelFormatter={
             chartMode === ChartMode.Monthly ? formatDate : undefined
           }
+          formatter={(value: number, id: string) => [
+            `$${formatPrice(value)}`,
+            getGroupName(id),
+          ]}
         />
         <Brush
           dataKey="date"
@@ -84,11 +100,11 @@ const HistoryChart = (props: Props) => {
             chartMode === ChartMode.Monthly ? formatDate : undefined
           }
         />
-        {groups.map(({ id, name, color }) => (
+        {groups.map(({ id, color }) => (
           <Line
             type="linear"
-            key={name}
-            dataKey={name}
+            key={id}
+            dataKey={id}
             stroke={
               selectedGroup !== id && selectedGroup != null
                 ? `${color}88`
