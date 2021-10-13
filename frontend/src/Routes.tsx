@@ -10,7 +10,7 @@ import {
   AppBar,
   Box,
   CSSObject,
-  Drawer as MuiDrawer,
+  Drawer,
   IconButton,
   List,
   ListItem,
@@ -59,7 +59,7 @@ const closedMixin = (theme: Theme): CSSObject => ({
   }),
 });
 
-const Drawer = styled(MuiDrawer)(({ theme, open }) => ({
+const MiniDrawer = styled(Drawer)(({ theme, open }) => ({
   whiteSpace: 'nowrap',
   ...(open && {
     ...openedMixin(theme),
@@ -140,7 +140,7 @@ const Routes = () => {
       </AppBar>
 
       <Box sx={{ display: 'flex' }}>
-        <Drawer
+        <MiniDrawer
           variant="permanent"
           open={drawerOpen}
           sx={{
@@ -149,7 +149,7 @@ const Routes = () => {
         >
           <Toolbar />
           {drawer}
-        </Drawer>
+        </MiniDrawer>
         <Drawer
           variant="temporary"
           open={drawerOpen}
@@ -159,7 +159,6 @@ const Routes = () => {
           }}
           sx={{
             display: { xs: 'block', sm: 'none' },
-            width: drawerWidth,
             '.MuiDrawer-paper': {
               width: drawerWidth,
             },

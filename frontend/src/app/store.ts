@@ -18,6 +18,7 @@ import {
 import storage from 'redux-persist/lib/storage';
 
 import api from '../api/base';
+import heatmap from '../reducers/heatmap';
 import history from '../reducers/history';
 import settings from '../reducers/settings';
 
@@ -28,6 +29,7 @@ const persistConfig = {
 };
 
 const rootReducer = combineReducers({
+  heatmap,
   history,
   settings,
   [api.reducerPath]: api.reducer,

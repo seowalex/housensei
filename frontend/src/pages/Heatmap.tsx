@@ -7,20 +7,15 @@ import {
   CardContent,
   CircularProgress,
   Container,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  FormControlLabel,
-  FormGroup,
   Grid,
   OutlinedInput,
   Slider,
   Stack,
-  Switch,
   TextField,
   Typography,
   useMediaQuery,
 } from '@mui/material';
+import { Settings as SettingsIcon } from '@mui/icons-material';
 import {
   GoogleMap,
   HeatmapLayer,
@@ -32,10 +27,14 @@ import {
 import { UseLoadScriptOptions } from '@react-google-maps/api/src/useJsApiLoader';
 import { InfoBoxOptions } from '@react-google-maps/infobox';
 import { skipToken } from '@reduxjs/toolkit/query/react';
-import { Settings as SettingsIcon } from '@mui/icons-material';
 
-import { useAppSelector } from '../app/hooks';
-import { selectDarkMode } from '../reducers/settings';
+import { useAppDispatch, useAppSelector } from '../app/hooks';
+import { selectTown, selectYear, setTown, setYear } from '../reducers/heatmap';
+import {
+  selectDarkMode,
+  selectShowHeatmap,
+  selectShowHeatmapPrices,
+} from '../reducers/settings';
 import {
   useGetIslandHeatmapQuery,
   useGetTownHeatmapQuery,
@@ -50,6 +49,8 @@ import {
   townRegions,
 } from '../app/constants';
 import { Town } from '../types/towns';
+
+import Settings from '../components/heatmap/Settings';
 
 const apiOptions: UseLoadScriptOptions = {
   googleMapsApiKey,
@@ -101,8 +102,13 @@ const Heatmap = () => {
   const { google } = window;
   const { isLoaded } = useJsApiLoader(apiOptions);
 
+  const dispatch = useAppDispatch();
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const darkMode = useAppSelector(selectDarkMode) ?? prefersDarkMode;
+  const showHeatmap = useAppSelector(selectShowHeatmap);
+  const showHeatmapPrices = useAppSelector(selectShowHeatmapPrices);
+  const town = useAppSelector(selectTown);
+  const year = useAppSelector(selectYear);
 
   const [map, setMap] = useState<google.maps.Map>();
   const [polygons, setPolygons] = useState<{
@@ -112,10 +118,6 @@ const Heatmap = () => {
     [K in Town]?: boolean;
   }>({});
 
-  const [town, setTown] = useState<Town | 'Islandwide'>('Islandwide');
-  const [year, setYear] = useState(currentYear);
-  const [showHeatmap, setShowHeatmap] = useState(true);
-  const [showOverlay, setShowOverlay] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
 
   const debouncedYear = useDebounce(year, 500);
@@ -188,7 +190,7 @@ const Heatmap = () => {
   }, [map, town]);
 
   useEffect(() => {
-    if (showOverlay) {
+    if (showHeatmapPrices) {
       for (const polygon of Object.values(polygons)) {
         polygon?.setOptions({
           fillOpacity: 0.4,
@@ -213,18 +215,18 @@ const Heatmap = () => {
         )
       );
     }
-  }, [showOverlay, polygons]);
+  }, [showHeatmapPrices, polygons]);
 
   const handleYearBlur = () => {
     if (Number.isNaN(year) || year < 1990) {
-      setYear(1990);
+      dispatch(setYear(1990));
     } else if (year > currentYear) {
-      setYear(currentYear);
+      dispatch(setYear(currentYear));
     }
   };
 
   const handlePolygonMouseOver = (townName: string) => {
-    if (!showOverlay) {
+    if (!showHeatmapPrices) {
       polygons[townName as Town]?.setOptions({
         fillOpacity: 0.4,
         strokeOpacity: 1,
@@ -237,7 +239,7 @@ const Heatmap = () => {
   };
 
   const handlePolygonMouseOut = (townName: string) => {
-    if (!showOverlay) {
+    if (!showHeatmapPrices) {
       polygons[townName as Town]?.setOptions({
         fillOpacity: 0,
         strokeOpacity: 0,
@@ -288,7 +290,7 @@ const Heatmap = () => {
               }
               onMouseOver={() => handlePolygonMouseOver(townName)}
               onMouseOut={() => handlePolygonMouseOut(townName)}
-              onClick={() => setTown(townName as Town)}
+              onClick={() => dispatch(setTown(townName as Town))}
               visible={town === 'Islandwide'}
             />
             <InfoBox
@@ -344,7 +346,9 @@ const Heatmap = () => {
             groupBy={(option) => townRegions[option as Town] ?? ''}
             renderInput={(params) => <TextField label="Town" {...params} />}
             value={town}
-            onChange={(_, value) => setTown(value as Town | 'Islandwide')}
+            onChange={(_, value) =>
+              dispatch(setTown(value as Town | 'Islandwide'))
+            }
             blurOnSelect
             disableClearable
             sx={{
@@ -367,47 +371,42 @@ const Heatmap = () => {
                 md: 400,
               },
               pointerEvents: 'auto',
+              overflow: 'visible',
             }}
           >
-            <CardContent sx={{ pb: '8px !important' }}>
-              <Grid container columnSpacing={2}>
-                <Grid item xs={12}>
-                  <Typography gutterBottom>Year</Typography>
-                </Grid>
-                <Grid item xs>
-                  <Box sx={{ px: 2 }}>
-                    <Slider
-                      track={false}
-                      min={1990}
-                      max={currentYear}
-                      marks={yearMarks}
-                      value={year}
-                      onChange={(_, value) => setYear(value as number)}
-                      valueLabelDisplay="auto"
-                    />
-                  </Box>
-                </Grid>
-                <Grid item xs="auto">
-                  <OutlinedInput
+            <CardContent sx={{ p: '0 16px 8px !important' }}>
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Typography gutterBottom>Year</Typography>
+                <Box sx={{ p: '16px 16px 0', flexGrow: 1 }}>
+                  <Slider
+                    track={false}
+                    min={1990}
+                    max={currentYear}
+                    marks={yearMarks}
                     value={year}
-                    size="small"
-                    onChange={(event) =>
-                      setYear(parseInt(event.target.value, 10))
-                    }
-                    onBlur={handleYearBlur}
-                    inputProps={{
-                      min: 1990,
-                      max: currentYear,
-                      type: 'number',
-                    }}
-                    sx={{
-                      '.MuiInputBase-input': {
-                        maxWidth: '70px',
-                      },
-                    }}
+                    onChange={(_, value) => dispatch(setYear(value as number))}
+                    valueLabelDisplay="auto"
                   />
-                </Grid>
-              </Grid>
+                </Box>
+                <OutlinedInput
+                  value={year}
+                  size="small"
+                  onChange={(event) =>
+                    dispatch(setYear(parseInt(event.target.value, 10)))
+                  }
+                  onBlur={handleYearBlur}
+                  inputProps={{
+                    min: 1990,
+                    max: currentYear,
+                    type: 'number',
+                  }}
+                  sx={{
+                    '.MuiInputBase-input': {
+                      maxWidth: '70px',
+                    },
+                  }}
+                />
+              </Stack>
             </CardContent>
           </Card>
         </Grid>
@@ -432,31 +431,10 @@ const Heatmap = () => {
           >
             <SettingsIcon />
           </Button>
-          <Dialog open={showSettings} onClose={() => setShowSettings(false)}>
-            <DialogTitle>Settings</DialogTitle>
-            <DialogContent>
-              <FormGroup>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={showHeatmap}
-                      onChange={(event) => setShowHeatmap(event.target.checked)}
-                    />
-                  }
-                  label="Show heatmap"
-                />
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={showOverlay}
-                      onChange={(event) => setShowOverlay(event.target.checked)}
-                    />
-                  }
-                  label="Show towns/prices"
-                />
-              </FormGroup>
-            </DialogContent>
-          </Dialog>
+          <Settings
+            open={showSettings}
+            onClose={() => setShowSettings(false)}
+          />
         </Grid>
       </Grid>
       {showHeatmap && (
