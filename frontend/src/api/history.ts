@@ -22,7 +22,7 @@ type BTOGroupFilters = Partial<
 >;
 type BTOGraphDataQueryParams = Partial<BTOGroupFilters> & { id: string };
 
-interface BTOGraphDataPoint {
+export interface BTOGraphDataPoint {
   name: string;
   price: number;
   date: string;

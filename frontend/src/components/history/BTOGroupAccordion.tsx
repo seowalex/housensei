@@ -22,6 +22,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import { matchSorter } from 'match-sorter';
 import { SyntheticEvent, useState } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -29,7 +30,12 @@ import { useGetBTOGraphQuery } from '../../api/history';
 import { useAppSelector } from '../../app/hooks';
 import {
   removeGroup,
+  selectBTOAggregations,
   selectBTOProjects,
+  selectDisplayedBTOAggregations,
+  selectDisplayedBTOProjects,
+  updateDisplayedBTOAggregations,
+  updateDisplayedBTOProjects,
   updateGroup,
 } from '../../reducers/history';
 import { BTOGroup, Group } from '../../types/groups';
@@ -55,29 +61,28 @@ interface Props {
   group: BTOGroup;
   expanded: boolean;
   onChangeSelectedGroup: (isExpanded: boolean) => void;
-  projectsState: BTOProject[];
-  onChangeSelectedProjects: (
-    event: SyntheticEvent,
-    projects: BTOProject[]
-  ) => void;
   onDuplicateGroup: (group: Group) => void;
 }
 
 const BTOGroupAccordion = (props: Props) => {
   const dispatch = useDispatch();
-  const {
-    group,
-    expanded,
-    onChangeSelectedGroup,
-    projectsState,
-    onChangeSelectedProjects,
-    onDuplicateGroup,
-  } = props;
+  const { group, expanded, onChangeSelectedGroup, onDuplicateGroup } = props;
+
   useGetBTOGraphQuery({
     ...group.filters,
     id: group.id,
   });
+
   const projects = useAppSelector(selectBTOProjects(group.id));
+  const aggregations = useAppSelector(selectBTOAggregations(group.id));
+
+  const displayedProjects = useAppSelector(
+    selectDisplayedBTOProjects(group.id)
+  );
+  const displayedAggregations = useAppSelector(
+    selectDisplayedBTOAggregations(group.id)
+  );
+
   const [displayedModal, setDisplayedModal] = useState<DisplayedModal>(
     DisplayedModal.Hidden
   );
@@ -107,6 +112,30 @@ const BTOGroupAccordion = (props: Props) => {
     onChangeSelectedGroup(false);
   };
 
+  const handleChangeDisplayedProjects = (
+    event: SyntheticEvent,
+    selectedProjects: BTOProject[]
+  ) => {
+    dispatch(
+      updateDisplayedBTOProjects({
+        id: group.id,
+        projects: selectedProjects,
+      })
+    );
+  };
+
+  const handleChangeDisplayedAggregations = (
+    event: SyntheticEvent,
+    selectedAggregations: BTOProject[]
+  ) => {
+    dispatch(
+      updateDisplayedBTOAggregations({
+        id: group.id,
+        aggregations: selectedAggregations,
+      })
+    );
+  };
+
   return (
     <>
       <Accordion
@@ -123,8 +152,75 @@ const BTOGroupAccordion = (props: Props) => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Autocomplete
-                onChange={onChangeSelectedProjects}
-                value={projectsState ?? []}
+                onChange={handleChangeDisplayedAggregations}
+                value={displayedAggregations ?? []}
+                multiple
+                disableCloseOnSelect
+                options={
+                  aggregations
+                    ? [...aggregations].sort((left, right) =>
+                        left.name.localeCompare(right.name)
+                      )
+                    : []
+                }
+                renderOption={(optionProps, option, { selected }) => (
+                  // eslint-disable-next-line react/jsx-props-no-spreading
+                  <li {...optionProps}>
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      sx={{ width: '100%' }}
+                    >
+                      <Stack spacing={0.5}>
+                        <Typography>{option.name}</Typography>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <AttachMoneyRounded fontSize="small" />
+                          <Typography variant="body2">
+                            {option.price}
+                          </Typography>
+                          <BedroomParentRounded fontSize="small" />
+                          <Typography variant="body2">
+                            {convertFlatTypeToFrontend(option.flatType)}
+                          </Typography>
+                        </Stack>
+                      </Stack>
+                      {selected && <CheckRoundedIcon fontSize="small" />}
+                    </Stack>
+                  </li>
+                )}
+                isOptionEqualToValue={(option, value) =>
+                  option.flatType === value.flatType
+                }
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Aggregated BTO data"
+                    placeholder={
+                      displayedAggregations == null ||
+                      displayedAggregations.length === 0
+                        ? 'Select an aggregation to show on chart'
+                        : ''
+                    }
+                  />
+                )}
+                filterOptions={(options, { inputValue }) =>
+                  matchSorter(options, inputValue, {
+                    keys: [
+                      'name',
+                      'price',
+                      (item: BTOProject) =>
+                        convertFlatTypeToFrontend(item.flatType),
+                    ],
+                  })
+                }
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Autocomplete
+                onChange={handleChangeDisplayedProjects}
+                value={displayedProjects ?? []}
                 multiple
                 disableCloseOnSelect
                 options={
@@ -177,17 +273,30 @@ const BTOGroupAccordion = (props: Props) => {
                   <TextField
                     {...params}
                     label={
-                      projectsState == null || projectsState.length === 0
-                        ? 'Select BTO projects'
+                      displayedProjects == null ||
+                      displayedProjects.length === 0
+                        ? 'Select specific BTO projects'
                         : 'Displayed BTO Projects'
                     }
                     placeholder={
-                      projectsState == null || projectsState.length === 0
+                      displayedProjects == null ||
+                      displayedProjects.length === 0
                         ? 'Select a project to show on chart'
                         : ''
                     }
                   />
                 )}
+                filterOptions={(options, { inputValue }) =>
+                  matchSorter(options, inputValue, {
+                    keys: [
+                      'name',
+                      'price',
+                      (item: BTOProject) => formatDate(item.date),
+                      (item: BTOProject) =>
+                        convertFlatTypeToFrontend(item.flatType),
+                    ],
+                  })
+                }
               />
             </Grid>
             <Grid item xs>

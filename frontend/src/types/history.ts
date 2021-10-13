@@ -14,7 +14,7 @@ export interface BTOProject {
 
 export interface ChartDataPoint {
   date: string;
-  [groupName: string]: string | number;
+  [id: string]: string | number;
 }
 
 export enum ChartMode {

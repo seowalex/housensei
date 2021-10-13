@@ -35,3 +35,24 @@ export const mapTownToRegion = (town: Town) => {
 
   return townToRegionMap[town];
 };
+
+export const autocompleteSorter =
+  (groupBy?: (options: any) => string) =>
+  (rankedItems: any[]): any[] => {
+    if (groupBy == null) {
+      return rankedItems;
+    }
+
+    const itemGroups: string[] = rankedItems
+      .map((item) => groupBy(item))
+      .filter((value, index, self) => self.indexOf(value) === index);
+
+    return [...rankedItems].sort((left, right) => {
+      const leftGroup = groupBy(left);
+      const rightGroup = groupBy(right);
+      if (leftGroup === rightGroup) {
+        return rankedItems.indexOf(left) - rankedItems.indexOf(right);
+      }
+      return itemGroups.indexOf(leftGroup) - itemGroups.indexOf(rightGroup);
+    });
+  };

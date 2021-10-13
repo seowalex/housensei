@@ -1,6 +1,8 @@
 import { CheckRounded as CheckRoundedIcon } from '@mui/icons-material';
 import { Autocomplete, Stack, TextField } from '@mui/material';
+import { matchSorter } from 'match-sorter';
 import { Control, Controller, FieldValues } from 'react-hook-form';
+import { autocompleteSorter } from '../../utils/towns';
 
 interface Props {
   name: string;
@@ -24,6 +26,7 @@ const FormAutocompleteInput = (props: Props) => {
     placeholder,
     limitTags,
   } = props;
+
   return (
     <Controller
       name={name}
@@ -64,6 +67,11 @@ const FormAutocompleteInput = (props: Props) => {
               </Stack>
             </li>
           )}
+          filterOptions={(filterOptions, { inputValue }) =>
+            matchSorter(filterOptions, inputValue, {
+              sorter: autocompleteSorter(groupBy),
+            })
+          }
         />
       )}
     />
