@@ -34,7 +34,7 @@ const getBto = async (ctx: Koa.Context): Promise<void> => {
       price: Math.round(
         _.meanBy(value, (bto) => (bto.minPrice + bto.maxPrice) / 2)
       ),
-      date: value[0].launchDate,
+      date: `${(value[0].launchDate as unknown as string).slice(0, -3)}-01`,
     }));
   ctx.body = {
     data: {
