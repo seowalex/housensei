@@ -1,4 +1,14 @@
-import { compareAsc, format, getYear, isValid, parseISO } from 'date-fns';
+import {
+  compareAsc,
+  eachMonthOfInterval,
+  eachYearOfInterval,
+  format,
+  getYear,
+  isValid,
+  max,
+  min,
+  parseISO,
+} from 'date-fns';
 import { BTOGraphDataPoint } from '../api/history';
 import { BackendFlatType, Group } from '../types/groups';
 import { ChartDataPoint, PriceDataPoint } from '../types/history';
@@ -85,28 +95,52 @@ export const getChartData = (rawData: {
     });
   });
 
-  const monthlyChartData: ChartDataPoint[] = [];
-  const yearlyChartData: ChartDataPoint[] = [];
+  const dates: Date[] = [];
 
   monthlyDateToDataMap.forEach((value, key) => {
+    const date = convertStringToDate(key);
+    if (date != null) {
+      dates.push(date);
+    }
+  });
+
+  const minDate = min(dates);
+  const maxDate = max(dates);
+  const months = eachMonthOfInterval({ start: minDate, end: maxDate });
+  const monthlyChartData: ChartDataPoint[] = [];
+
+  months.forEach((month) => {
+    const monthString = format(month, 'yyyy-MM-dd');
     const chartDataPoint: ChartDataPoint = {
-      date: key,
+      date: monthString,
     };
-    value.forEach(({ id, price }) => {
-      chartDataPoint[id] = price;
-    });
+    const data = monthlyDateToDataMap.get(monthString);
+
+    if (data != null) {
+      data.forEach(({ id, price }) => {
+        chartDataPoint[id] = price;
+      });
+    }
+
     monthlyChartData.push(chartDataPoint);
   });
 
-  monthlyChartData.sort((left, right) => compareDates(left.date, right.date));
+  const years = eachYearOfInterval({ start: minDate, end: maxDate });
+  const yearlyChartData: ChartDataPoint[] = [];
 
-  yearlyDateToDataMap.forEach((value, key) => {
+  years.forEach((year) => {
+    const yearString = format(year, 'yyyy');
     const chartDataPoint: ChartDataPoint = {
-      date: key,
+      date: yearString,
     };
-    Object.entries(value).forEach(([id, [price, count]]) => {
-      chartDataPoint[id] = Math.floor(price / count);
-    });
+    const data = yearlyDateToDataMap.get(yearString);
+
+    if (data != null) {
+      Object.entries(data).forEach(([id, [price, count]]) => {
+        chartDataPoint[id] = Math.floor(price / count);
+      });
+    }
+
     yearlyChartData.push(chartDataPoint);
   });
 
