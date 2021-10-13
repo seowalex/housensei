@@ -4,17 +4,20 @@ import {
   Label,
   Line,
   LineChart,
+  ReferenceDot,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip as ChartTooltip,
   XAxis,
   YAxis,
 } from 'recharts';
+import { Circle } from '@mui/icons-material';
 import { ChartMode } from '../../types/history';
 import {
   formatDate,
   formatPrice,
   formatPriceToThousand,
+  formatProjectName,
 } from '../../utils/history';
 import { convertFlatTypeToFrontend } from '../../utils/groups';
 import { useAppSelector } from '../../app/hooks';
@@ -24,6 +27,7 @@ import {
   selectMonthlyChartData,
   selectYearlyChartData,
 } from '../../reducers/history';
+import { Group } from '../../types/groups';
 
 interface Props {
   chartMode: ChartMode;
@@ -44,9 +48,9 @@ const HistoryChart = (props: Props) => {
   const chartData =
     chartMode === ChartMode.Monthly ? monthlyChartData : yearlyChartData;
 
-  const getGroupName = (id: string): string => {
+  const getGroup = (id: string): Group | undefined => {
     const group = groups.filter((g) => g.id === id);
-    return group.length === 0 ? '' : group[0].name;
+    return group.length === 0 ? undefined : group[0];
   };
 
   return (
@@ -87,10 +91,13 @@ const HistoryChart = (props: Props) => {
           labelFormatter={
             chartMode === ChartMode.Monthly ? formatDate : undefined
           }
-          formatter={(value: number, id: string) => [
-            `$${formatPrice(value)}`,
-            getGroupName(id),
-          ]}
+          formatter={(value: number, id: string) => {
+            const formatterGroup = getGroup(id);
+            return [
+              value == null ? 'No Data' : `$${formatPrice(value)}`,
+              formatterGroup?.name ?? '',
+            ];
+          }}
         />
         <Brush
           dataKey="date"
@@ -120,24 +127,49 @@ const HistoryChart = (props: Props) => {
             {displayedBTOProjectsRecord[id] &&
               displayedBTOProjectsRecord[id].projects &&
               displayedBTOProjectsRecord[id].projects.map(
-                ({ name, price, flatType }) => (
-                  <ReferenceLine
-                    y={price}
-                    stroke={
-                      selectedGroup !== id && selectedGroup != null
-                        ? `${color}88`
-                        : color
-                    }
-                    strokeWidth={selectedGroup === id ? 3 : 2}
-                    strokeDasharray="7 3"
-                    ifOverflow="extendDomain"
-                  >
-                    <Label position="insideLeft" value={price} />
-                    <Label
-                      position="insideRight"
-                      value={`${name} (${convertFlatTypeToFrontend(flatType)})`}
-                    />
-                  </ReferenceLine>
+                ({ name, price, date, flatType }) => (
+                  <>
+                    <ReferenceLine
+                      y={price}
+                      stroke={
+                        selectedGroup !== id && selectedGroup != null
+                          ? `${color}88`
+                          : color
+                      }
+                      strokeWidth={selectedGroup === id ? 3 : 2}
+                      strokeDasharray="7 3"
+                      ifOverflow="extendDomain"
+                    >
+                      <Label
+                        position="left"
+                        value={formatPriceToThousand(price)}
+                      />
+                      <Label
+                        position="insideBottomLeft"
+                        value={`${formatProjectName(
+                          name
+                        )} (${convertFlatTypeToFrontend(flatType)})`}
+                      />
+                    </ReferenceLine>
+                    <ReferenceDot
+                      x={date}
+                      y={price}
+                      r={5}
+                      fill={
+                        selectedGroup !== id && selectedGroup != null
+                          ? `${color}88`
+                          : color
+                      }
+                      stroke="none"
+                      ifOverflow="extendDomain"
+                    >
+                      <Label
+                        position="bottom"
+                        value={formatDate(date)}
+                        offset={-1}
+                      />
+                    </ReferenceDot>
+                  </>
                 )
               )}
             {displayedBTOProjectsRecord[id] &&
@@ -155,8 +187,11 @@ const HistoryChart = (props: Props) => {
                     strokeDasharray="7 3"
                     ifOverflow="extendDomain"
                   >
-                    <Label position="insideLeft" value={price} />
-                    <Label position="insideRight" value={name} />
+                    <Label
+                      position="left"
+                      value={formatPriceToThousand(price)}
+                    />
+                    <Label position="insideBottomLeft" value={name} />
                   </ReferenceLine>
                 )
               )}

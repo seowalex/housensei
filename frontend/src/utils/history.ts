@@ -53,6 +53,18 @@ export const formatPriceToThousand = (price: number): string => {
   return `${Math.floor(price / 1000)}K`;
 };
 
+export const formatProjectName = (name: string): string => {
+  const separators = [',', ' &'];
+  const filteredSeparators = separators.filter(
+    (separator) => name.split(separator).length > 1
+  );
+  if (filteredSeparators.length > 0) {
+    const separator = filteredSeparators[0];
+    return `${name.split(separator)[0]}${separator} ...`;
+  }
+  return name;
+};
+
 const upsertMap = (
   map: Map<string, any>,
   key: string,

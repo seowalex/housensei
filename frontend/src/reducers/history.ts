@@ -56,6 +56,7 @@ const slice = createSlice({
         state.yearlyChartData = yearlyData;
       } else {
         delete state.btoProjectsRecord[action.payload];
+        delete state.displayedBTOProjectsRecord[action.payload];
       }
     },
     resetGroups: (state) => {
