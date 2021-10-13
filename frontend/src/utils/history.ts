@@ -1,6 +1,8 @@
 import { compareAsc, format, getYear, isValid, parseISO } from 'date-fns';
-import { Group } from '../types/groups';
+import { BTOGraphDataPoint } from '../api/history';
+import { BackendFlatType, Group } from '../types/groups';
 import { ChartDataPoint, PriceDataPoint } from '../types/history';
+import { convertFlatTypeToFrontend } from './groups';
 
 export const convertStringToDate = (dateString: string): Date | undefined => {
   const date = parseISO(dateString);
@@ -111,4 +113,40 @@ export const getChartData = (
   });
 
   return [monthlyChartData, yearlyChartData];
+};
+
+export const aggregateBTOProjects = (
+  dataPoints: BTOGraphDataPoint[]
+): BTOGraphDataPoint[] => {
+  const aggregatedProjectsMap = new Map<
+    BackendFlatType,
+    { totalPrice: number; count: number }
+  >();
+
+  dataPoints.forEach(({ price, flatType }) => {
+    upsertMap(
+      aggregatedProjectsMap,
+      flatType,
+      { totalPrice: price, count: 1 },
+      (record) => ({
+        totalPrice: record.totalPrice + price,
+        count: record.count + 1,
+      })
+    );
+  });
+
+  const aggregatedProjectsData: BTOGraphDataPoint[] = [];
+
+  aggregatedProjectsMap.forEach(({ totalPrice, count }, key) => {
+    const projectsDataPoint: BTOGraphDataPoint = {
+      name: `${convertFlatTypeToFrontend(key)} Average`,
+      price: Math.floor(totalPrice / count),
+      date: '',
+      flatType: key,
+    };
+
+    aggregatedProjectsData.push(projectsDataPoint);
+  });
+
+  return aggregatedProjectsData;
 };

@@ -1,5 +1,6 @@
 import { Chip, Stack, Typography } from '@mui/material';
 import { Group } from '../../types/groups';
+import { convertFlatTypeToFrontend } from '../../utils/groups';
 
 interface Props {
   group: Group;
@@ -52,7 +53,7 @@ const GroupDetails = (props: Props) => {
           <>
             {flatTypes.slice(0, 3).map((flatType) => (
               <Chip
-                label={flatType}
+                label={convertFlatTypeToFrontend(flatType)}
                 size="small"
                 variant="outlined"
                 key={flatType}

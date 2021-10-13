@@ -8,14 +8,19 @@ import {
 import type { RootState } from '../app/store';
 import { Group } from '../types/groups';
 import { BTOProject, ChartDataPoint, PriceDataPoint } from '../types/history';
-import { getChartData } from '../utils/history';
+import { aggregateBTOProjects, getChartData } from '../utils/history';
+
+interface BTOProjectsData {
+  projects: BTOProject[];
+  aggregations: BTOProject[];
+}
 
 interface HistoryState {
   groups: Record<string, Group>;
   resaleRawData: Record<string, PriceDataPoint[]>;
   monthlyChartData: ChartDataPoint[];
   yearlyChartData: ChartDataPoint[];
-  btoProjectsRecord: Record<string, BTOProject[]>;
+  btoProjectsRecord: Record<string, BTOProjectsData>;
 }
 
 const initialState: HistoryState = {
@@ -76,14 +81,20 @@ const slice = createSlice({
       .addMatcher(
         getBTOGraph.matchFulfilled,
         (state, action: PayloadAction<BTOGraphDataResponse>) => {
-          state.btoProjectsRecord[action.payload.id] = action.payload.data;
-          delete state.resaleRawData[action.payload.id];
-          const [monthlyData, yearlyData] = getChartData(
-            state.resaleRawData,
-            state.groups
-          );
-          state.monthlyChartData = monthlyData;
-          state.yearlyChartData = yearlyData;
+          const aggregations = aggregateBTOProjects(action.payload.data);
+          state.btoProjectsRecord[action.payload.id] = {
+            projects: action.payload.data,
+            aggregations,
+          };
+          if (state.resaleRawData[action.payload.id] != null) {
+            delete state.resaleRawData[action.payload.id];
+            const [monthlyData, yearlyData] = getChartData(
+              state.resaleRawData,
+              state.groups
+            );
+            state.monthlyChartData = monthlyData;
+            state.yearlyChartData = yearlyData;
+          }
         }
       );
   },
@@ -103,10 +114,14 @@ export const selectYearlyChartData = (state: RootState): ChartDataPoint[] =>
   state.history.yearlyChartData;
 export const selectBTOProjectsRecord = (
   state: RootState
-): Record<string, BTOProject[]> => state.history.btoProjectsRecord;
+): Record<string, BTOProjectsData> => state.history.btoProjectsRecord;
 export const selectBTOProjects =
   (id: string) =>
   (state: RootState): BTOProject[] =>
-    state.history.btoProjectsRecord[id];
+    state.history.btoProjectsRecord[id]?.projects ?? [];
+export const selectAggregatedBTOProjects =
+  (id: string) =>
+  (state: RootState): BTOProject[] =>
+    state.history.btoProjectsRecord[id]?.aggregations ?? [];
 
 export default slice.reducer;

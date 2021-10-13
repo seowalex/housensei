@@ -10,7 +10,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { styled } from '@mui/system';
 import { BTOProject, ChartMode } from '../../types/history';
 import { formatDate, formatPrice } from '../../utils/history';
 import { convertFlatTypeToFrontend } from '../../utils/groups';
@@ -25,10 +24,12 @@ interface Props {
   chartMode: ChartMode;
   selectedGroup: string | undefined;
   projectsState: Record<string, BTOProject[]>;
+  aggregatedProjectsState: Record<string, BTOProject[]>;
 }
 
 const HistoryChart = (props: Props) => {
-  const { chartMode, selectedGroup, projectsState } = props;
+  const { chartMode, selectedGroup, projectsState, aggregatedProjectsState } =
+    props;
   const groups = useAppSelector(selectGroups);
   const monthlyChartData = useAppSelector(selectMonthlyChartData);
   const yearlyChartData = useAppSelector(selectYearlyChartData);
@@ -110,6 +111,7 @@ const HistoryChart = (props: Props) => {
                   }
                   strokeWidth={selectedGroup === id ? 3 : 2}
                   strokeDasharray="7 3"
+                  alwaysShow
                   ifOverflow="extendDomain"
                 >
                   <Label position="insideLeft" value={price} />
@@ -117,6 +119,24 @@ const HistoryChart = (props: Props) => {
                     position="insideRight"
                     value={`${name} (${convertFlatTypeToFrontend(flatType)})`}
                   />
+                </ReferenceLine>
+              ))}
+            {aggregatedProjectsState[id] &&
+              aggregatedProjectsState[id].map(({ name, price }) => (
+                <ReferenceLine
+                  y={price}
+                  stroke={
+                    selectedGroup !== id && selectedGroup != null
+                      ? `${color}88`
+                      : color
+                  }
+                  strokeWidth={selectedGroup === id ? 3 : 2}
+                  strokeDasharray="7 3"
+                  alwaysShow
+                  ifOverflow="extendDomain"
+                >
+                  <Label position="insideLeft" value={price} />
+                  <Label position="insideRight" value={name} />
                 </ReferenceLine>
               ))}
           </>

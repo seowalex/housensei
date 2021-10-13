@@ -29,6 +29,7 @@ import { useGetBTOGraphQuery } from '../../api/history';
 import { useAppSelector } from '../../app/hooks';
 import {
   removeGroup,
+  selectAggregatedBTOProjects,
   selectBTOProjects,
   updateGroup,
 } from '../../reducers/history';
@@ -60,6 +61,11 @@ interface Props {
     event: SyntheticEvent,
     projects: BTOProject[]
   ) => void;
+  aggregatedProjectsState: BTOProject[];
+  onChangeSelectedAggregatedProjects: (
+    event: SyntheticEvent,
+    projects: BTOProject[]
+  ) => void;
   onDuplicateGroup: (group: Group) => void;
 }
 
@@ -71,6 +77,8 @@ const BTOGroupAccordion = (props: Props) => {
     onChangeSelectedGroup,
     projectsState,
     onChangeSelectedProjects,
+    aggregatedProjectsState,
+    onChangeSelectedAggregatedProjects,
     onDuplicateGroup,
   } = props;
   useGetBTOGraphQuery({
@@ -78,6 +86,9 @@ const BTOGroupAccordion = (props: Props) => {
     id: group.id,
   });
   const projects = useAppSelector(selectBTOProjects(group.id));
+  const aggregatedProjects = useAppSelector(
+    selectAggregatedBTOProjects(group.id)
+  );
   const [displayedModal, setDisplayedModal] = useState<DisplayedModal>(
     DisplayedModal.Hidden
   );
@@ -121,6 +132,63 @@ const BTOGroupAccordion = (props: Props) => {
         </AccordionSummary>
         <AccordionDetails>
           <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Autocomplete
+                onChange={onChangeSelectedAggregatedProjects}
+                value={aggregatedProjectsState ?? []}
+                multiple
+                disableCloseOnSelect
+                options={
+                  aggregatedProjects
+                    ? [...aggregatedProjects].sort((left, right) =>
+                        left.name.localeCompare(right.name)
+                      )
+                    : []
+                }
+                renderOption={(optionProps, option, { selected }) => (
+                  // eslint-disable-next-line react/jsx-props-no-spreading
+                  <li {...optionProps}>
+                    <Stack
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      sx={{ width: '100%' }}
+                    >
+                      <Stack spacing={0.5}>
+                        <Typography>{option.name}</Typography>
+                        <Stack direction="row" spacing={1} alignItems="center">
+                          <AttachMoneyRounded fontSize="small" />
+                          <Typography variant="body2">
+                            {option.price}
+                          </Typography>
+                          <BedroomParentRounded fontSize="small" />
+                          <Typography variant="body2">
+                            {convertFlatTypeToFrontend(option.flatType)}
+                          </Typography>
+                        </Stack>
+                      </Stack>
+                      {selected && <CheckRoundedIcon fontSize="small" />}
+                    </Stack>
+                  </li>
+                )}
+                isOptionEqualToValue={(option, value) =>
+                  option.flatType === value.flatType
+                }
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Aggregated BTO data"
+                    placeholder={
+                      aggregatedProjectsState == null ||
+                      aggregatedProjectsState.length === 0
+                        ? 'Select an aggregation to show on chart'
+                        : ''
+                    }
+                  />
+                )}
+              />
+            </Grid>
             <Grid item xs={12}>
               <Autocomplete
                 onChange={onChangeSelectedProjects}
@@ -178,7 +246,7 @@ const BTOGroupAccordion = (props: Props) => {
                     {...params}
                     label={
                       projectsState == null || projectsState.length === 0
-                        ? 'Select BTO projects'
+                        ? 'Select specific BTO projects'
                         : 'Displayed BTO Projects'
                     }
                     placeholder={

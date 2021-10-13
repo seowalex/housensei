@@ -20,6 +20,10 @@ interface Props {
   onChangeProject: (
     id: string
   ) => (event: SyntheticEvent, projects: BTOProject[]) => void;
+  aggregatedProjectsState: Record<string, BTOProject[]>;
+  onChangeAggregatedProject: (
+    id: string
+  ) => (event: SyntheticEvent, projects: BTOProject[]) => void;
 }
 
 const GroupList = (props: Props) => {
@@ -29,6 +33,8 @@ const GroupList = (props: Props) => {
     onChangeSelectedGroup,
     projectsState,
     onChangeProject,
+    aggregatedProjectsState,
+    onChangeAggregatedProject,
   } = props;
   const groups = useAppSelector(selectGroups);
   const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
@@ -87,6 +93,10 @@ const GroupList = (props: Props) => {
               onChangeSelectedGroup={onChangeSelectedGroup(group.id)}
               projectsState={projectsState[group.id]}
               onChangeSelectedProjects={onChangeProject(group.id)}
+              aggregatedProjectsState={aggregatedProjectsState[group.id]}
+              onChangeSelectedAggregatedProjects={onChangeAggregatedProject(
+                group.id
+              )}
               onDuplicateGroup={handleDuplicateGroup}
             />
           )

@@ -21,6 +21,9 @@ const History = () => {
   const [projectsState, setProjectsState] = useState<
     Record<string, BTOProject[]>
   >({});
+  const [aggregatedProjectsState, setAggregatedProjectsState] = useState<
+    Record<string, BTOProject[]>
+  >({});
   const [chartMode, setChartMode] = useState<ChartMode>(ChartMode.Monthly);
 
   useEffect(() => {
@@ -39,6 +42,22 @@ const History = () => {
 
       return prevState;
     });
+
+    setAggregatedProjectsState((s) => {
+      const prevState = { ...s };
+      const btoProjectIds = Object.keys(btoProjects);
+      const removedIds = Object.keys(prevState).filter(
+        (id) => !btoProjectIds.includes(id)
+      );
+      removedIds.forEach((id) => {
+        delete prevState[id];
+      });
+      btoProjectIds.forEach((id) => {
+        prevState[id] = btoProjects[id].aggregations;
+      });
+
+      return prevState;
+    });
   }, [btoProjects]);
 
   const handleChangeSelectedGroup = (id: string) => (isExpanded: boolean) => {
@@ -50,6 +69,11 @@ const History = () => {
       setProjectsState({ ...projectsState, [id]: value });
     };
 
+  const handleChangeAggregatedProject =
+    (id: string) => (event: SyntheticEvent, value: BTOProject[]) => {
+      setAggregatedProjectsState({ ...aggregatedProjectsState, [id]: value });
+    };
+
   return (
     <Container sx={{ p: 3 }}>
       <Paper sx={{ p: '1rem' }}>
@@ -59,6 +83,7 @@ const History = () => {
               chartMode={chartMode}
               selectedGroup={selectedGroup}
               projectsState={projectsState}
+              aggregatedProjectsState={aggregatedProjectsState}
             />
           </Grid>
           <Grid item xs={12} md={4}>
@@ -72,6 +97,8 @@ const History = () => {
                 onChangeSelectedGroup={handleChangeSelectedGroup}
                 projectsState={projectsState}
                 onChangeProject={handleChangeProject}
+                aggregatedProjectsState={aggregatedProjectsState}
+                onChangeAggregatedProject={handleChangeAggregatedProject}
               />
               <ButtonGroup>
                 <Button
