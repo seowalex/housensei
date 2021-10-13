@@ -33,6 +33,7 @@ import { UseLoadScriptOptions } from '@react-google-maps/api/src/useJsApiLoader'
 import { InfoBoxOptions } from '@react-google-maps/infobox';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 import { Settings as SettingsIcon } from '@mui/icons-material';
+import { matchSorter } from 'match-sorter';
 
 import { useAppSelector } from '../app/hooks';
 import { selectDarkMode } from '../reducers/settings';
@@ -49,7 +50,7 @@ import {
   townCoordinates,
 } from '../app/constants';
 import { Town } from '../types/towns';
-import { mapTownToRegion } from '../utils/towns';
+import { autocompleteSorter, mapTownToRegion } from '../utils/towns';
 
 const apiOptions: UseLoadScriptOptions = {
   googleMapsApiKey,
@@ -249,6 +250,13 @@ const Heatmap = () => {
     }
   };
 
+  const autocompleteGroupBy = (option: string) => {
+    if (option === 'Islandwide') {
+      return '';
+    }
+    return mapTownToRegion(option as Town);
+  };
+
   return isLoaded ? (
     <Container
       sx={{
@@ -344,17 +352,17 @@ const Heatmap = () => {
                 return leftTown.localeCompare(rightTown);
               })
             )}
-            groupBy={(option) => {
-              if (option === 'Islandwide') {
-                return '';
-              }
-              return mapTownToRegion(option as Town);
-            }}
+            groupBy={autocompleteGroupBy}
             renderInput={(params) => <TextField label="Town" {...params} />}
             value={town}
             onChange={(_, value) => setTown(value as Town | 'Islandwide')}
             blurOnSelect
             disableClearable
+            filterOptions={(options, { inputValue }) =>
+              matchSorter(options, inputValue, {
+                sorter: autocompleteSorter(autocompleteGroupBy),
+              })
+            }
             sx={{
               width: {
                 xs: '100%',
