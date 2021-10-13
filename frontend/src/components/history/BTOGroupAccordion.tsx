@@ -29,8 +29,12 @@ import { useGetBTOGraphQuery } from '../../api/history';
 import { useAppSelector } from '../../app/hooks';
 import {
   removeGroup,
-  selectAggregatedBTOProjects,
+  selectBTOAggregations,
   selectBTOProjects,
+  selectDisplayedBTOAggregations,
+  selectDisplayedBTOProjects,
+  updateDisplayedBTOAggregations,
+  updateDisplayedBTOProjects,
   updateGroup,
 } from '../../reducers/history';
 import { BTOGroup, Group } from '../../types/groups';
@@ -56,39 +60,28 @@ interface Props {
   group: BTOGroup;
   expanded: boolean;
   onChangeSelectedGroup: (isExpanded: boolean) => void;
-  projectsState: BTOProject[];
-  onChangeSelectedProjects: (
-    event: SyntheticEvent,
-    projects: BTOProject[]
-  ) => void;
-  aggregatedProjectsState: BTOProject[];
-  onChangeSelectedAggregatedProjects: (
-    event: SyntheticEvent,
-    projects: BTOProject[]
-  ) => void;
   onDuplicateGroup: (group: Group) => void;
 }
 
 const BTOGroupAccordion = (props: Props) => {
   const dispatch = useDispatch();
-  const {
-    group,
-    expanded,
-    onChangeSelectedGroup,
-    projectsState,
-    onChangeSelectedProjects,
-    aggregatedProjectsState,
-    onChangeSelectedAggregatedProjects,
-    onDuplicateGroup,
-  } = props;
+  const { group, expanded, onChangeSelectedGroup, onDuplicateGroup } = props;
+
   useGetBTOGraphQuery({
     ...group.filters,
     id: group.id,
   });
+
   const projects = useAppSelector(selectBTOProjects(group.id));
-  const aggregatedProjects = useAppSelector(
-    selectAggregatedBTOProjects(group.id)
+  const aggregations = useAppSelector(selectBTOAggregations(group.id));
+
+  const displayedProjects = useAppSelector(
+    selectDisplayedBTOProjects(group.id)
   );
+  const displayedAggregations = useAppSelector(
+    selectDisplayedBTOAggregations(group.id)
+  );
+
   const [displayedModal, setDisplayedModal] = useState<DisplayedModal>(
     DisplayedModal.Hidden
   );
@@ -118,6 +111,30 @@ const BTOGroupAccordion = (props: Props) => {
     onChangeSelectedGroup(false);
   };
 
+  const handleChangeDisplayedProjects = (
+    event: SyntheticEvent,
+    selectedProjects: BTOProject[]
+  ) => {
+    dispatch(
+      updateDisplayedBTOProjects({
+        id: group.id,
+        projects: selectedProjects,
+      })
+    );
+  };
+
+  const handleChangeDisplayedAggregations = (
+    event: SyntheticEvent,
+    selectedAggregations: BTOProject[]
+  ) => {
+    dispatch(
+      updateDisplayedBTOAggregations({
+        id: group.id,
+        aggregations: selectedAggregations,
+      })
+    );
+  };
+
   return (
     <>
       <Accordion
@@ -134,13 +151,13 @@ const BTOGroupAccordion = (props: Props) => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Autocomplete
-                onChange={onChangeSelectedAggregatedProjects}
-                value={aggregatedProjectsState ?? []}
+                onChange={handleChangeDisplayedAggregations}
+                value={displayedAggregations ?? []}
                 multiple
                 disableCloseOnSelect
                 options={
-                  aggregatedProjects
-                    ? [...aggregatedProjects].sort((left, right) =>
+                  aggregations
+                    ? [...aggregations].sort((left, right) =>
                         left.name.localeCompare(right.name)
                       )
                     : []
@@ -180,8 +197,8 @@ const BTOGroupAccordion = (props: Props) => {
                     {...params}
                     label="Aggregated BTO data"
                     placeholder={
-                      aggregatedProjectsState == null ||
-                      aggregatedProjectsState.length === 0
+                      displayedAggregations == null ||
+                      displayedAggregations.length === 0
                         ? 'Select an aggregation to show on chart'
                         : ''
                     }
@@ -191,8 +208,8 @@ const BTOGroupAccordion = (props: Props) => {
             </Grid>
             <Grid item xs={12}>
               <Autocomplete
-                onChange={onChangeSelectedProjects}
-                value={projectsState ?? []}
+                onChange={handleChangeDisplayedProjects}
+                value={displayedProjects ?? []}
                 multiple
                 disableCloseOnSelect
                 options={
@@ -245,12 +262,14 @@ const BTOGroupAccordion = (props: Props) => {
                   <TextField
                     {...params}
                     label={
-                      projectsState == null || projectsState.length === 0
+                      displayedProjects == null ||
+                      displayedProjects.length === 0
                         ? 'Select specific BTO projects'
                         : 'Displayed BTO Projects'
                     }
                     placeholder={
-                      projectsState == null || projectsState.length === 0
+                      displayedProjects == null ||
+                      displayedProjects.length === 0
                         ? 'Select a project to show on chart'
                         : ''
                     }

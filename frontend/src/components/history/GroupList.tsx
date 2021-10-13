@@ -1,12 +1,11 @@
 import { Button, Modal, Stack } from '@mui/material';
-import { SyntheticEvent, useState } from 'react';
+import { useState } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 import { useAppSelector } from '../../app/hooks';
 import { createGroup, selectGroups } from '../../reducers/history';
 import { BTOGroup, Group, GroupFilters, ResaleGroup } from '../../types/groups';
-import { BTOProject } from '../../types/history';
 import { getGroupColor, mapFormValuesToGroupFilters } from '../../utils/groups';
 import { FormPaper } from '../styled';
 import BTOGroupAccordion from './BTOGroupAccordion';
@@ -16,26 +15,11 @@ import ResaleGroupAccordion from './ResaleGroupAccordion';
 interface Props {
   selectedGroup: string | undefined;
   onChangeSelectedGroup: (id: string) => (isExpanded: boolean) => void;
-  projectsState: Record<string, BTOProject[]>;
-  onChangeProject: (
-    id: string
-  ) => (event: SyntheticEvent, projects: BTOProject[]) => void;
-  aggregatedProjectsState: Record<string, BTOProject[]>;
-  onChangeAggregatedProject: (
-    id: string
-  ) => (event: SyntheticEvent, projects: BTOProject[]) => void;
 }
 
 const GroupList = (props: Props) => {
   const dispatch = useDispatch();
-  const {
-    selectedGroup,
-    onChangeSelectedGroup,
-    projectsState,
-    onChangeProject,
-    aggregatedProjectsState,
-    onChangeAggregatedProject,
-  } = props;
+  const { selectedGroup, onChangeSelectedGroup } = props;
   const groups = useAppSelector(selectGroups);
   const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
 
@@ -91,12 +75,6 @@ const GroupList = (props: Props) => {
               group={group as BTOGroup}
               expanded={selectedGroup === group.id}
               onChangeSelectedGroup={onChangeSelectedGroup(group.id)}
-              projectsState={projectsState[group.id]}
-              onChangeSelectedProjects={onChangeProject(group.id)}
-              aggregatedProjectsState={aggregatedProjectsState[group.id]}
-              onChangeSelectedAggregatedProjects={onChangeAggregatedProject(
-                group.id
-              )}
               onDuplicateGroup={handleDuplicateGroup}
             />
           )

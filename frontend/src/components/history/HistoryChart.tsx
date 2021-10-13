@@ -10,11 +10,12 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { BTOProject, ChartMode } from '../../types/history';
+import { ChartMode } from '../../types/history';
 import { formatDate, formatPrice } from '../../utils/history';
 import { convertFlatTypeToFrontend } from '../../utils/groups';
 import { useAppSelector } from '../../app/hooks';
 import {
+  selectDisplayedBTOProjectsRecord,
   selectGroups,
   selectMonthlyChartData,
   selectYearlyChartData,
@@ -23,16 +24,19 @@ import {
 interface Props {
   chartMode: ChartMode;
   selectedGroup: string | undefined;
-  projectsState: Record<string, BTOProject[]>;
-  aggregatedProjectsState: Record<string, BTOProject[]>;
 }
 
 const HistoryChart = (props: Props) => {
-  const { chartMode, selectedGroup, projectsState, aggregatedProjectsState } =
-    props;
+  const { chartMode, selectedGroup } = props;
   const groups = useAppSelector(selectGroups);
+
   const monthlyChartData = useAppSelector(selectMonthlyChartData);
   const yearlyChartData = useAppSelector(selectYearlyChartData);
+
+  const displayedBTOProjectsRecord = useAppSelector(
+    selectDisplayedBTOProjectsRecord
+  );
+
   const chartData =
     chartMode === ChartMode.Monthly ? monthlyChartData : yearlyChartData;
 
@@ -58,10 +62,7 @@ const HistoryChart = (props: Props) => {
             offset={10}
           />
         </XAxis>
-        <YAxis
-          tickFormatter={(value, index) => formatPrice(value)}
-          type="number"
-        >
+        <YAxis tickFormatter={(value) => formatPrice(value)} type="number">
           <Label
             value="Average Price (SGD)"
             position="insideLeft"
@@ -100,45 +101,49 @@ const HistoryChart = (props: Props) => {
         ))}
         {groups.map(({ id, color }) => (
           <>
-            {projectsState[id] &&
-              projectsState[id].map(({ name, price, flatType }) => (
-                <ReferenceLine
-                  y={price}
-                  stroke={
-                    selectedGroup !== id && selectedGroup != null
-                      ? `${color}88`
-                      : color
-                  }
-                  strokeWidth={selectedGroup === id ? 3 : 2}
-                  strokeDasharray="7 3"
-                  alwaysShow
-                  ifOverflow="extendDomain"
-                >
-                  <Label position="insideLeft" value={price} />
-                  <Label
-                    position="insideRight"
-                    value={`${name} (${convertFlatTypeToFrontend(flatType)})`}
-                  />
-                </ReferenceLine>
-              ))}
-            {aggregatedProjectsState[id] &&
-              aggregatedProjectsState[id].map(({ name, price }) => (
-                <ReferenceLine
-                  y={price}
-                  stroke={
-                    selectedGroup !== id && selectedGroup != null
-                      ? `${color}88`
-                      : color
-                  }
-                  strokeWidth={selectedGroup === id ? 3 : 2}
-                  strokeDasharray="7 3"
-                  alwaysShow
-                  ifOverflow="extendDomain"
-                >
-                  <Label position="insideLeft" value={price} />
-                  <Label position="insideRight" value={name} />
-                </ReferenceLine>
-              ))}
+            {displayedBTOProjectsRecord[id] &&
+              displayedBTOProjectsRecord[id].projects &&
+              displayedBTOProjectsRecord[id].projects.map(
+                ({ name, price, flatType }) => (
+                  <ReferenceLine
+                    y={price}
+                    stroke={
+                      selectedGroup !== id && selectedGroup != null
+                        ? `${color}88`
+                        : color
+                    }
+                    strokeWidth={selectedGroup === id ? 3 : 2}
+                    strokeDasharray="7 3"
+                    ifOverflow="extendDomain"
+                  >
+                    <Label position="insideLeft" value={price} />
+                    <Label
+                      position="insideRight"
+                      value={`${name} (${convertFlatTypeToFrontend(flatType)})`}
+                    />
+                  </ReferenceLine>
+                )
+              )}
+            {displayedBTOProjectsRecord[id] &&
+              displayedBTOProjectsRecord[id].aggregations &&
+              displayedBTOProjectsRecord[id].aggregations.map(
+                ({ name, price }) => (
+                  <ReferenceLine
+                    y={price}
+                    stroke={
+                      selectedGroup !== id && selectedGroup != null
+                        ? `${color}88`
+                        : color
+                    }
+                    strokeWidth={selectedGroup === id ? 3 : 2}
+                    strokeDasharray="7 3"
+                    ifOverflow="extendDomain"
+                  >
+                    <Label position="insideLeft" value={price} />
+                    <Label position="insideRight" value={name} />
+                  </ReferenceLine>
+                )
+              )}
           </>
         ))}
       </LineChart>
