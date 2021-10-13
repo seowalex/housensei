@@ -80,32 +80,50 @@ const Routes = () => {
 
   const drawer = (
     <List>
-      <ListItem disablePadding>
-        <ListItemButton component={Link} to="/heatmap">
-          <ListItemIcon>
-            <MapIcon />
-          </ListItemIcon>
-          <ListItemText primary="Price Heatmap" />
-        </ListItemButton>
-      </ListItem>
+      <Tooltip
+        title="Price Heatmap"
+        placement="right"
+        disableHoverListener={drawerOpen || !isDesktop}
+      >
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/heatmap">
+            <ListItemIcon>
+              <MapIcon />
+            </ListItemIcon>
+            <ListItemText primary="Price Heatmap" />
+          </ListItemButton>
+        </ListItem>
+      </Tooltip>
 
-      <ListItem disablePadding>
-        <ListItemButton component={Link} to="/history">
-          <ListItemIcon>
-            <TimelineIcon />
-          </ListItemIcon>
-          <ListItemText primary="Price History" />
-        </ListItemButton>
-      </ListItem>
+      <Tooltip
+        title="Price History"
+        placement="right"
+        disableHoverListener={drawerOpen || !isDesktop}
+      >
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/history">
+            <ListItemIcon>
+              <TimelineIcon />
+            </ListItemIcon>
+            <ListItemText primary="Price History" />
+          </ListItemButton>
+        </ListItem>
+      </Tooltip>
 
-      <ListItem disablePadding>
-        <ListItemButton component={Link} to="/grants">
-          <ListItemIcon>
-            <CalculateIcon />
-          </ListItemIcon>
-          <ListItemText primary="Grant Calculator" />
-        </ListItemButton>
-      </ListItem>
+      <Tooltip
+        title="Grant Calculator"
+        placement="right"
+        disableHoverListener={drawerOpen || !isDesktop}
+      >
+        <ListItem disablePadding>
+          <ListItemButton component={Link} to="/grants">
+            <ListItemIcon>
+              <CalculateIcon />
+            </ListItemIcon>
+            <ListItemText primary="Grant Calculator" />
+          </ListItemButton>
+        </ListItem>
+      </Tooltip>
     </List>
   );
 

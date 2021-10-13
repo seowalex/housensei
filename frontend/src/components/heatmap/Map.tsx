@@ -236,7 +236,14 @@ const Map = () => {
                 <CardContent
                   sx={{ p: (theme) => `${theme.spacing(1)} !important` }}
                 >
-                  <Typography variant="subtitle2">{townName}</Typography>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {townName}
+                  </Typography>
                   <Typography variant="caption">
                     {formatPrice(
                       islandHeatmap?.find((point) => point.town === townName)
