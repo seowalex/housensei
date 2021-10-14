@@ -29,10 +29,18 @@ import {
 } from '../../api/heatmap';
 
 import { currencyFormatter, useDebounce } from '../../app/utils';
-import { townRegions } from '../../app/constants';
+import {
+  singaporeCoordinates,
+  townCoordinates,
+  townRegions,
+} from '../../app/constants';
 import { Town } from '../../types/towns';
 
 import Settings from './Settings';
+
+interface Props {
+  map?: google.maps.Map;
+}
 
 const currentYear = new Date().getFullYear();
 
@@ -44,7 +52,7 @@ const yearMarks = [
   return { value, label: value.toString() };
 });
 
-const MapOverlay = () => {
+const MapOverlay = ({ map }: Props) => {
   const dispatch = useAppDispatch();
   const showHeatmap = useAppSelector(selectShowHeatmap);
   const town = useAppSelector(selectTown);
@@ -65,6 +73,12 @@ const MapOverlay = () => {
           town,
         }
   );
+
+  const handleTownChange = (_: React.SyntheticEvent, townName: string) => {
+    dispatch(setTown(townName as Town | 'Islandwide'));
+    map?.setCenter(townCoordinates[townName as Town] ?? singaporeCoordinates);
+    map?.setZoom(townName === 'Islandwide' ? 12 : 15);
+  };
 
   const handleYearBlur = () => {
     if (Number.isNaN(year) || year < 1990) {
@@ -93,9 +107,7 @@ const MapOverlay = () => {
             groupBy={(option) => townRegions[option as Town] ?? ''}
             renderInput={(params) => <TextField label="Town" {...params} />}
             value={town}
-            onChange={(_, value) =>
-              dispatch(setTown(value as Town | 'Islandwide'))
-            }
+            onChange={handleTownChange}
             blurOnSelect
             disableClearable
             sx={{

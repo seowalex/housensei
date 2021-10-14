@@ -30,6 +30,8 @@ import {
 } from '../../app/constants';
 import { Town } from '../../types/towns';
 
+import MapOverlay from './MapOverlay';
+
 const infoBoxOptions: InfoBoxOptions = {
   boxStyle: {
     overflow: 'visible',
@@ -146,11 +148,6 @@ const Map = () => {
   }, [google, town, islandHeatmap, townHeatmap]);
 
   useEffect(() => {
-    map?.setCenter(townCoordinates[town as Town] ?? singaporeCoordinates);
-    map?.setZoom(town === 'Islandwide' ? 12 : 15);
-  }, [map, town]);
-
-  useEffect(() => {
     for (const polygon of Object.values(polygons)) {
       polygon?.setOptions({
         fillOpacity: showHeatmapPrices ? 0.4 : 0,
@@ -164,6 +161,27 @@ const Map = () => {
       )
     );
   }, [showHeatmapPrices, polygons]);
+
+  const handleMapIdle = () => {
+    const zoom = map?.getZoom();
+
+    if (google && zoom) {
+      if (zoom < 15) {
+        dispatch(setTown('Islandwide'));
+      } else {
+        for (const [townName, polygon] of Object.entries(polygons)) {
+          if (
+            google.maps.geometry.poly.containsLocation(
+              map?.getCenter() ?? null,
+              polygon
+            )
+          ) {
+            dispatch(setTown(townName as Town));
+          }
+        }
+      }
+    }
+  };
 
   const handlePolygonMouseOver = (townName: string) => {
     if (!showHeatmapPrices) {
@@ -191,71 +209,81 @@ const Map = () => {
     }
   };
 
+  const handlePolygonClick = (townName: string) => {
+    dispatch(setTown(townName as Town));
+    map?.setCenter(townCoordinates[townName as Town] ?? singaporeCoordinates);
+    map?.setZoom(15);
+  };
+
   return (
-    <GoogleMap
-      mapContainerStyle={{ height: '100%' }}
-      options={mapOptions}
-      onLoad={setMap}
-    >
-      <TransitLayer />
-      {showHeatmap && (
-        <HeatmapLayer data={heatmapData} options={heatmapLayerOptions} />
-      )}
-      {town === 'Islandwide' &&
-        Object.entries(townBoundaries).map(([townName, paths]) => (
-          <Fragment key={townName}>
-            <Polygon
-              paths={paths}
-              options={polygonOptions}
-              onLoad={(polygon) =>
-                setPolygons((prevPolygons) => ({
-                  ...prevPolygons,
-                  [townName]: polygon,
-                }))
-              }
-              onMouseOver={() => handlePolygonMouseOver(townName)}
-              onMouseOut={() => handlePolygonMouseOut(townName)}
-              onClick={() => dispatch(setTown(townName as Town))}
-            />
-            <InfoBox
-              position={townCoordinates[townName as Town]}
-              options={{
-                ...infoBoxOptions,
-                visible: infoBoxes[townName as Town],
-              }}
-            >
-              <Card
-                sx={{
-                  backgroundColor: darkMode
-                    ? 'rgba(18, 18, 18, 0.8)'
-                    : 'rgba(255, 255, 255, 0.8)',
-                  textAlign: 'center',
-                  m: '-25% 50% 0 -50%',
+    <>
+      <GoogleMap
+        mapContainerStyle={{ height: '100%' }}
+        options={mapOptions}
+        onLoad={setMap}
+        onIdle={handleMapIdle}
+      >
+        <TransitLayer />
+        {showHeatmap && (
+          <HeatmapLayer data={heatmapData} options={heatmapLayerOptions} />
+        )}
+        {town === 'Islandwide' &&
+          Object.entries(townBoundaries).map(([townName, paths]) => (
+            <Fragment key={townName}>
+              <Polygon
+                paths={paths}
+                options={polygonOptions}
+                onLoad={(polygon) =>
+                  setPolygons((prevPolygons) => ({
+                    ...prevPolygons,
+                    [townName]: polygon,
+                  }))
+                }
+                onMouseOver={() => handlePolygonMouseOver(townName)}
+                onMouseOut={() => handlePolygonMouseOut(townName)}
+                onClick={() => handlePolygonClick(townName)}
+              />
+              <InfoBox
+                position={townCoordinates[townName as Town]}
+                options={{
+                  ...infoBoxOptions,
+                  visible: infoBoxes[townName as Town],
                 }}
               >
-                <CardContent
-                  sx={{ p: (theme) => `${theme.spacing(1)} !important` }}
+                <Card
+                  sx={{
+                    backgroundColor: darkMode
+                      ? 'rgba(18, 18, 18, 0.8)'
+                      : 'rgba(255, 255, 255, 0.8)',
+                    textAlign: 'center',
+                    m: '-25% 50% 0 -50%',
+                  }}
                 >
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      whiteSpace: 'nowrap',
-                    }}
+                  <CardContent
+                    sx={{ p: (theme) => `${theme.spacing(1)} !important` }}
                   >
-                    {townName}
-                  </Typography>
-                  <Typography variant="caption">
-                    {formatPrice(
-                      islandHeatmap?.find((point) => point.town === townName)
-                        ?.resalePrice
-                    )}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </InfoBox>
-          </Fragment>
-        ))}
-    </GoogleMap>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {townName}
+                    </Typography>
+                    <Typography variant="caption">
+                      {formatPrice(
+                        islandHeatmap?.find((point) => point.town === townName)
+                          ?.resalePrice
+                      )}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </InfoBox>
+            </Fragment>
+          ))}
+      </GoogleMap>
+      <MapOverlay map={map} />
+    </>
   );
 };
 

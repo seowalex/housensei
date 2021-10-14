@@ -5,11 +5,10 @@ import { UseLoadScriptOptions } from '@react-google-maps/api/src/useJsApiLoader'
 import { googleMapsApiKey } from '../app/constants';
 
 import Map from '../components/heatmap/Map';
-import MapOverlay from '../components/heatmap/MapOverlay';
 
 const apiOptions: UseLoadScriptOptions = {
   googleMapsApiKey,
-  libraries: ['places', 'visualization'],
+  libraries: ['geometry', 'places', 'visualization'],
 };
 
 const Heatmap = () => {
@@ -33,7 +32,6 @@ const Heatmap = () => {
       }}
     >
       <Map />
-      <MapOverlay />
     </Container>
   ) : (
     <Container
