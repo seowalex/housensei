@@ -6,7 +6,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { Done as DoneIcon, Edit as EditIcon } from '@mui/icons-material';
+import { Edit as EditIcon } from '@mui/icons-material';
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 
 import { useAppDispatch } from '../../app/hooks';
@@ -21,6 +21,12 @@ interface Props {
 const PriceRange = ({ priceRange, setHeatmapPriceRange }: Props) => {
   const dispatch = useAppDispatch();
   const [priceRangeOpen, setPriceRangeOpen] = useState(false);
+
+  const handleEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Escape' || event.key === 'Enter') {
+      setPriceRangeOpen(false);
+    }
+  };
 
   return priceRangeOpen ? (
     <TextField
@@ -43,17 +49,9 @@ const PriceRange = ({ priceRange, setHeatmapPriceRange }: Props) => {
             $
           </InputAdornment>
         ),
-        endAdornment: (
-          <InputAdornment position="end" sx={{ ml: 0 }}>
-            <IconButton
-              size="small"
-              edge="end"
-              onClick={() => setPriceRangeOpen(false)}
-            >
-              <DoneIcon fontSize="inherit" />
-            </IconButton>
-          </InputAdornment>
-        ),
+        onBlur: () => setPriceRangeOpen(false),
+        onKeyDown: handleEnter,
+        autoFocus: true,
         sx: {
           fontSize: (theme) => theme.typography.body2,
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
