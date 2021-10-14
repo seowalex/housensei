@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Autocomplete,
   Box,
@@ -22,13 +22,19 @@ import {
   setTown,
   setYear,
 } from '../../reducers/heatmap';
-import { selectShowHeatmap } from '../../reducers/settings';
+import {
+  selectHeatmapPriceRangeLower,
+  selectHeatmapPriceRangeUpper,
+  selectShowHeatmap,
+  setHeatmapPriceRangeLower,
+  setHeatmapPriceRangeUpper,
+} from '../../reducers/settings';
 import {
   useGetIslandHeatmapQuery,
   useGetTownHeatmapQuery,
 } from '../../api/heatmap';
 
-import { currencyFormatter, useDebounce } from '../../app/utils';
+import { useDebounce } from '../../app/utils';
 import {
   singaporeCoordinates,
   townCoordinates,
@@ -37,6 +43,7 @@ import {
 import { Town } from '../../types/towns';
 
 import Settings from './Settings';
+import PriceRange from './PriceRange';
 
 interface Props {
   map?: google.maps.Map;
@@ -73,6 +80,26 @@ const MapOverlay = ({ map }: Props) => {
           town,
         }
   );
+
+  const defaultPriceRangeLower = useMemo(
+    () =>
+      town === 'Islandwide'
+        ? Math.min(...(islandHeatmap?.map((point) => point.resalePrice) ?? []))
+        : Math.min(...(townHeatmap?.map((point) => point.resalePrice) ?? [])),
+    [town, islandHeatmap, townHeatmap]
+  );
+  const defaultPriceRangeUpper = useMemo(
+    () =>
+      town === 'Islandwide'
+        ? Math.max(...(islandHeatmap?.map((point) => point.resalePrice) ?? []))
+        : Math.max(...(townHeatmap?.map((point) => point.resalePrice) ?? [])),
+    [town, islandHeatmap, townHeatmap]
+  );
+
+  const priceRangeLower =
+    useAppSelector(selectHeatmapPriceRangeLower) ?? defaultPriceRangeLower;
+  const priceRangeUpper =
+    useAppSelector(selectHeatmapPriceRangeUpper) ?? defaultPriceRangeUpper;
 
   const handleTownChange = (_: React.SyntheticEvent, townName: string) => {
     dispatch(setTown(townName as Town | 'Islandwide'));
@@ -221,42 +248,16 @@ const MapOverlay = ({ map }: Props) => {
                 pointerEvents: 'auto',
               }}
             >
-              <CardContent sx={{ p: '12px !important' }}>
+              <CardContent sx={{ p: '0 12px 12px !important' }}>
                 <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="subtitle2" gutterBottom>
-                    {town === 'Islandwide'
-                      ? currencyFormatter.format(
-                          Math.min(
-                            ...(islandHeatmap?.map(
-                              (point) => point.resalePrice
-                            ) ?? [])
-                          )
-                        )
-                      : currencyFormatter.format(
-                          Math.min(
-                            ...(townHeatmap?.map(
-                              (point) => point.resalePrice
-                            ) ?? [])
-                          )
-                        )}
-                  </Typography>
-                  <Typography variant="subtitle2" gutterBottom>
-                    {town === 'Islandwide'
-                      ? currencyFormatter.format(
-                          Math.max(
-                            ...(islandHeatmap?.map(
-                              (point) => point.resalePrice
-                            ) ?? [])
-                          )
-                        )
-                      : currencyFormatter.format(
-                          Math.max(
-                            ...(townHeatmap?.map(
-                              (point) => point.resalePrice
-                            ) ?? [])
-                          )
-                        )}
-                  </Typography>
+                  <PriceRange
+                    priceRange={priceRangeLower}
+                    setHeatmapPriceRange={setHeatmapPriceRangeLower}
+                  />
+                  <PriceRange
+                    priceRange={priceRangeUpper}
+                    setHeatmapPriceRange={setHeatmapPriceRangeUpper}
+                  />
                 </Stack>
                 <Box
                   sx={{
