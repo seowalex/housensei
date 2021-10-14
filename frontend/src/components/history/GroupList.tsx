@@ -40,6 +40,26 @@ const GroupList = (props: Props) => {
     setShowCreateForm(false);
   };
 
+  const handleCreateBTOGroup = (group: Group) => {
+    const groupId = uuidv4();
+    const {
+      minStorey,
+      maxStorey,
+      minLeasePeriod,
+      maxLeasePeriod,
+      ...btoFilters
+    } = group.filters;
+    const btoGroup: Group = {
+      type: 'bto',
+      id: groupId,
+      name: `${group.name} (BTO)`,
+      color: getGroupColor(groups.length),
+      filters: btoFilters,
+    };
+    dispatch(createGroup(btoGroup));
+    onChangeSelectedGroup(groupId)(true);
+  };
+
   const handleDuplicateGroup = (group: Group) => {
     const groupId = uuidv4();
     const duplicatedGroup: Group = {
@@ -69,6 +89,7 @@ const GroupList = (props: Props) => {
               expanded={selectedGroup === group.id}
               onChangeSelectedGroup={onChangeSelectedGroup(group.id)}
               onDuplicateGroup={handleDuplicateGroup}
+              onCreateBTOGroup={handleCreateBTOGroup}
             />
           ) : (
             <BTOGroupAccordion
