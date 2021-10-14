@@ -3,6 +3,7 @@ import {
   DeleteRounded as DeleteRoundedIcon,
   EditRounded as EditRoundedIcon,
   ExpandMoreRounded as ExpandMoreRoundedIcon,
+  NewReleasesRounded,
   WarningRounded as WarningRoundedIcon,
 } from '@mui/icons-material';
 import {
@@ -12,6 +13,7 @@ import {
   Alert,
   AlertTitle,
   Button,
+  Collapse,
   Grid,
   IconButton,
   Modal,
@@ -22,7 +24,8 @@ import {
 import { useState } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { useGetResaleGraphQuery } from '../../api/history';
+
+import { useGetBTOGraphQuery, useGetResaleGraphQuery } from '../../api/history';
 import { removeGroup, updateGroup } from '../../reducers/history';
 import { Group, ResaleGroup } from '../../types/groups';
 import {
@@ -45,18 +48,40 @@ interface Props {
   expanded: boolean;
   onChangeSelectedGroup: (isExpanded: boolean) => void;
   onDuplicateGroup: (group: Group) => void;
+  onCreateBTOGroup: (group: Group) => void;
 }
 
 const ResaleGroupAccordion = (props: Props) => {
   const dispatch = useDispatch();
-  const { group, expanded, onChangeSelectedGroup, onDuplicateGroup } = props;
-  const { data: queryResponse } = useGetResaleGraphQuery({
+  const {
+    group,
+    expanded,
+    onChangeSelectedGroup,
+    onDuplicateGroup,
+    onCreateBTOGroup,
+  } = props;
+
+  const { data: resaleQueryResponse } = useGetResaleGraphQuery({
     ...group.filters,
     id: group.id,
   });
+
+  const {
+    minStorey,
+    maxStorey,
+    minLeasePeriod,
+    maxLeasePeriod,
+    ...btoFilters
+  } = group.filters;
+  const { data: btoQueryResponse } = useGetBTOGraphQuery({
+    ...btoFilters,
+    id: group.id,
+  });
+
   const [displayedModal, setDisplayedModal] = useState<DisplayedModal>(
     DisplayedModal.Hidden
   );
+  const [showBTOAlert, setShowBTOAlert] = useState<boolean>(true);
 
   const onUpdateGroup: SubmitHandler<GroupFormValues> = (
     data: GroupFormValues
@@ -120,7 +145,7 @@ const ResaleGroupAccordion = (props: Props) => {
                 </Stack>
               </Grid>
             </Grid>
-            {queryResponse?.data.length === 0 && (
+            {resaleQueryResponse?.data.length === 0 && (
               <Grid item>
                 <Alert severity="warning" icon={<WarningRoundedIcon />}>
                   <AlertTitle>No data found!</AlertTitle>
@@ -129,6 +154,34 @@ const ResaleGroupAccordion = (props: Props) => {
                 </Alert>
               </Grid>
             )}
+            <Grid item>
+              <Collapse
+                in={
+                  showBTOAlert &&
+                  btoQueryResponse &&
+                  btoQueryResponse.data.length > 0
+                }
+              >
+                <Alert
+                  severity="success"
+                  icon={<NewReleasesRounded />}
+                  onClose={() => setShowBTOAlert(false)}
+                >
+                  <AlertTitle>{`${
+                    btoQueryResponse?.data.length ?? ''
+                  } related BTO projects found!`}</AlertTitle>
+                  <Button
+                    variant="outlined"
+                    onClick={() => {
+                      setShowBTOAlert(false);
+                      onCreateBTOGroup(group);
+                    }}
+                  >
+                    Add to chart
+                  </Button>
+                </Alert>
+              </Collapse>
+            </Grid>
           </Grid>
         </AccordionDetails>
       </Accordion>

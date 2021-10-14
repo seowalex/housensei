@@ -163,11 +163,7 @@ const HistoryChart = (props: Props) => {
                       stroke="none"
                       ifOverflow="extendDomain"
                     >
-                      <Label
-                        position="bottom"
-                        value={formatDate(date)}
-                        offset={-1}
-                      />
+                      <Label position="bottom" value={formatDate(date)} />
                     </ReferenceDot>
                   </>
                 )

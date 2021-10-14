@@ -10,7 +10,7 @@ import {
   parseISO,
 } from 'date-fns';
 import { BTOGraphDataPoint } from '../api/history';
-import { BackendFlatType, Group } from '../types/groups';
+import { BackendFlatType } from '../types/groups';
 import { ChartDataPoint, PriceDataPoint } from '../types/history';
 import { convertFlatTypeToFrontend } from './groups';
 
@@ -115,6 +115,10 @@ export const getChartData = (rawData: {
       dates.push(date);
     }
   });
+
+  if (dates.length === 0) {
+    return [[], []];
+  }
 
   const minDate = min(dates);
   const maxDate = max(dates);
