@@ -1,5 +1,11 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
-import { Card, CardContent, Typography, useMediaQuery } from '@mui/material';
+import {
+  Card,
+  CardContent,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 import {
   GoogleMap,
   HeatmapLayer,
@@ -68,6 +74,7 @@ const Map = () => {
   const { google } = window;
 
   const dispatch = useAppDispatch();
+  const theme = useTheme();
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const darkMode = useAppSelector(selectDarkMode) ?? prefersDarkMode;
   const showHeatmap = useAppSelector(selectShowHeatmap);
@@ -110,13 +117,23 @@ const Map = () => {
 
   const polygonOptions: google.maps.PolygonOptions = useMemo(
     () => ({
-      fillColor: darkMode ? '#9e9e9e' : '#757575',
+      fillColor: darkMode ? theme.palette.grey[500] : theme.palette.grey[600],
       fillOpacity: 0,
-      strokeColor: darkMode ? '#757575' : '#616161',
+      strokeColor: darkMode ? theme.palette.grey[600] : theme.palette.grey[700],
       strokeWeight: 2,
       strokeOpacity: 0,
     }),
-    [darkMode]
+    [theme, darkMode]
+  );
+
+  const selectedPolygonOptions: google.maps.PolygonOptions = useMemo(
+    () => ({
+      fillOpacity: 0,
+      strokeColor: theme.palette.error.light,
+      strokeWeight: 3,
+      strokeOpacity: 1,
+    }),
+    [theme]
   );
 
   const heatmapLayerOptions: google.maps.visualization.HeatmapLayerOptions =
@@ -146,6 +163,12 @@ const Map = () => {
           weight: point.resalePrice,
         }));
   }, [google, town, islandHeatmap, townHeatmap]);
+
+  useEffect(() => {
+    map?.setCenter(townCoordinates[town as Town] ?? singaporeCoordinates);
+    map?.setZoom(town === 'Islandwide' ? 12 : 15);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map]);
 
   useEffect(() => {
     for (const polygon of Object.values(polygons)) {
@@ -259,9 +282,7 @@ const Map = () => {
                     m: '-25% 50% 0 -50%',
                   }}
                 >
-                  <CardContent
-                    sx={{ p: (theme) => `${theme.spacing(1)} !important` }}
-                  >
+                  <CardContent sx={{ p: `${theme.spacing(1)} !important` }}>
                     <Typography
                       variant="subtitle2"
                       sx={{
@@ -281,6 +302,12 @@ const Map = () => {
               </InfoBox>
             </Fragment>
           ))}
+        {town !== 'Islandwide' && (
+          <Polygon
+            paths={townBoundaries[town as Town]}
+            options={selectedPolygonOptions}
+          />
+        )}
       </GoogleMap>
       <MapOverlay map={map} />
     </>
