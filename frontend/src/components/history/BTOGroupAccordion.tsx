@@ -22,6 +22,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import { matchSorter } from 'match-sorter';
 import { SyntheticEvent, useState } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -204,6 +205,16 @@ const BTOGroupAccordion = (props: Props) => {
                     }
                   />
                 )}
+                filterOptions={(options, { inputValue }) =>
+                  matchSorter(options, inputValue, {
+                    keys: [
+                      'name',
+                      'price',
+                      (item: BTOProject) =>
+                        convertFlatTypeToFrontend(item.flatType),
+                    ],
+                  })
+                }
               />
             </Grid>
             <Grid item xs={12}>
@@ -275,6 +286,17 @@ const BTOGroupAccordion = (props: Props) => {
                     }
                   />
                 )}
+                filterOptions={(options, { inputValue }) =>
+                  matchSorter(options, inputValue, {
+                    keys: [
+                      'name',
+                      'price',
+                      (item: BTOProject) => formatDate(item.date),
+                      (item: BTOProject) =>
+                        convertFlatTypeToFrontend(item.flatType),
+                    ],
+                  })
+                }
               />
             </Grid>
             <Grid item xs>

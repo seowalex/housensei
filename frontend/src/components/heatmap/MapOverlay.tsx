@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { Settings as SettingsIcon } from '@mui/icons-material';
 import { skipToken } from '@reduxjs/toolkit/query/react';
+import { matchSorter } from 'match-sorter';
 
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import {
@@ -35,6 +36,7 @@ import {
 } from '../../api/heatmap';
 
 import { useDebounce } from '../../app/utils';
+import { townSorter } from '../../utils/towns';
 import {
   singaporeCoordinates,
   townCoordinates,
@@ -132,6 +134,13 @@ const MapOverlay = ({ map }: Props) => {
               )
             )}
             groupBy={(option) => townRegions[option as Town] ?? ''}
+            filterOptions={(options, { inputValue }) =>
+              matchSorter(options, inputValue, {
+                sorter: townSorter(
+                  (option) => townRegions[option as Town] ?? ''
+                ),
+              })
+            }
             renderInput={(params) => <TextField label="Town" {...params} />}
             value={town}
             onChange={handleTownChange}
