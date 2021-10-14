@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -20,6 +20,8 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { selectTown, selectYear, setTown } from '../../reducers/heatmap';
 import {
   selectDarkMode,
+  selectHeatmapPriceRangeLower,
+  selectHeatmapPriceRangeUpper,
   selectShowHeatmap,
   selectShowHeatmapPrices,
 } from '../../reducers/settings';
@@ -50,26 +52,6 @@ const infoBoxOptions: InfoBoxOptions = {
 const formatPrice = (price?: number) =>
   price ? currencyFormatter.format(price) : '';
 
-const normaliseHeatmap = <T extends { resalePrice: number }>(heatmap?: T[]) => {
-  if (!heatmap) {
-    return [];
-  }
-
-  const minPrice = Math.min(...heatmap.map((point) => point.resalePrice));
-  const maxPrice = Math.max(...heatmap.map((point) => point.resalePrice));
-
-  return heatmap.map((point) =>
-    Object.fromEntries(
-      Object.entries(point).map(([key, value]) => [
-        key,
-        key === 'resalePrice'
-          ? (value - minPrice) / (maxPrice - minPrice) + Number.MIN_VALUE
-          : value,
-      ])
-    )
-  ) as T[];
-};
-
 const Map = () => {
   const { google } = window;
 
@@ -79,6 +61,8 @@ const Map = () => {
   const darkMode = useAppSelector(selectDarkMode) ?? prefersDarkMode;
   const showHeatmap = useAppSelector(selectShowHeatmap);
   const showHeatmapPrices = useAppSelector(selectShowHeatmapPrices);
+  const heatmapPriceRangeLower = useAppSelector(selectHeatmapPriceRangeLower);
+  const heatmapPriceRangeUpper = useAppSelector(selectHeatmapPriceRangeUpper);
   const town = useAppSelector(selectTown);
   const year = useAppSelector(selectYear);
 
@@ -140,10 +124,44 @@ const Map = () => {
     useMemo(
       () => ({
         dissipating: false,
+        maxIntensity: 1,
         radius: town === 'Islandwide' ? 0.035 : 0.001,
       }),
       [town]
     );
+
+  const normaliseHeatmap = useCallback(
+    <T extends { resalePrice: number }>(heatmap?: T[]) => {
+      if (!heatmap) {
+        return [];
+      }
+
+      const heatmapMinPrice = Math.min(
+        ...heatmap.map((point) => point.resalePrice)
+      );
+      const heatmapMaxPrice = Math.max(
+        ...heatmap.map((point) => point.resalePrice)
+      );
+
+      const minPrice = heatmapPriceRangeLower
+        ? Math.max(heatmapPriceRangeLower, heatmapMinPrice)
+        : heatmapMinPrice;
+      const maxPrice = heatmapPriceRangeUpper ?? heatmapMaxPrice;
+
+      return heatmap.map((point) =>
+        Object.fromEntries(
+          Object.entries(point).map(([key, value]) => [
+            key,
+            key === 'resalePrice'
+              ? Math.max((value - minPrice) / (maxPrice - minPrice), 0) +
+                Number.MIN_VALUE
+              : value,
+          ])
+        )
+      ) as T[];
+    },
+    [heatmapPriceRangeLower, heatmapPriceRangeUpper]
+  );
 
   const heatmapData = useMemo(() => {
     if (!google) {
@@ -162,7 +180,7 @@ const Map = () => {
           }),
           weight: point.resalePrice,
         }));
-  }, [google, town, islandHeatmap, townHeatmap]);
+  }, [google, town, islandHeatmap, townHeatmap, normaliseHeatmap]);
 
   useEffect(() => {
     map?.setCenter(townCoordinates[town as Town] ?? singaporeCoordinates);
