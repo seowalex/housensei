@@ -28,10 +28,18 @@ const UserQuestions = (props: StepProps) => {
     { label: 'No', value: false },
   ];
 
-  const monthlyIncomeOptions = [
-    { label: 'Not more than $1500', value: 1500 },
-    { label: '$1501 to $2000', value: 2000 },
-  ];
+  // const income = [1500, 2000, ..., 9000, 10k, 11k, 12k, 14k, 21k]
+  let possibleIncomes = [...Array(16).keys()].map((num) => num * 500 + 1500); // gives [1.5k, 2k 2.5k ... 9k]
+  possibleIncomes = possibleIncomes.concat([10000, 11000, 12000, 14000, 21000]);
+
+  const monthlyIncomeOptions = possibleIncomes.map((income, idx) => ({
+    label: `$${income} to $${possibleIncomes[idx + 1]}`,
+    value: income,
+  }));
+
+  monthlyIncomeOptions.unshift({ label: 'Not more than $1500', value: 0 });
+  monthlyIncomeOptions[monthlyIncomeOptions.length - 1].label =
+    'More than $21000';
 
   return (
     <Grid container item direction="column" spacing={3}>

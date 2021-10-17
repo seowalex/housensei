@@ -25,7 +25,7 @@ const FormSelectInput = (props: Props) => {
       name={name}
       control={form.control}
       render={({ field: { onChange, value } }) => (
-        <FormControl component="fieldset" error={error}>
+        <FormControl component="fieldset" error={!!error}>
           <FormLabel component="legend">{label}</FormLabel>
           <RadioGroup row value={value} onChange={onChange}>
             {options.map((option) => (

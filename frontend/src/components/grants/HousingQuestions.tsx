@@ -5,12 +5,19 @@ import StepProps from './StepProps';
 
 const HousingQuestions = (props: StepProps) => {
   const { form } = props;
+  const watchMartialStatus = form.watch('maritalStatus');
+  const isCouple = watchMartialStatus === 'Couple';
+  const watchHousingType = form.watch('housingType');
+  const isResale = watchHousingType === 'Resale';
 
   const housingTypeOptions = [
     { label: 'BTO', value: 'BTO' },
     { label: 'Resale', value: 'Resale' },
-    { label: 'Executive Condominium', value: 'EC' },
   ];
+
+  if (isCouple) {
+    housingTypeOptions.push({ label: 'Executive Condominium', value: 'EC' });
+  }
 
   const leaseOptions = [
     { label: 'Yes', value: true },
@@ -27,27 +34,37 @@ const HousingQuestions = (props: StepProps) => {
   const flatSizeOptions = ToArray(FlatType);
 
   return (
-    <Grid container direction="column">
-      <FormRadioInput
-        label="What is the housing type that you are intending to purchase?"
-        name="housingType"
-        form={form}
-        options={housingTypeOptions}
-      />
+    <Grid container item direction="column" spacing={3}>
+      <Grid item>
+        <FormRadioInput
+          label="What is the housing type that you are intending to purchase?"
+          name="housingType"
+          form={form}
+          options={housingTypeOptions}
+        />
+      </Grid>
 
-      <FormRadioInput
-        label="Is the lease of the house that you are intending to purchase more than 20 years old?"
-        name="lease"
-        form={form}
-        options={leaseOptions}
-      />
+      {isResale && (
+        <>
+          <Grid item>
+            <FormRadioInput
+              label="Is the lease of the house that you are intending to purchase more than 20 years old?"
+              name="lease"
+              form={form}
+              options={leaseOptions}
+            />
+          </Grid>
 
-      <FormRadioInput
-        label="What is the flat size that you are intending to purchase?"
-        name="flatSize"
-        form={form}
-        options={flatSizeOptions}
-      />
+          <Grid item>
+            <FormRadioInput
+              label="What is the flat size that you are intending to purchase?"
+              name="flatSize"
+              form={form}
+              options={flatSizeOptions}
+            />
+          </Grid>
+        </>
+      )}
     </Grid>
   );
 };

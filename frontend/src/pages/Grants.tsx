@@ -74,23 +74,43 @@ const Grants = () => {
 
   // TODO fill in validation messages
 
+  const notEmptyStrCheck = (message: string) =>
+    yup.mixed().notOneOf([''], message);
+
   const validationSchema = [
     yup.object({
-      maritalStatus: yup.string().required(),
-      singleNationality: yup.string().required(),
-      // add to ensure couple attributes are required if martial status is sth
-      singleFirstTimer: yup.boolean().required(),
-      age: yup.boolean().when('maritalStatus', {
-        is: 'Single',
-        then: yup.boolean().required('Must indicate age'),
+      maritalStatus: yup.string().required('Must indicate marital status'),
+      singleNationality: yup.string().required('Must indicate nationality'),
+      coupleNationality: yup.mixed().when('maritalStatus', {
+        is: 'Couple',
+        then: yup.string().required("Must indicate partner's nationality"),
       }),
-      workingAtLeastAYear: yup.boolean().required(),
-      monthlyIncome: yup.number().required(),
+      singleFirstTimer: notEmptyStrCheck('Must indicate if first time buyer'),
+      coupleFirstTimer: yup.mixed().when('maritalStatus', {
+        is: 'Couple',
+        then: notEmptyStrCheck(
+          'Must indicate whether partner is first time buyer'
+        ),
+      }),
+      age: yup.mixed().when('maritalStatus', {
+        is: 'Single',
+        then: notEmptyStrCheck('Must indicate age'),
+      }),
+      workingAtLeastAYear: notEmptyStrCheck(
+        'Must indicate if working for at least a year'
+      ),
+      monthlyIncome: notEmptyStrCheck('Must indicate monthly income'),
     }),
     yup.object({
-      housingType: yup.string().required(),
-      lease: yup.boolean().required(),
-      flatSize: yup.string().required(),
+      housingType: yup.string().required('Must indicate housing type'),
+      lease: yup.mixed().when('housingType', {
+        is: 'Resale',
+        then: notEmptyStrCheck('Must indicate resale lease'),
+      }),
+      flatSize: yup.mixed().when('housingType', {
+        is: 'Resale',
+        then: notEmptyStrCheck('Must indicate resale flat size'),
+      }),
     }),
   ];
 
@@ -135,9 +155,9 @@ const Grants = () => {
                     onClick={() => {
                       // check if pass validation of all steps before
                       if (
-                        idx === 0 ||
+                        idx !== 0 &&
                         validationSchema
-                          .slice(idx - 1)
+                          .slice(0, idx)
                           .some(
                             (validation) =>
                               !validation.isValidSync(methods.getValues())
