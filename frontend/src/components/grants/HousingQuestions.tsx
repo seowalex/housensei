@@ -18,11 +18,11 @@ const HousingQuestions = (props: StepProps) => {
   ];
 
   // Helper
-  const StringIsNumber = (value: any) => Number.isNaN(Number(value)) === false;
   function ToArray(enumme: Record<string, any>) {
-    return Object.keys(enumme)
-      .filter(StringIsNumber)
-      .map((key) => enumme[key]);
+    return Object.keys(enumme).map((key) => ({
+      label: enumme[key],
+      value: key,
+    }));
   }
   const flatSizeOptions = ToArray(FlatType);
 

@@ -3,7 +3,7 @@ import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
-import { Box, Container, Paper } from '@mui/material';
+import { Container, Grid, Paper, Typography } from '@mui/material';
 import * as yup from 'yup';
 import {
   FieldValues,
@@ -16,13 +16,23 @@ import UserQuestions from '../components/grants/UserQuestions';
 import GrantsCalculation from '../components/grants/GrantsCalculation';
 import HousingQuestions from '../components/grants/HousingQuestions';
 
-// some styling
-// export type FormValues = {
-//   maritalStatus: string;
-//   nationality: string;
-// };
+export type GrantsFormValues = {
+  maritalStatus: string;
+  singleNationality: string;
+  coupleNationality: string;
+  singleFirstTimer: boolean | '';
+  coupleFirstTimer: boolean | '';
+  age: boolean | '';
+  workingAtLeastAYear: boolean | '';
+  monthlyIncome: number | '';
 
-const defaultValues = {
+  // housing questions
+  housingType: string;
+  lease: boolean | '';
+  flatSize: string;
+};
+
+const defaultValues: GrantsFormValues = {
   // user questions
   maritalStatus: '',
   singleNationality: '',
@@ -70,7 +80,10 @@ const Grants = () => {
       singleNationality: yup.string().required(),
       // add to ensure couple attributes are required if martial status is sth
       singleFirstTimer: yup.boolean().required(),
-      age: yup.boolean().required(),
+      age: yup.boolean().when('maritalStatus', {
+        is: 'Single',
+        then: yup.boolean().required('Must indicate age'),
+      }),
       workingAtLeastAYear: yup.boolean().required(),
       monthlyIncome: yup.number().required(),
     }),
@@ -81,15 +94,15 @@ const Grants = () => {
     }),
   ];
 
-  const currentValidationSchema =
-    validationSchema[activeStep < 2 ? activeStep : 0];
+  const currentValidationSchema = validationSchema[activeStep];
+
   const methods = useForm({
     shouldUnregister: false,
     defaultValues,
     resolver: yupResolver(currentValidationSchema),
     mode: 'onChange',
   });
-  const { reset, trigger } = methods;
+  const { trigger } = methods;
 
   const handleNext = async () => {
     const isStepValid = await trigger();
@@ -100,61 +113,88 @@ const Grants = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
-    reset();
-  };
-
   return (
-    <Container>
-      <Paper elevation={1}>
-        <Stepper activeStep={activeStep}>
-          {steps.map((label) => {
-            const stepProps = {};
-            const labelProps = {};
-            return (
-              <Step key={label} {...stepProps}>
-                <StepLabel {...labelProps}>{label}</StepLabel>
-              </Step>
-            );
-          })}
-        </Stepper>
-        <div style={{ minHeight: '50%' }}>
-          {activeStep === steps.length ? (
-            <>
-              <Button onClick={handleReset}>Reset</Button>
-            </>
-          ) : (
+    <Container sx={{ p: 3 }}>
+      <Paper sx={{ p: '1rem' }}>
+        <Grid container direction="column" spacing={10} padding={5}>
+          <Grid item>
+            <Typography variant="h2">Grant Calculator</Typography>
+            <br />
+            <Typography>
+              Check your eligibility for the Enhanced CPF Housing Grant (EHG),
+              Family Grant, Proximity Housing Grant (PHG) and Family Grant here.
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Stepper activeStep={activeStep}>
+              {steps.map((label, idx) => {
+                const stepProps = {};
+                const labelProps = {};
+                return (
+                  <Step
+                    onClick={() => {
+                      // check if pass validation of all steps before
+                      if (
+                        idx === 0 ||
+                        validationSchema
+                          .slice(idx - 1)
+                          .some(
+                            (validation) =>
+                              !validation.isValidSync(methods.getValues())
+                          )
+                      ) {
+                        return;
+                      }
+
+                      setActiveStep(idx);
+                    }}
+                    key={label}
+                    {...stepProps}
+                  >
+                    <StepLabel {...labelProps}>{label}</StepLabel>
+                  </Step>
+                );
+              })}
+            </Stepper>
+          </Grid>
+          {/* button group */}
+          <Grid container item direction="column">
             <FormProvider {...methods}>
               <form>
-                <div>
+                <Grid container item>
                   {getStepContent(
                     activeStep,
                     methods as UseFormReturn<FieldValues>
                   )}
-                </div>
-                <Box
-                  display="flex"
+                </Grid>
+                <Grid
+                  container
+                  item
+                  alignItems="center"
                   justifyContent="center"
-                  style={{ paddingTop: '5vh' }}
+                  padding={5}
                 >
-                  <Button disabled={activeStep === 0} onClick={handleBack}>
-                    Back
-                  </Button>
-                  {activeStep < steps.length - 1 && (
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleNext}
-                    >
-                      {activeStep < steps.length - 2 ? 'Continue' : 'Submit'}
+                  <Grid item>
+                    <Button disabled={activeStep === 0} onClick={handleBack}>
+                      Back
                     </Button>
+                  </Grid>
+                  {activeStep < steps.length - 1 && (
+                    <Grid item>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleNext}
+                      >
+                        {activeStep < steps.length - 2 ? 'Continue' : 'Finish'}
+                      </Button>
+                    </Grid>
                   )}
-                </Box>
+                </Grid>
               </form>
             </FormProvider>
-          )}
-        </div>
+          </Grid>
+        </Grid>
       </Paper>
     </Container>
   );

@@ -32,70 +32,93 @@ const UserQuestions = (props: StepProps) => {
     { label: 'Not more than $1500', value: 1500 },
     { label: '$1501 to $2000', value: 2000 },
   ];
+
   return (
-    <Grid container direction="column">
-      <FormRadioInput
-        label="Are you purchasing as a single or a couple?"
-        name="maritalStatus"
-        form={form}
-        options={[
-          { label: 'Single', value: 'Single' },
-          { label: 'Couple', value: 'Couple' },
-        ]}
-      />
-
-      <FormRadioInput
-        label="What is your nationality?"
-        name="singleNationality"
-        form={form}
-        options={nationalityOptions}
-      />
-
-      {isCouple && (
+    <Grid container item direction="column" spacing={3}>
+      <Grid item>
         <FormRadioInput
-          label="What is your partner's nationality?"
-          name="coupleNationality"
+          label="Are you purchasing as a single or a couple?"
+          name="maritalStatus"
           form={form}
-          options={nationalityOptions}
+          options={[
+            { label: 'Single', value: 'Single' },
+            { label: 'Couple', value: 'Couple' },
+          ]}
         />
+      </Grid>
+
+      <Grid container item direction="row" spacing={5}>
+        <Grid item>
+          <FormRadioInput
+            label="What is your nationality?"
+            name="singleNationality"
+            form={form}
+            options={nationalityOptions}
+          />
+        </Grid>
+
+        {isCouple && (
+          <Grid item>
+            <FormRadioInput
+              label="What is your partner's nationality?"
+              name="coupleNationality"
+              form={form}
+              options={nationalityOptions}
+            />
+          </Grid>
+        )}
+      </Grid>
+
+      <Grid container item direction="row" spacing={5}>
+        <Grid item>
+          <FormRadioInput
+            label="Are you a first time buyer?"
+            name="singleFirstTimer"
+            form={form}
+            options={firstTimerOptions}
+          />
+        </Grid>
+
+        {isCouple && (
+          <Grid item>
+            <FormRadioInput
+              label="Is your partner a first time buyer?"
+              name="coupleFirstTimer"
+              form={form}
+              options={firstTimerOptions}
+            />
+          </Grid>
+        )}
+      </Grid>
+
+      {!isCouple && (
+        <Grid item>
+          <FormRadioInput
+            label="Are you more than 35 years old?"
+            name="age"
+            form={form}
+            options={ageOptions}
+          />
+        </Grid>
       )}
 
-      <FormRadioInput
-        label="Are you a first time buyer?"
-        name="singleFirstTimer"
-        form={form}
-        options={firstTimerOptions}
-      />
-
-      {isCouple && (
+      <Grid item>
         <FormRadioInput
-          label="Is your partner a first time buyer?"
-          name="coupleFirstTimer"
+          label="Have you been workng for at least a year?"
+          name="workingAtLeastAYear"
           form={form}
-          options={firstTimerOptions}
+          options={workingAtLeastAYearOptions}
         />
-      )}
+      </Grid>
 
-      <FormRadioInput
-        label="Are you more than 35 years old?"
-        name="age"
-        form={form}
-        options={ageOptions}
-      />
-
-      <FormRadioInput
-        label="Have you been workng for at least a year?"
-        name="workingAtLeastAYear"
-        form={form}
-        options={workingAtLeastAYearOptions}
-      />
-
-      <FormRadioInput
-        label="What is your monthly income?"
-        name="monthlyIncome"
-        form={form}
-        options={monthlyIncomeOptions}
-      />
+      <Grid item>
+        <FormRadioInput
+          label="What is your monthly income?"
+          name="monthlyIncome"
+          form={form}
+          options={monthlyIncomeOptions}
+        />
+      </Grid>
     </Grid>
   );
 };

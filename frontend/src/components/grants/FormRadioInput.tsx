@@ -1,4 +1,5 @@
 import {
+  FormControl,
   FormControlLabel,
   FormHelperText,
   FormLabel,
@@ -12,7 +13,6 @@ interface Props {
   options: Array<{ label: string; value: any }>;
   form: UseFormReturn<FieldValues>;
   label?: string;
-  // placeholder?: string;
 }
 
 const FormSelectInput = (props: Props) => {
@@ -25,15 +25,9 @@ const FormSelectInput = (props: Props) => {
       name={name}
       control={form.control}
       render={({ field: { onChange, value } }) => (
-        <>
+        <FormControl component="fieldset" error={error}>
           <FormLabel component="legend">{label}</FormLabel>
-          <RadioGroup
-            row
-            aria-label="gender"
-            name="controlled-radio-buttons-group"
-            value={value}
-            onChange={onChange}
-          >
+          <RadioGroup row value={value} onChange={onChange}>
             {options.map((option) => (
               <FormControlLabel
                 key={option.value}
@@ -43,8 +37,8 @@ const FormSelectInput = (props: Props) => {
               />
             ))}
           </RadioGroup>
-          {error && <FormHelperText>{error}</FormHelperText>}
-        </>
+          <FormHelperText style={{ height: '5px' }}>{error}</FormHelperText>
+        </FormControl>
       )}
     />
   );
