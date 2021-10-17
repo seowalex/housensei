@@ -25,13 +25,18 @@ const HousingQuestions = (props: StepProps) => {
   ];
 
   // Helper
-  function ToArray(enumme: Record<string, any>) {
+  function ToArray(enumme: Record<string, string>) {
     return Object.keys(enumme).map((key) => ({
       label: enumme[key],
       value: key,
     }));
   }
   const flatSizeOptions = ToArray(FlatType);
+
+  const livingWithExtendedFamilyOptions = [
+    { label: 'Yes', value: true },
+    { label: 'No', value: false },
+  ];
 
   return (
     <Grid container item direction="column" spacing={3}>
@@ -64,6 +69,17 @@ const HousingQuestions = (props: StepProps) => {
             />
           </Grid>
         </>
+      )}
+
+      {isResale && isCouple && (
+        <Grid item>
+          <FormRadioInput
+            label="Are you intending to live with you or your partner's extended family?"
+            name="livingWithExtendedFamily"
+            form={form}
+            options={livingWithExtendedFamilyOptions}
+          />
+        </Grid>
       )}
     </Grid>
   );

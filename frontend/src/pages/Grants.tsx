@@ -15,8 +15,10 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import UserQuestions from '../components/grants/UserQuestions';
 import GrantsCalculation from '../components/grants/GrantsCalculation';
 import HousingQuestions from '../components/grants/HousingQuestions';
+import ProximityQuestions from '../components/grants/ProximityQuestions';
 
 export type GrantsFormValues = {
+  // user questions
   maritalStatus: string;
   singleNationality: string;
   coupleNationality: string;
@@ -30,6 +32,11 @@ export type GrantsFormValues = {
   housingType: string;
   lease: boolean | '';
   flatSize: string;
+  livingWithExtendedFamily: boolean | '';
+
+  // proximity questions
+  receivedProximityBefore: boolean | '';
+  proximityStatus: string;
 };
 
 const defaultValues: GrantsFormValues = {
@@ -47,6 +54,11 @@ const defaultValues: GrantsFormValues = {
   housingType: '',
   lease: '',
   flatSize: '',
+  livingWithExtendedFamily: '',
+
+  // proximity questions
+  receivedProximityBefore: '',
+  proximityStatus: '',
 };
 
 function getStepContent(step: number, form: UseFormReturn<FieldValues>) {
@@ -55,7 +67,9 @@ function getStepContent(step: number, form: UseFormReturn<FieldValues>) {
       return <UserQuestions form={form} />;
     case 1:
       return <HousingQuestions form={form} />;
-    case 4:
+    case 2:
+      return <ProximityQuestions form={form} />;
+    case 3:
       return <GrantsCalculation formValues={form.getValues} />;
     default:
       return 'Unknown step';
@@ -67,12 +81,11 @@ const Grants = () => {
   const steps = [
     'Background of Buyer',
     'Housing',
-    'Miscellaneous',
     'Proximity',
     'Grant Calculation',
   ];
 
-  // TODO fill in validation messages
+  // TODO can convert all yup.string().required to notEmptyStrCheck
 
   const notEmptyStrCheck = (message: string) =>
     yup.mixed().notOneOf([''], message);
@@ -111,6 +124,33 @@ const Grants = () => {
         is: 'Resale',
         then: notEmptyStrCheck('Must indicate resale flat size'),
       }),
+      livingWithExtendedFamily: yup
+        .mixed()
+        .test(
+          'livingWithExtendedFamily',
+          'Must indicate if living with extended family',
+          function (item) {
+            if (
+              // eslint-disable-next-line react/no-this-in-sfc
+              this.parent.maritalStatus !== 'Couple' ||
+              // eslint-disable-next-line react/no-this-in-sfc
+              this.parent.housingType !== 'Resale'
+            ) {
+              return true;
+            }
+            return item !== '';
+          }
+        ),
+    }),
+    yup.object({
+      receivedProximityBefore: notEmptyStrCheck(
+        'Must indicate if received proximity grant before'
+      ),
+      proximityStatus: yup
+        .string()
+        .required(
+          'Must indicate intended living proximity with parents or children'
+        ),
     }),
   ];
 
@@ -141,8 +181,9 @@ const Grants = () => {
             <Typography variant="h2">Grant Calculator</Typography>
             <br />
             <Typography>
-              Check your eligibility for the Enhanced CPF Housing Grant (EHG),
-              Family Grant, Proximity Housing Grant (PHG) and Family Grant here.
+              Check your eligibility for the Enhanced CPF Housing Grant (EHG/EHG
+              Single), Family Grant, Proximity Housing Grant (PHG), Singles
+              Grant, Half Housing Grant here.
             </Typography>
           </Grid>
           <Grid item>
