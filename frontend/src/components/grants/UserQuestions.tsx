@@ -7,6 +7,11 @@ const UserQuestions = (props: StepProps) => {
   const watchMartialStatus = form.watch('maritalStatus');
   const isCouple = watchMartialStatus === 'Couple';
 
+  const maritalStatusOptions = [
+    { label: 'Single', value: 'Single' },
+    { label: 'Couple', value: 'Couple' },
+  ];
+
   const nationalityOptions = [
     { label: 'Singaporean', value: 'SC' },
     { label: 'PR', value: 'PR' },
@@ -48,10 +53,7 @@ const UserQuestions = (props: StepProps) => {
           label="Are you purchasing as a single or a couple?"
           name="maritalStatus"
           form={form}
-          options={[
-            { label: 'Single', value: 'Single' },
-            { label: 'Couple', value: 'Couple' },
-          ]}
+          options={maritalStatusOptions}
         />
       </Grid>
 
@@ -59,7 +61,7 @@ const UserQuestions = (props: StepProps) => {
         <Grid item>
           <FormRadioInput
             label="What is your nationality?"
-            name="singleNationality"
+            name="ownNationality"
             form={form}
             options={nationalityOptions}
           />
@@ -69,7 +71,7 @@ const UserQuestions = (props: StepProps) => {
           <Grid item>
             <FormRadioInput
               label="What is your partner's nationality?"
-              name="coupleNationality"
+              name="partnerNationality"
               form={form}
               options={nationalityOptions}
             />
@@ -81,7 +83,7 @@ const UserQuestions = (props: StepProps) => {
         <Grid item>
           <FormRadioInput
             label="Are you a first time buyer?"
-            name="singleFirstTimer"
+            name="ownFirstTimer"
             form={form}
             options={firstTimerOptions}
           />
@@ -91,7 +93,7 @@ const UserQuestions = (props: StepProps) => {
           <Grid item>
             <FormRadioInput
               label="Is your partner a first time buyer?"
-              name="coupleFirstTimer"
+              name="partnerFirstTimer"
               form={form}
               options={firstTimerOptions}
             />

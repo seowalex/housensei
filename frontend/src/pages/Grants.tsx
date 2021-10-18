@@ -19,11 +19,11 @@ import ProximityQuestions from '../components/grants/ProximityQuestions';
 
 export type GrantsFormValues = {
   // user questions
-  maritalStatus: string;
-  singleNationality: string;
-  coupleNationality: string;
-  singleFirstTimer: boolean | '';
-  coupleFirstTimer: boolean | '';
+  maritalStatus: 'Single' | 'Couple' | '';
+  ownNationality: string;
+  partnerNationality: string;
+  ownFirstTimer: boolean | '';
+  partnerFirstTimer: boolean | '';
   age: boolean | '';
   workingAtLeastAYear: boolean | '';
   monthlyIncome: number | '';
@@ -42,10 +42,10 @@ export type GrantsFormValues = {
 const defaultValues: GrantsFormValues = {
   // user questions
   maritalStatus: '',
-  singleNationality: '',
-  coupleNationality: '',
-  singleFirstTimer: '',
-  coupleFirstTimer: '',
+  ownNationality: '',
+  partnerNationality: '',
+  ownFirstTimer: '',
+  partnerFirstTimer: '',
   age: '',
   workingAtLeastAYear: '',
   monthlyIncome: '',
@@ -93,13 +93,13 @@ const Grants = () => {
   const validationSchema = [
     yup.object({
       maritalStatus: yup.string().required('Must indicate marital status'),
-      singleNationality: yup.string().required('Must indicate nationality'),
-      coupleNationality: yup.mixed().when('maritalStatus', {
+      ownNationality: yup.string().required('Must indicate nationality'),
+      partnerNationality: yup.mixed().when('maritalStatus', {
         is: 'Couple',
         then: yup.string().required("Must indicate partner's nationality"),
       }),
-      singleFirstTimer: notEmptyStrCheck('Must indicate if first time buyer'),
-      coupleFirstTimer: yup.mixed().when('maritalStatus', {
+      ownFirstTimer: notEmptyStrCheck('Must indicate if first time buyer'),
+      partnerFirstTimer: yup.mixed().when('maritalStatus', {
         is: 'Couple',
         then: notEmptyStrCheck(
           'Must indicate whether partner is first time buyer'

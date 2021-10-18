@@ -35,9 +35,9 @@ const ProximityQuestions = (props: StepProps) => {
       </Grid>
       <Grid item>
         <FormRadioInput
-          label={`Will you be living with or near your ${
-            isCouple ? "or your partner's " : ''
-          }extended family (parents/children)?`}
+          label={`Will you be living with or near your parents${
+            isCouple ? ', parents-in-law' : ''
+          } and/or children?`}
           name="proximityStatus"
           form={form}
           options={proximityStatusOptions}
