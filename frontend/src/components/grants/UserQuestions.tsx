@@ -1,11 +1,17 @@
 import { Grid } from '@mui/material';
 import FormRadioInput from './FormRadioInput';
+import FormSelectInput from './FormSelectInput';
 import StepProps from './StepProps';
 
 const UserQuestions = (props: StepProps) => {
   const { form } = props;
   const watchMartialStatus = form.watch('maritalStatus');
   const isCouple = watchMartialStatus === 'Couple';
+
+  const watchOwnNationality = form.watch('ownNationality');
+  const isOwnForeigner = watchOwnNationality === 'F';
+  const watchPartnerNationality = form.watch('partnerNationality');
+  const isPartnerForeigner = watchPartnerNationality === 'F';
 
   const maritalStatusOptions = [
     { label: 'Single', value: 'Single' },
@@ -34,15 +40,20 @@ const UserQuestions = (props: StepProps) => {
   ];
 
   // const income = [1500, 2000, ..., 9000, 10k, 11k, 12k, 14k, 21k]
-  let possibleIncomes = [...Array(16).keys()].map((num) => num * 500 + 1500); // gives [1.5k, 2k 2.5k ... 9k]
-  possibleIncomes = possibleIncomes.concat([10000, 11000, 12000, 14000, 21000]);
+  let possibleIncomes = [...Array(16).keys()].map((num) => num * 250 + 750); // gives [750, ..., 4250, 4500]
+  possibleIncomes = possibleIncomes.concat(
+    [...Array(8).keys()].map((num) => num * 500 + 5000)
+  ); // gives [5000, 5500, ..., 8.5k, 9k]
+  possibleIncomes = possibleIncomes.concat([
+    9000, 10000, 11000, 12000, 14000, 21000,
+  ]);
 
   const monthlyIncomeOptions = possibleIncomes.map((income, idx) => ({
-    label: `$${income} to $${possibleIncomes[idx + 1]}`,
+    label: `$${income + 1} to $${possibleIncomes[idx + 1]}`,
     value: income,
   }));
 
-  monthlyIncomeOptions.unshift({ label: 'Not more than $1500', value: 0 });
+  monthlyIncomeOptions.unshift({ label: 'Not more than $750', value: 0 });
   monthlyIncomeOptions[monthlyIncomeOptions.length - 1].label =
     'More than $21000';
 
@@ -80,16 +91,18 @@ const UserQuestions = (props: StepProps) => {
       </Grid>
 
       <Grid container item direction="row" spacing={5}>
-        <Grid item>
-          <FormRadioInput
-            label="Are you a first time buyer?"
-            name="ownFirstTimer"
-            form={form}
-            options={firstTimerOptions}
-          />
-        </Grid>
+        {!isOwnForeigner && (
+          <Grid item>
+            <FormRadioInput
+              label="Are you a first time buyer?"
+              name="ownFirstTimer"
+              form={form}
+              options={firstTimerOptions}
+            />
+          </Grid>
+        )}
 
-        {isCouple && (
+        {isCouple && !isPartnerForeigner && (
           <Grid item>
             <FormRadioInput
               label="Is your partner a first time buyer?"
@@ -122,8 +135,8 @@ const UserQuestions = (props: StepProps) => {
       </Grid>
 
       <Grid item>
-        <FormRadioInput
-          label="What is your monthly income?"
+        <FormSelectInput
+          label="What is your monthly household income?"
           name="monthlyIncome"
           form={form}
           options={monthlyIncomeOptions}

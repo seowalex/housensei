@@ -1,10 +1,9 @@
 import {
   FormControl,
-  FormControlLabel,
   FormHelperText,
   FormLabel,
-  Radio,
-  RadioGroup,
+  MenuItem,
+  Select,
 } from '@mui/material';
 import { Controller, FieldValues, UseFormReturn } from 'react-hook-form';
 
@@ -26,16 +25,13 @@ const FormSelectInput = (props: Props) => {
       render={({ field: { onChange, value } }) => (
         <FormControl component="fieldset" error={!!error}>
           <FormLabel component="legend">{label}</FormLabel>
-          <RadioGroup row value={value} onChange={onChange}>
+          <Select value={value} label={label} onChange={onChange}>
             {options.map((option) => (
-              <FormControlLabel
-                key={option.value}
-                value={option.value}
-                control={<Radio />}
-                label={option.label}
-              />
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
             ))}
-          </RadioGroup>
+          </Select>
           <FormHelperText style={{ height: '5px' }}>{error}</FormHelperText>
         </FormControl>
       )}

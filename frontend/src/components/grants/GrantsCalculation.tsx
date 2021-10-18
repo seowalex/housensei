@@ -8,6 +8,20 @@ interface Props {
 
 const GrantsCalculation = (props: Props) => {
   const { formValues } = props;
+
+  const values = formValues();
+
+  // TODO is a string, not a bool
+  const parseJson = {
+    ...values,
+    singleNationality: values.ownNationality,
+    coupleNationality: `${values.ownNationality}/${values.partnerNationality}`,
+    singleFirstTimer: values.ownFirstTimer,
+    coupleFirstTimer: `${values.ownFirstTimer}/${values.partnerFirstTimer}`,
+  };
+
+  console.log(parseJson);
+
   // console.log(formValues());
   return (
     <Grid container spacing={2}>

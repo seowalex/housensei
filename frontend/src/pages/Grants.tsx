@@ -20,8 +20,8 @@ import ProximityQuestions from '../components/grants/ProximityQuestions';
 export type GrantsFormValues = {
   // user questions
   maritalStatus: 'Single' | 'Couple' | '';
-  ownNationality: string;
-  partnerNationality: string;
+  ownNationality: 'SC' | 'PR' | 'F' | '';
+  partnerNationality: 'SC' | 'PR' | 'F' | '';
   ownFirstTimer: boolean | '';
   partnerFirstTimer: boolean | '';
   age: boolean | '';
@@ -29,14 +29,22 @@ export type GrantsFormValues = {
   monthlyIncome: number | '';
 
   // housing questions
-  housingType: string;
+  housingType: 'BTO' | 'Resale' | 'EC' | '';
   lease: boolean | '';
-  flatSize: string;
+  flatSize:
+    | '1 Room'
+    | '2 Room'
+    | '3 Room'
+    | '4 Room'
+    | '5 Room'
+    | '3Gen'
+    | 'Studio'
+    | '';
   livingWithExtendedFamily: boolean | '';
 
   // proximity questions
   receivedProximityBefore: boolean | '';
-  proximityStatus: string;
+  proximityStatus: 'Within 4km' | 'Live together' | 'No' | '';
 };
 
 const defaultValues: GrantsFormValues = {
@@ -98,13 +106,38 @@ const Grants = () => {
         is: 'Couple',
         then: yup.string().required("Must indicate partner's nationality"),
       }),
-      ownFirstTimer: notEmptyStrCheck('Must indicate if first time buyer'),
-      partnerFirstTimer: yup.mixed().when('maritalStatus', {
-        is: 'Couple',
-        then: notEmptyStrCheck(
-          'Must indicate whether partner is first time buyer'
+      ownFirstTimer: yup
+        .mixed()
+        .test(
+          'ownNationality',
+          'Must indicate if first time buyer',
+          function (item) {
+            if (
+              // eslint-disable-next-line react/no-this-in-sfc
+              this.parent.ownNationality === 'F'
+            ) {
+              return true;
+            }
+            return item !== '';
+          }
         ),
-      }),
+      partnerFirstTimer: yup
+        .mixed()
+        .test(
+          'partnerNationality and couple',
+          'Must indicate whether partner is first time buyer',
+          function (item) {
+            if (
+              // eslint-disable-next-line react/no-this-in-sfc
+              this.parent.partnerNationality === 'F' ||
+              // eslint-disable-next-line react/no-this-in-sfc
+              this.parent.maritalStatus !== 'Couple'
+            ) {
+              return true;
+            }
+            return item !== '';
+          }
+        ),
       age: yup.mixed().when('maritalStatus', {
         is: 'Single',
         then: notEmptyStrCheck('Must indicate age'),
@@ -173,6 +206,19 @@ const Grants = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
+  const onStepClick = (idx: number) => {
+    if (
+      idx !== 0 &&
+      validationSchema
+        .slice(0, idx)
+        .some((validation) => !validation.isValidSync(methods.getValues()))
+    ) {
+      return;
+    }
+
+    setActiveStep(idx);
+  };
+
   return (
     <Container sx={{ p: 3 }}>
       <Paper sx={{ p: '1rem' }}>
@@ -195,19 +241,7 @@ const Grants = () => {
                   <Step
                     onClick={() => {
                       // check if pass validation of all steps before
-                      if (
-                        idx !== 0 &&
-                        validationSchema
-                          .slice(0, idx)
-                          .some(
-                            (validation) =>
-                              !validation.isValidSync(methods.getValues())
-                          )
-                      ) {
-                        return;
-                      }
-
-                      setActiveStep(idx);
+                      onStepClick(idx);
                     }}
                     key={label}
                     {...stepProps}
@@ -234,9 +268,14 @@ const Grants = () => {
                   alignItems="center"
                   justifyContent="center"
                   padding={5}
+                  spacing={3}
                 >
                   <Grid item>
-                    <Button disabled={activeStep === 0} onClick={handleBack}>
+                    <Button
+                      disabled={activeStep === 0}
+                      onClick={handleBack}
+                      size="large"
+                    >
                       Back
                     </Button>
                   </Grid>
@@ -246,6 +285,7 @@ const Grants = () => {
                         variant="contained"
                         color="primary"
                         onClick={handleNext}
+                        size="large"
                       >
                         {activeStep < steps.length - 2 ? 'Continue' : 'Finish'}
                       </Button>
