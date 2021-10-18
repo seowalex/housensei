@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 import Resale from '../models/resale';
-import { Town } from '../utils/model';
+import { FlatType, Town } from '../utils/model';
 
 export type QueryResaleByTown = {
   years?: number[];
@@ -34,10 +34,18 @@ const getResalesByIsland = async (
 
 const getResalesByTown = async (
   queries: QueryResaleByTown
-): Promise<Array<{ address: string; resalePrice: number }>> => {
+): Promise<
+  Array<{
+    address: string;
+    resalePrice: number;
+    coordinates: [number, number];
+    details: Array<{ f1: FlatType; f2: number }>;
+  }>
+> => {
   const queryBuilder = getRepository(Resale)
     .createQueryBuilder('resale')
     .select('MAX(resale.coordinates)', 'coordinates')
+    .addSelect('json_agg((resale.flatType, resale.resalePrice))', 'details')
     .addSelect("CONCAT(resale.block, ' ', resale.streetName)", 'address')
     .addSelect('CAST(AVG(resale.resalePrice) AS int)', 'resalePrice')
     .where('coordinates IS NOT NULL');
