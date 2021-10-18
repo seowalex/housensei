@@ -24,6 +24,7 @@ const GroupDetails = (props: Props) => {
 
   return (
     <Stack spacing={0.5}>
+      <Typography variant="body1">Filters:</Typography>
       <Stack
         direction="row"
         spacing={1}

@@ -44,6 +44,7 @@ import {
   mapFormValuesToGroupFilters,
   mapGroupToFormValues,
   convertFlatTypeToFrontend,
+  btoProjectsSorter,
 } from '../../utils/groups';
 import { compareDates, formatDate } from '../../utils/history';
 import { FormPaper, ModalPaper } from '../styled';
@@ -295,6 +296,7 @@ const BTOGroupAccordion = (props: Props) => {
                       (item: BTOProject) =>
                         convertFlatTypeToFrontend(item.flatType),
                     ],
+                    sorter: btoProjectsSorter,
                   })
                 }
               />

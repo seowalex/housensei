@@ -10,8 +10,11 @@ import { useState } from 'react';
 import { ChartMode } from '../types/history';
 import GroupList from '../components/history/GroupList';
 import HistoryChart from '../components/history/HistoryChart';
+import { useAppSelector } from '../app/hooks';
+import { selectGroups } from '../reducers/history';
 
 const History = () => {
+  const groups = useAppSelector(selectGroups);
   const [selectedGroup, setSelectedGroup] = useState<string | undefined>(
     undefined
   );
@@ -38,24 +41,26 @@ const History = () => {
                 selectedGroup={selectedGroup}
                 onChangeSelectedGroup={handleChangeSelectedGroup}
               />
-              <ButtonGroup>
-                <Button
-                  variant={
-                    chartMode === ChartMode.Monthly ? 'contained' : 'outlined'
-                  }
-                  onClick={() => setChartMode(ChartMode.Monthly)}
-                >
-                  Monthly
-                </Button>
-                <Button
-                  variant={
-                    chartMode === ChartMode.Yearly ? 'contained' : 'outlined'
-                  }
-                  onClick={() => setChartMode(ChartMode.Yearly)}
-                >
-                  Yearly
-                </Button>
-              </ButtonGroup>
+              {groups.filter((group) => group.type === 'resale').length > 0 && (
+                <ButtonGroup>
+                  <Button
+                    variant={
+                      chartMode === ChartMode.Monthly ? 'contained' : 'outlined'
+                    }
+                    onClick={() => setChartMode(ChartMode.Monthly)}
+                  >
+                    Monthly
+                  </Button>
+                  <Button
+                    variant={
+                      chartMode === ChartMode.Yearly ? 'contained' : 'outlined'
+                    }
+                    onClick={() => setChartMode(ChartMode.Yearly)}
+                  >
+                    Yearly
+                  </Button>
+                </ButtonGroup>
+              )}
             </Stack>
           </Grid>
         </Grid>

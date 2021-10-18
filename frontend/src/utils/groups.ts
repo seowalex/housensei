@@ -1,3 +1,5 @@
+import { MatchSorterOptions } from 'match-sorter';
+
 import { GroupFormValues } from '../components/history/GroupForm';
 import {
   BackendFlatType,
@@ -6,6 +8,7 @@ import {
   GroupColor,
   GroupFilters,
 } from '../types/groups';
+import { BTOProject } from '../types/history';
 
 const convertFlatTypeToBackend = (flatType: FlatType): BackendFlatType => {
   switch (flatType) {
@@ -50,6 +53,10 @@ export const convertFlatTypeToFrontend = (
       return FlatType.STUDIO;
   }
 };
+
+export const btoProjectsSorter: MatchSorterOptions<BTOProject>['sorter'] = (
+  rankedItems
+) => [...rankedItems].sort((a, b) => -a.item.date.localeCompare(b.item.date));
 
 export const mapGroupToFormValues = (group: Group): GroupFormValues => {
   const { type, name, filters } = group;

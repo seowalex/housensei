@@ -2,7 +2,9 @@ import {
   Button,
   ButtonGroup,
   CircularProgress,
+  Divider,
   Grid,
+  IconButton,
   Stack,
   Typography,
 } from '@mui/material';
@@ -14,6 +16,7 @@ import {
   SubmitHandler,
   useForm,
 } from 'react-hook-form';
+import { CloseRounded } from '@mui/icons-material';
 import { FlatType } from '../../types/groups';
 import { Town } from '../../types/towns';
 import FormAutocompleteInput from '../forms/FormAutocompleteInput';
@@ -87,26 +90,32 @@ const GroupForm = (props: Props) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
+        <IconButton
+          sx={{ position: 'absolute', top: '0', right: '0', margin: '1rem' }}
+          onClick={() => {
+            if (formType === 'update') {
+              reset(currentData || defaultFormValues);
+            }
+            handleClose();
+          }}
+        >
+          <CloseRounded fontSize="large" />
+        </IconButton>
         <Grid item xs={12}>
           <Box sx={{ p: '0.5rem 0rem' }}>
-            <Typography variant="h4" sx={{ textAlign: 'center' }}>
+            <Typography
+              variant="h4"
+              sx={{ textAlign: 'center', width: '100%' }}
+            >
               {formType === 'create' ? 'Create Group' : 'Edit Group'}
             </Typography>
           </Box>
         </Grid>
         <Grid item xs={12} lg={6}>
-          <FormTextInput
-            name="name"
-            control={control as Control<FieldValues>}
-            label="Group Name"
-            placeholder={groupNamePlaceholder ?? 'Enter a group name'}
-          />
-        </Grid>
-        <Grid item xs={12} lg={6}>
           <Stack
             direction="row"
-            spacing={2}
+            spacing={1}
             alignItems="center"
             sx={{ height: '100%' }}
           >
@@ -132,6 +141,19 @@ const GroupForm = (props: Props) => {
               )}
             />
           </Stack>
+        </Grid>
+        <Grid item xs={12} lg={6}>
+          <FormTextInput
+            name="name"
+            control={control as Control<FieldValues>}
+            label="Group Name (optional)"
+            placeholder={groupNamePlaceholder ?? 'Enter a group name'}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Divider>
+            <Typography variant="h6">Filters</Typography>
+          </Divider>
         </Grid>
         <Grid item xs={12} lg={6}>
           <FormAutocompleteInput
@@ -160,7 +182,7 @@ const GroupForm = (props: Props) => {
             limitTags={3}
           />
         </Grid>
-        <Grid item xs={12} lg={6}>
+        <Grid item xs={12}>
           <FormSwitchInput
             name="isFloorAreaRangeEnabled"
             control={control as Control<FieldValues>}
@@ -178,7 +200,7 @@ const GroupForm = (props: Props) => {
             disabled={!watchFloorAreaRangeEnabled || isSubmitting}
           />
         </Grid>
-        <Grid item xs={12} lg={6}>
+        <Grid item xs={12}>
           <FormSwitchInput
             name="isYearRangeEnabled"
             control={control as Control<FieldValues>}
@@ -215,93 +237,73 @@ const GroupForm = (props: Props) => {
             initialValue={[2010, 2021]}
           />
         </Grid>
-        <Grid item xs={12} lg={6}>
+        <Grid item xs={12}>
           {watchType === 'resale' ? (
-            <>
-              <FormSwitchInput
-                name="isLeasePeriodRangeEnabled"
-                control={control as Control<FieldValues>}
-                disabled={isSubmitting}
-                label="Remaining Lease Period (years)"
-              />
-              <FormSliderInput
-                name="leasePeriodRange"
-                control={control as Control<FieldValues>}
-                setValue={setValue}
-                currentData={
-                  currentData ? currentData.leasePeriodRange : undefined
-                }
-                min={1}
-                max={99}
-                inputFields
-                disabled={!watchLeasePeriodRangeEnabled || isSubmitting}
-                initialValue={[50, 99]}
-              />
-            </>
+            <FormSwitchInput
+              name="isLeasePeriodRangeEnabled"
+              control={control as Control<FieldValues>}
+              disabled={isSubmitting}
+              label="Remaining Lease Period (years)"
+            />
           ) : (
-            <>
-              <StaticFormSwitchInput label="Lease Period filter unavailable" />
-            </>
+            <StaticFormSwitchInput label="Lease Period filter unavailable" />
           )}
+          <FormSliderInput
+            name="leasePeriodRange"
+            control={control as Control<FieldValues>}
+            setValue={setValue}
+            currentData={currentData ? currentData.leasePeriodRange : undefined}
+            min={1}
+            max={99}
+            inputFields
+            disabled={
+              watchType === 'bto' ||
+              !watchLeasePeriodRangeEnabled ||
+              isSubmitting
+            }
+            initialValue={[50, 99]}
+          />
         </Grid>
-        <Grid item xs={12} lg={6}>
+        <Grid item xs={12}>
           {watchType === 'resale' ? (
-            <>
-              <FormSwitchInput
-                name="isStoreyRangeEnabled"
-                control={control as Control<FieldValues>}
-                disabled={isSubmitting}
-                label="Storey"
-              />
-              <FormSliderInput
-                name="storeyRange"
-                control={control as Control<FieldValues>}
-                setValue={setValue}
-                currentData={currentData ? currentData.storeyRange : undefined}
-                min={1}
-                max={60}
-                inputFields
-                disabled={!watchStoreyRangeEnabled || isSubmitting}
-                initialValue={[1, 60]}
-              />
-            </>
+            <FormSwitchInput
+              name="isStoreyRangeEnabled"
+              control={control as Control<FieldValues>}
+              disabled={isSubmitting}
+              label="Storey"
+            />
           ) : (
-            <>
-              <StaticFormSwitchInput label="Storey filter unavailable" />
-            </>
+            <StaticFormSwitchInput label="Storey filter unavailable" />
           )}
+          <FormSliderInput
+            name="storeyRange"
+            control={control as Control<FieldValues>}
+            setValue={setValue}
+            currentData={currentData ? currentData.storeyRange : undefined}
+            min={1}
+            max={60}
+            inputFields
+            disabled={
+              watchType === 'bto' || !watchStoreyRangeEnabled || isSubmitting
+            }
+            initialValue={[1, 20]}
+          />
         </Grid>
         <Grid item container xs={12} justifyContent="space-between">
           <Grid item>
-            <Stack direction="row" spacing={1}>
-              <Button
-                variant="outlined"
-                type="button"
-                onClick={() => reset({ ...defaultFormValues, type: watchType })}
-                color="error"
-              >
-                {isSubmitting ? <CircularProgress /> : 'Clear All'}
-              </Button>
-            </Stack>
+            <Button
+              variant="outlined"
+              type="button"
+              onClick={() => reset({ ...defaultFormValues, type: watchType })}
+              color="error"
+            >
+              {isSubmitting ? <CircularProgress /> : 'Clear All'}
+            </Button>
           </Grid>
           <Grid item>
-            <Stack direction="row" spacing={1}>
-              <Button
-                variant="outlined"
-                type="button"
-                onClick={() => {
-                  if (formType === 'update') {
-                    reset(currentData || defaultFormValues);
-                  }
-                  handleClose();
-                }}
-              >
-                {isSubmitting ? <CircularProgress /> : 'Cancel'}
-              </Button>
-              <Button variant="contained" type="submit">
-                {isSubmitting ? <CircularProgress /> : submitText}
-              </Button>
-            </Stack>
+            <Button variant="contained" type="submit">
+              {isSubmitting ? <CircularProgress /> : submitText}
+            </Button>
           </Grid>
         </Grid>
       </Grid>

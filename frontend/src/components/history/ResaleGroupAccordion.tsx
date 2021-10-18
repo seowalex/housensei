@@ -100,6 +100,7 @@ const ResaleGroupAccordion = (props: Props) => {
       })
     );
     setDisplayedModal(DisplayedModal.Hidden);
+    setShowBTOAlert(true);
   };
 
   const onDeleteGroup = () => {
@@ -169,15 +170,17 @@ const ResaleGroupAccordion = (props: Props) => {
                 >
                   <AlertTitle>{`${
                     btoQueryResponse?.data.length ?? ''
-                  } related BTO projects found!`}</AlertTitle>
+                  } BTO projects found!`}</AlertTitle>
+                  We found {btoQueryResponse?.data.length ?? ''} BTO projects
+                  with the same filters as this group.
                   <Button
-                    variant="outlined"
+                    variant="text"
                     onClick={() => {
                       setShowBTOAlert(false);
                       onCreateBTOGroup(group);
                     }}
                   >
-                    Add to chart
+                    Add BTO to chart
                   </Button>
                 </Alert>
               </Collapse>
