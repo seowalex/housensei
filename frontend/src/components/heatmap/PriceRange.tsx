@@ -16,9 +16,11 @@ import { currencyFormatter } from '../../app/utils';
 interface Props {
   priceRange: number;
   setHeatmapPriceRange: ActionCreatorWithPayload<number, string>;
+  min?: number;
+  max?: number;
 }
 
-const PriceRange = ({ priceRange, setHeatmapPriceRange }: Props) => {
+const PriceRange = ({ priceRange, setHeatmapPriceRange, min, max }: Props) => {
   const dispatch = useAppDispatch();
   const [value, setValue] = useState(priceRange);
   const [priceRangeOpen, setPriceRangeOpen] = useState(false);
@@ -29,13 +31,29 @@ const PriceRange = ({ priceRange, setHeatmapPriceRange }: Props) => {
 
   const handleEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Escape' || event.key === 'Enter') {
-      dispatch(setHeatmapPriceRange(value));
+      if (
+        value >= (min ?? Number.NEGATIVE_INFINITY) &&
+        value <= (max ?? Number.POSITIVE_INFINITY)
+      ) {
+        dispatch(setHeatmapPriceRange(value));
+      } else {
+        setValue(priceRange);
+      }
+
       setPriceRangeOpen(false);
     }
   };
 
   const handleBlur = () => {
-    dispatch(setHeatmapPriceRange(value));
+    if (
+      value >= (min ?? Number.NEGATIVE_INFINITY) &&
+      value <= (max ?? Number.POSITIVE_INFINITY)
+    ) {
+      dispatch(setHeatmapPriceRange(value));
+    } else {
+      setValue(priceRange);
+    }
+
     setPriceRangeOpen(false);
   };
 

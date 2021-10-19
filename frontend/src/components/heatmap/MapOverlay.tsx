@@ -306,10 +306,12 @@ const MapOverlay = ({ map }: Props) => {
                   <PriceRange
                     priceRange={priceRangeLower}
                     setHeatmapPriceRange={setHeatmapPriceRangeLower}
+                    max={priceRangeUpper}
                   />
                   <PriceRange
                     priceRange={priceRangeUpper}
                     setHeatmapPriceRange={setHeatmapPriceRangeUpper}
+                    min={priceRangeLower}
                   />
                 </Stack>
                 <Box
