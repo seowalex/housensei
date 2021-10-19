@@ -1,0 +1,38 @@
+{
+    "attribute": "maritalStatus",
+    "options": {
+      "single": false,
+      "couple": {
+        "attribute": "coupleNationality",
+        "options": {
+          "SC/SC": {
+            "attribute": "coupleFirstTimer",
+            "options": {
+              "yes/yes": {
+                "attribute": "workingAtLeastAYear",
+                "options": {
+                  "yes": true,
+                  "no": false
+                }
+              },
+              "yes/no": false
+            }
+          },
+          "SC/PR": {
+            "attribute": "coupleFirstTimer",
+            "options": {
+              "yes/yes": {
+                "attribute": "workingAtLeastAYear",
+                "options": {
+                  "yes": true,
+                  "no": false
+                }
+              },
+              "yes/no": false
+            }
+          },
+          "SC/F": false
+        }
+      }
+    }
+  }

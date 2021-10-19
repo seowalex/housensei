@@ -1,0 +1,101 @@
+{
+    "attribute": "receivedProximityBefore",
+    "options": {
+      "yes": 0,
+      "no": {
+        "attribute": "housingType",
+        "options": {
+          "BTO": 0,
+          "Resale": {
+            "attribute": "lease",
+            "options": {
+              "yes": {
+                "attribute": "maritalStatus",
+                "options": {
+                  "single": {
+                    "attribute": "singleNationality",
+                    "options": {
+                      "SC": {
+                        "attribute": "proximityStatus",
+                        "options": {
+                          "Within 4km": {
+                            "attribute": "flatSize",
+                            "options": {
+                              "2 Room": 10000,
+                              "3 Room": 10000,
+                              "4 Room": 10000,
+                              "5 Room": 10000
+                            }
+                          },
+                          "Live together": 15000,
+                          "no": 0
+                        }
+                      },
+                      "PR": 0,
+                      "F": 0
+                    }
+                  },
+                  "couple": {
+                    "attribute": "coupleNationality",
+                    "options": {
+                      "SC/SC": {
+                        "attribute": "proximityStatus",
+                        "options": {
+                          "Within 4km": {
+                            "attribute": "flatSize",
+                            "options": {
+                              "2 Room": 20000,
+                              "3 Room": 20000,
+                              "4 Room": 20000,
+                              "5 Room": 20000
+                            }
+                          },
+                          "Live together": {
+                            "attribute": "flatSize",
+                            "options": {
+                              "2 Room": 30000,
+                              "3 Room": 30000,
+                              "4 Room": 30000,
+                              "5 Room": 30000
+                            }
+                          },
+                          "no": 0
+                        }
+                      },
+                      "SC/PR": {
+                        "attribute": "proximityStatus",
+                        "options": {
+                          "Within 4km": {
+                            "attribute": "flatSize",
+                            "options": {
+                              "2 Room": 20000,
+                              "3 Room": 20000,
+                              "4 Room": 20000,
+                              "5 Room": 20000
+                            }
+                          },
+                          "Live together": {
+                            "attribute": "flatSize",
+                            "options": {
+                              "2 Room": 30000,
+                              "3 Room": 30000,
+                              "4 Room": 30000,
+                              "5 Room": 30000
+                            }
+                          },
+                          "no": 0
+                        }
+                      },
+                      "SC/F": 0
+                    }
+                  }
+                }
+              },
+              "no": 0
+            }
+          },
+          "EC": 0
+        }
+      }
+    }
+  }

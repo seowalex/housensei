@@ -1,0 +1,150 @@
+{
+    "attribute": "maritalStatus",
+    "options": {
+      "single": 0,
+      "couple": {
+        "attribute": "housingType",
+        "options": {
+          "BTO": 0,
+          "Resale": {
+            "attribute": "lease",
+            "options": {
+              "yes": {
+                "attribute": "coupleNationality",
+                "options": {
+                  "SC/SC": {
+                    "attribute": "coupleFirstTimer",
+                    "options": {
+                      "yes/yes": {
+                        "attribute": "livingWithExtendedFamily",
+                        "options": {
+                          "yes": {
+                            "attribute": "monthlyIncome",
+                            "options": {
+                              "<= 21000": {
+                                "attribute": "flatSize",
+                                "options": {
+                                  "1 Room": 0,
+                                  "2 Room": 50000,
+                                  "3 Room": 50000,
+                                  "4 Room": 50000,
+                                  "5 Room": 50000,
+                                  "3Gen": 40000,
+                                  "Studio": 40000
+                                }
+                              },
+                              "> 21000": 0
+                            }
+                          },
+                          "no": {
+                            "attribute": "monthlyIncome",
+                            "options": {
+                              "<= 14000": {
+                                "attribute": "flatSize",
+                                "options": {
+                                  "1 Room": 0,
+                                  "2 Room": 50000,
+                                  "3 Room": 50000,
+                                  "4 Room": 50000,
+                                  "5 Room": 50000,
+                                  "3Gen": 40000,
+                                  "Studio": 40000
+                                }
+                              },
+                              "> 14000": 0
+                            }
+                          }
+                        }
+                      },
+                      "yes/no": 0,
+                      "no/no": 0
+                    }
+                  },
+                  "SC/PR": {
+                    "attribute": "coupleFirstTimer",
+                    "options": {
+                      "yes/yes": {
+                        "attribute": "livingWithExtendedFamily",
+                        "options": {
+                          "yes": {
+                            "attribute": "monthlyIncome",
+                            "options": {
+                              "<= 21000": {
+                                "attribute": "flatSize",
+                                "options": {
+                                  "1 Room": 0,
+                                  "2 Room": 40000,
+                                  "3 Room": 40000,
+                                  "4 Room": 40000,
+                                  "5 Room": 40000,
+                                  "3Gen": 30000,
+                                  "Studio": 30000
+                                }
+                              },
+                              "> 21000": 0
+                            }
+                          },
+                          "no": {
+                            "attribute": "monthlyIncome",
+                            "options": {
+                              "<= 14000": {
+                                "attribute": "flatSize",
+                                "options": {
+                                  "1 Room": 0,
+                                  "2 Room": 40000,
+                                  "3 Room": 40000,
+                                  "4 Room": 40000,
+                                  "5 Room": 40000,
+                                  "3Gen": 30000,
+                                  "Studio": 30000
+                                }
+                              },
+                              "> 14000": 0
+                            }
+                          }
+                        }
+                      },
+                      "yes/no": 0,
+                      "no/no": 0
+                    }
+                  },
+                  "SC/F": 0
+                }
+              },
+              "no": 0
+            }
+          },
+          "EC": {
+            "attribute": "coupleFirstTimer",
+            "options": {
+              "yes/yes": {
+                "attribute": "coupleNationality",
+                "options": {
+                  "SC/SC": {
+                    "attribute": "monthlyIncome",
+                    "options": {
+                      "<= 10000": 30000,
+                      "> 10000 && <= 11000": 20000,
+                      "> 11000 && <= 12000": 10000,
+                      "> 12000": 0
+                    }
+                  },
+                  "SC/PR": {
+                    "attribute": "monthlyIncome",
+                    "options": {
+                      "<= 10000": 20000,
+                      "> 10000 && <= 11000": 10000,
+                      "> 11000": 0
+                    }
+                  },
+                  "SC/F": 0
+                }
+              },
+              "yes/no": 0,
+              "no/no": 0
+            }
+          }
+        }
+      }
+    }
+  }

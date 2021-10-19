@@ -1,0 +1,151 @@
+{
+    "attribute": "housingType",
+    "options": {
+      "BTO": 0,
+      "EC": {
+        "attribute": "coupleFirstTimer",
+        "options": {
+          "yes/yes": 0,
+          "yes/no": {
+            "attribute": "coupleNationality",
+            "options": {
+              "SC/SC": {
+                "attribute": "monthlyIncome",
+                "options": {
+                  "<= 10000": 15000,
+                  "> 10000 && <= 11000": 10000,
+                  "> 11000 && <= 12000": 5000,
+                  "> 12000": 0
+                }
+              },
+              "SC/PR": {
+                "attribute": "monthlyIncome",
+                "options": {
+                  "<= 10000": 15000,
+                  "> 10000 && <= 11000": 10000,
+                  "> 11000 && <= 12000": 5000,
+                  "> 12000": 0
+                }
+              },
+              "SC/F": 0
+            }
+          },
+          "no/no": 0
+        }
+      },
+      "Resale": {
+        "attribute": "lease",
+        "options": {
+          "yes": {
+            "attribute": "maritalStatus",
+            "options": {
+              "single": 0,
+              "couple": {
+                "attribute": "coupleNationality",
+                "options": {
+                  "SC/SC": {
+                    "attribute": "coupleFirstTimer",
+                    "options": {
+                      "yes/yes": 0,
+                      "yes/no": {
+                        "attribute": "livingWithExtendedFamily",
+                        "options": {
+                          "yes": {
+                            "attribute": "monthlyIncome",
+                            "options": {
+                              "<= 21000": {
+                                "attribute": "flatSize",
+                                "options": {
+                                  "1 Room": 0,
+                                  "2 Room": 25000,
+                                  "3 Room": 25000,
+                                  "4 Room": 25000,
+                                  "5 Room": 20000,
+                                  "3Gen": 20000,
+                                  "Studio": 20000
+                                }
+                              },
+                              "> 21000": 0
+                            }
+                          },
+                          "no": {
+                            "attribute": "monthlyIncome",
+                            "options": {
+                              "<= 14000": {
+                                "attribute": "flatSize",
+                                "options": {
+                                  "1 Room": 0,
+                                  "2 Room": 25000,
+                                  "3 Room": 25000,
+                                  "4 Room": 25000,
+                                  "5 Room": 20000,
+                                  "3Gen": 20000,
+                                  "Studio": 20000
+                                }
+                              },
+                              "> 14000": 0
+                            }
+                          }
+                        }
+                      },
+                      "no/no": 0
+                    }
+                  },
+                  "SC/PR": {
+                    "attribute": "coupleFirstTimer",
+                    "options": {
+                      "yes/yes": 0,
+                      "yes/no": {
+                        "attribute": "livingWithExtendedFamily",
+                        "options": {
+                          "yes": {
+                            "attribute": "monthlyIncome",
+                            "options": {
+                              "<= 21000": {
+                                "attribute": "flatSize",
+                                "options": {
+                                  "1 Room": 0,
+                                  "2 Room": 25000,
+                                  "3 Room": 25000,
+                                  "4 Room": 25000,
+                                  "5 Room": 20000,
+                                  "3Gen": 20000,
+                                  "Studio": 20000
+                                }
+                              },
+                              "> 21000": 0
+                            }
+                          },
+                          "no": {
+                            "attribute": "monthlyIncome",
+                            "options": {
+                              "<= 14000": {
+                                "attribute": "flatSize",
+                                "options": {
+                                  "1 Room": 0,
+                                  "2 Room": 25000,
+                                  "3 Room": 25000,
+                                  "4 Room": 25000,
+                                  "5 Room": 20000,
+                                  "3Gen": 20000,
+                                  "Studio": 20000
+                                }
+                              },
+                              "> 14000": 0
+                            }
+                          }
+                        }
+                      },
+                      "no/no": 0
+                    }
+                  },
+                  "SC/F": 0
+                }
+              }
+            }
+          },
+          "no": 0
+        }
+      }
+    }
+  }
