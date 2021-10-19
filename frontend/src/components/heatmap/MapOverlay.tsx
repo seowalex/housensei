@@ -301,7 +301,21 @@ const MapOverlay = ({ map }: Props) => {
                 pointerEvents: 'auto',
               }}
             >
-              <CardContent sx={{ p: '0 12px 12px !important' }}>
+              <CardContent
+                sx={{ position: 'relative', p: '0 12px 12px !important' }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    position: 'absolute',
+                    top: 12,
+                    left: 0,
+                    width: '100%',
+                    textAlign: 'center',
+                  }}
+                >
+                  Average Resale Price
+                </Typography>
                 <Stack direction="row" justifyContent="space-between">
                   <PriceRange
                     priceRange={priceRangeLower}
