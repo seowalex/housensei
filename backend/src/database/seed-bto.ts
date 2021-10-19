@@ -134,6 +134,31 @@ const seedBTOs = async () => {
     [FlatType.STUDIO]: [9, 11],
   };
 
+  const parseTown = (str: string | number) => {
+    let town = str as Town;
+
+    if ((town as any) === 'Kallang-Whampoa') {
+      // it could be kallang-whampoa or kallang/whampoa - this is a hack
+      town = Town.KAL;
+    }
+
+    if ((town as any) === 'Central') {
+      // Central refers to Central Area
+      town = Town.CEN;
+    }
+
+    if ((town as any) === 'Bidadari') {
+      // Bidadari is actually in Toa Payoh
+      town = Town.TAP;
+    }
+
+    if (!Object.values(Town).includes(town)) {
+      return null;
+    }
+
+    return town;
+  };
+
   // returns min and max as an array
   const parseFloorArea = (
     floorArea: string | number
@@ -188,33 +213,28 @@ const seedBTOs = async () => {
   const btos: Array<Omit<BTO, 'id'>> = []; // what we are gonna add into the database in the end
 
   const interestedRows = data.slice(headerRows, -footerRows);
-  interestedRows.forEach((row) => {
-    let town = row[TOWN] as Town;
-    if ((town as any) === 'Kallang-Whampoa') {
-      // it could be kallang-whampoa or kallang/whampoa - this is a hack
-      town = Town.KAL;
+  interestedRows.forEach((row, rowIdx) => {
+    let town = parseTown(row[TOWN]);
+
+    let name = row[NAME] as string;
+
+    let launchDate = new Date(row[LAUNCH_DATE]);
+
+    // some rows at the bottom of the excel are not merged cells :(
+    if ((!town || !name || !launchDate) && row[FLAT_TYPE]) {
+      let currRowIdx = rowIdx - 1;
+      while (!town && rowIdx - currRowIdx < 8) {
+        const currRow = interestedRows[currRowIdx];
+        town = parseTown(currRow[TOWN]);
+        name = currRow[NAME] as string;
+        launchDate = new Date(currRow[LAUNCH_DATE]);
+        currRowIdx -= 1;
+      }
     }
 
-    if ((town as any) === 'Central') {
-      // Central refers to Central Area
-      town = Town.CEN;
-    }
-
-    if ((town as any) === 'Bidadari') {
-      // Bidadari is actually in Toa Payoh
-      town = Town.TAP;
-    }
-
-    // if (!Object.values(Town).includes(town)) {
-    //   console.log(town);
-    //   return;
-    // }
-
-    const name = row[NAME] as string;
-    if (!name) {
+    if (!town || !name || !launchDate) {
       return;
     }
-    const launchDate = new Date(row[LAUNCH_DATE]);
 
     // TODO 2-room + 4-room -> only the case for Skyterrace@Dawson
     const flatType = Object.values(FlatType).find((possibleflatType) =>
