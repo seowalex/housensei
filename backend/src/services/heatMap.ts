@@ -39,7 +39,11 @@ const getResalesByTown = async (
     address: string;
     resalePrice: number;
     coordinates: [number, number];
-    details: Array<{ f1: FlatType; f2: number }>;
+    details: Array<{
+      flatType: FlatType;
+      resalePrice: number;
+      transactionMonth: number;
+    }>;
   }>
 > => {
   const queryBuilder = getRepository(Resale)
