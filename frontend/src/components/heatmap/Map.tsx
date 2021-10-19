@@ -10,6 +10,7 @@ import {
   GoogleMap,
   HeatmapLayer,
   InfoBox,
+  Marker,
   Polygon,
   TransitLayer,
 } from '@react-google-maps/api';
@@ -67,6 +68,8 @@ const Map = () => {
   const year = useAppSelector(selectYear);
 
   const [map, setMap] = useState<google.maps.Map>();
+  const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox>();
+  const [searchMarkers, setSearchMarkers] = useState<google.maps.LatLng[]>([]);
   const [polygons, setPolygons] = useState<{
     [K in Town]?: google.maps.Polygon;
   }>({});
@@ -261,6 +264,7 @@ const Map = () => {
       <GoogleMap
         mapContainerStyle={{ height: '100%' }}
         options={mapOptions}
+        onBoundsChanged={() => searchBox?.setBounds(map?.getBounds() ?? null)}
         onLoad={setMap}
         onIdle={handleMapIdle}
       >
@@ -323,8 +327,16 @@ const Map = () => {
             options={selectedPolygonOptions}
           />
         )}
+        {searchMarkers.map((position) => (
+          <Marker position={position} />
+        ))}
       </GoogleMap>
-      <MapOverlay map={map} />
+      <MapOverlay
+        map={map}
+        searchBox={searchBox}
+        setSearchBox={setSearchBox}
+        setSearchMarkers={setSearchMarkers}
+      />
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import {
   Autocomplete,
   Box,
@@ -13,6 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Settings as SettingsIcon } from '@mui/icons-material';
+import { StandaloneSearchBox } from '@react-google-maps/api';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 import { matchSorter } from 'match-sorter';
 
@@ -49,6 +50,11 @@ import PriceRange from './PriceRange';
 
 interface Props {
   map?: google.maps.Map;
+  searchBox?: google.maps.places.SearchBox;
+  setSearchBox: Dispatch<
+    SetStateAction<google.maps.places.SearchBox | undefined>
+  >;
+  setSearchMarkers: Dispatch<SetStateAction<google.maps.LatLng[]>>;
 }
 
 const currentYear = new Date().getFullYear();
@@ -61,7 +67,12 @@ const yearMarks = [
   return { value, label: value.toString() };
 });
 
-const MapOverlay = ({ map }: Props) => {
+const MapOverlay = ({
+  map,
+  searchBox,
+  setSearchBox,
+  setSearchMarkers,
+}: Props) => {
   const dispatch = useAppDispatch();
   const showHeatmap = useAppSelector(selectShowHeatmap);
   const town = useAppSelector(selectTown);
@@ -147,6 +158,42 @@ const MapOverlay = ({ map }: Props) => {
     }
   }, [dispatch, priceRangeUpper, defaultPriceRangeUpper]);
 
+  const setMapViewport = () => {
+    if (!map || !searchBox) {
+      return;
+    }
+
+    const places = searchBox.getPlaces();
+
+    if (places?.length === 0) {
+      return;
+    }
+
+    setSearchMarkers([]);
+
+    const bounds = new google.maps.LatLngBounds();
+
+    places?.forEach((place) => {
+      if (!place.geometry || !place.geometry.location) {
+        return;
+      }
+
+      const { location } = place.geometry;
+
+      if (location) {
+        setSearchMarkers((markers) => [...markers, location]);
+      }
+
+      if (place.geometry.viewport) {
+        bounds.union(place.geometry.viewport);
+      } else {
+        bounds.extend(place.geometry.location);
+      }
+    });
+
+    map.fitBounds(bounds);
+  };
+
   const handleTownChange = (_: React.SyntheticEvent, townName: string) => {
     dispatch(setTown(townName as Town | 'Islandwide'));
     map?.setCenter(townCoordinates[townName as Town] ?? singaporeCoordinates);
@@ -168,6 +215,26 @@ const MapOverlay = ({ map }: Props) => {
         spacing={2}
         sx={{ position: 'absolute', top: 0, p: 2, pointerEvents: 'none' }}
       >
+        <Grid item xs={12} md="auto">
+          <StandaloneSearchBox
+            onPlacesChanged={setMapViewport}
+            onLoad={setSearchBox}
+          >
+            <TextField
+              placeholder="Search..."
+              sx={{
+                width: {
+                  xs: '100%',
+                  md: 400,
+                },
+                pointerEvents: 'auto',
+                '.MuiInputBase-root': {
+                  backgroundColor: (theme) => theme.palette.background.default,
+                },
+              }}
+            />
+          </StandaloneSearchBox>
+        </Grid>
         <Grid item xs={12} md="auto">
           <Autocomplete
             options={['Islandwide'].concat(
