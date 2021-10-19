@@ -41,14 +41,14 @@ import {
   btoProjectsSorter,
   convertFlatTypeToFrontend,
   isSameBTOProject,
-  mapFormValuesToGroupFilters,
-  mapGroupToFormValues,
+  mapUpdateFormValuesToGroupFilters,
+  mapGroupToUpdateFormValues,
 } from '../../utils/groups';
 import { compareDates, formatDate } from '../../utils/history';
 import { FormPaper, ModalPaper } from '../styled';
 import GroupDetails from './GroupDetails';
-import GroupForm, { GroupFormValues } from './GroupForm';
 import GroupSummary from './GroupSummary';
+import UpdateGroupForm, { UpdateGroupFormValues } from './UpdateGroupForm';
 
 enum DisplayedModal {
   Update,
@@ -84,14 +84,14 @@ const BTOGroupAccordion = (props: Props) => {
     DisplayedModal.Hidden
   );
 
-  const onUpdateGroup: SubmitHandler<GroupFormValues> = (
-    data: GroupFormValues
+  const onUpdateGroup: SubmitHandler<UpdateGroupFormValues> = (
+    data: UpdateGroupFormValues
   ) => {
     const updatedGroup: Group = {
       ...group,
       type: data.type,
       name: data.name === '' ? group.name : data.name,
-      filters: mapFormValuesToGroupFilters(data),
+      filters: mapUpdateFormValuesToGroupFilters(data),
     };
 
     dispatch(
@@ -259,11 +259,10 @@ const BTOGroupAccordion = (props: Props) => {
         }}
       >
         <FormPaper>
-          <GroupForm
-            formType="update"
+          <UpdateGroupForm
             onSubmit={onUpdateGroup}
             handleClose={() => setDisplayedModal(DisplayedModal.Hidden)}
-            currentData={mapGroupToFormValues(group)}
+            currentData={mapGroupToUpdateFormValues(group)}
           />
         </FormPaper>
       </Modal>

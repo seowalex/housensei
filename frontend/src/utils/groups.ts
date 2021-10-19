@@ -1,6 +1,7 @@
 import { MatchSorterOptions } from 'match-sorter';
 
-import { GroupFormValues } from '../components/history/GroupForm';
+import { CreateGroupFormValues } from '../components/history/CreateGroupForm';
+import { UpdateGroupFormValues } from '../components/history/UpdateGroupForm';
 import {
   BackendFlatType,
   FlatType,
@@ -64,16 +65,16 @@ export const btoProjectsSorter: MatchSorterOptions<BTOProject>['sorter'] = (
   rankedItems
 ) => [...rankedItems].sort((a, b) => -a.item.date.localeCompare(b.item.date));
 
-export const mapGroupToFormValues = (group: Group): GroupFormValues => {
+export const mapGroupToUpdateFormValues = (
+  group: Group
+): UpdateGroupFormValues => {
   const { type, name, filters } = group;
 
-  const groupFormValues: GroupFormValues = {
+  const groupFormValues: UpdateGroupFormValues = {
     name,
     type,
-    towns: filters.towns,
-    flatTypes: filters.flatTypes.map((flatType) =>
-      convertFlatTypeToFrontend(flatType)
-    ),
+    towns: filters.towns[0],
+    flatTypes: convertFlatTypeToFrontend(filters.flatTypes[0]),
     isStoreyRangeEnabled:
       filters.minStorey != null && filters.maxStorey != null,
     isFloorAreaRangeEnabled:
@@ -113,14 +114,57 @@ export const mapGroupToFormValues = (group: Group): GroupFormValues => {
   return groupFormValues;
 };
 
-export const mapFormValuesToGroupFilters = (
-  data: GroupFormValues
+export const mapCreateFormValuesToGroupFilters = (
+  data: CreateGroupFormValues
+): GroupFilters[] => {
+  const baseFilters: GroupFilters = {
+    towns: [],
+    flatTypes: [],
+  };
+
+  if (data.isFloorAreaRangeEnabled && data.floorAreaRange != null) {
+    baseFilters.minFloorArea = data.floorAreaRange.lower;
+    baseFilters.maxFloorArea = data.floorAreaRange.upper;
+  }
+
+  if (data.isYearRangeEnabled && data.yearRange != null) {
+    baseFilters.startYear = data.yearRange.lower;
+    baseFilters.endYear = data.yearRange.upper;
+  }
+
+  if (data.type === 'resale') {
+    if (data.isStoreyRangeEnabled && data.storeyRange != null) {
+      baseFilters.minStorey = data.storeyRange.lower;
+      baseFilters.maxStorey = data.storeyRange.upper;
+    }
+
+    if (data.isLeasePeriodRangeEnabled && data.leasePeriodRange != null) {
+      baseFilters.minLeasePeriod = data.leasePeriodRange.lower;
+      baseFilters.maxLeasePeriod = data.leasePeriodRange.upper;
+    }
+  }
+
+  const groupFilters: GroupFilters[] = [];
+
+  data.towns.forEach((town) => {
+    data.flatTypes.forEach((flatType) => {
+      groupFilters.push({
+        ...baseFilters,
+        towns: [town],
+        flatTypes: [convertFlatTypeToBackend(flatType)],
+      });
+    });
+  });
+
+  return groupFilters;
+};
+
+export const mapUpdateFormValuesToGroupFilters = (
+  data: UpdateGroupFormValues
 ): GroupFilters => {
   const groupFilters: GroupFilters = {
-    towns: data.towns,
-    flatTypes: data.flatTypes.map((flatType) =>
-      convertFlatTypeToBackend(flatType)
-    ),
+    towns: data.towns ? [data.towns] : [],
+    flatTypes: data.flatTypes ? [convertFlatTypeToBackend(data.flatTypes)] : [],
   };
 
   if (data.isFloorAreaRangeEnabled && data.floorAreaRange != null) {

@@ -167,6 +167,7 @@ const HistoryChart = (props: Props) => {
                           ? 'black'
                           : 'white',
                       }}
+                      isAnimationActive={false}
                     />
                   ))}
               </>

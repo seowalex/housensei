@@ -29,13 +29,13 @@ import { useGetBTOGraphQuery, useGetResaleGraphQuery } from '../../api/history';
 import { removeGroup, updateGroup } from '../../reducers/history';
 import { Group, ResaleGroup } from '../../types/groups';
 import {
-  mapFormValuesToGroupFilters,
-  mapGroupToFormValues,
+  mapUpdateFormValuesToGroupFilters,
+  mapGroupToUpdateFormValues,
 } from '../../utils/groups';
 import { FormPaper, ModalPaper } from '../styled';
 import GroupDetails from './GroupDetails';
-import GroupForm, { GroupFormValues } from './GroupForm';
 import GroupSummary from './GroupSummary';
+import UpdateGroupForm, { UpdateGroupFormValues } from './UpdateGroupForm';
 
 enum DisplayedModal {
   Update,
@@ -83,14 +83,14 @@ const ResaleGroupAccordion = (props: Props) => {
   );
   const [showBTOAlert, setShowBTOAlert] = useState<boolean>(true);
 
-  const onUpdateGroup: SubmitHandler<GroupFormValues> = (
-    data: GroupFormValues
+  const onUpdateGroup: SubmitHandler<UpdateGroupFormValues> = (
+    data: UpdateGroupFormValues
   ) => {
     const updatedGroup: Group = {
       ...group,
       type: data.type,
       name: data.name === '' ? group.name : data.name,
-      filters: mapFormValuesToGroupFilters(data),
+      filters: mapUpdateFormValuesToGroupFilters(data),
     };
 
     dispatch(
@@ -197,11 +197,10 @@ const ResaleGroupAccordion = (props: Props) => {
         }}
       >
         <FormPaper>
-          <GroupForm
-            formType="update"
+          <UpdateGroupForm
             onSubmit={onUpdateGroup}
             handleClose={() => setDisplayedModal(DisplayedModal.Hidden)}
-            currentData={mapGroupToFormValues(group)}
+            currentData={mapGroupToUpdateFormValues(group)}
           />
         </FormPaper>
       </Modal>

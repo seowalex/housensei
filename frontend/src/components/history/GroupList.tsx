@@ -6,10 +6,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { useAppSelector } from '../../app/hooks';
 import { createGroup, selectGroups } from '../../reducers/history';
 import { BTOGroup, Group, GroupFilters, ResaleGroup } from '../../types/groups';
-import { getGroupColor, mapFormValuesToGroupFilters } from '../../utils/groups';
+import {
+  getGroupColor,
+  mapCreateFormValuesToGroupFilters,
+} from '../../utils/groups';
 import { FormPaper } from '../styled';
 import BTOGroupAccordion from './BTOGroupAccordion';
-import GroupForm, { GroupFormValues } from './GroupForm';
+import CreateGroupForm, { CreateGroupFormValues } from './CreateGroupForm';
 import ResaleGroupAccordion from './ResaleGroupAccordion';
 
 interface Props {
@@ -23,20 +26,45 @@ const GroupList = (props: Props) => {
   const groups = useAppSelector(selectGroups);
   const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
 
-  const handleCreateGroup: SubmitHandler<GroupFormValues> = (
-    data: GroupFormValues
+  const handleCreateGroup: SubmitHandler<CreateGroupFormValues> = (
+    data: CreateGroupFormValues
   ) => {
-    const filters: GroupFilters = mapFormValuesToGroupFilters(data);
-    const groupId = uuidv4();
-    const group: Group = {
-      type: data.type,
-      id: groupId,
-      name: data.name === '' ? `Group ${groups.length + 1}` : data.name,
-      color: getGroupColor(groups.length),
-      filters,
-    };
-    dispatch(createGroup(group));
-    onChangeSelectedGroup(groupId)(true);
+    const groupFilters: GroupFilters[] =
+      mapCreateFormValuesToGroupFilters(data);
+    if (groupFilters.length === 1) {
+      const groupId = uuidv4();
+      const group: Group = {
+        type: data.type,
+        id: groupId,
+        name: data.name === '' ? 'New Group' : data.name,
+        color: getGroupColor(groups.length),
+        filters: groupFilters[0],
+      };
+
+      dispatch(createGroup(group));
+      onChangeSelectedGroup(groupId)(true);
+    } else {
+      const createdGroups = groupFilters.map((filters, index) => {
+        const groupId = uuidv4();
+        const group: Group = {
+          type: data.type,
+          id: groupId,
+          name:
+            data.name === ''
+              ? `New Group ${index + 1}`
+              : `${data.name} ${index + 1}`,
+          color: getGroupColor(groups.length + index),
+          filters,
+        };
+        return group;
+      });
+
+      createdGroups.forEach((group) => {
+        dispatch(createGroup(group));
+      });
+      onChangeSelectedGroup(createdGroups[0].id)(true);
+    }
+
     setShowCreateForm(false);
   };
 
@@ -110,11 +138,9 @@ const GroupList = (props: Props) => {
         }}
       >
         <FormPaper>
-          <GroupForm
-            formType="create"
+          <CreateGroupForm
             onSubmit={handleCreateGroup}
             handleClose={() => setShowCreateForm(false)}
-            groupNamePlaceholder={`Group ${groups.length + 1}`}
           />
         </FormPaper>
       </Modal>

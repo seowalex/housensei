@@ -7,7 +7,7 @@ import {
   FieldValues,
   UseFormSetValue,
 } from 'react-hook-form';
-import type { Range } from '../history/GroupForm';
+import type { Range } from '../history/CreateGroupForm';
 
 interface Props {
   name: string;
@@ -57,7 +57,7 @@ const FormSliderInput = (props: Props) => {
     }
   }, [sliderValue, name, setValue]);
 
-  const handleSliderChange = (_: any, newValue: number | number[]) => {
+  const handleSliderChange = (_: Event, newValue: number | number[]) => {
     setSliderValue(newValue as number[]);
   };
 
