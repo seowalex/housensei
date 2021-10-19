@@ -54,6 +54,12 @@ export const convertFlatTypeToFrontend = (
   }
 };
 
+export const isSameBTOProject = (a: BTOProject, b: BTOProject) =>
+  a.name === b.name &&
+  a.date === b.date &&
+  a.price === b.price &&
+  a.flatType === b.flatType;
+
 export const btoProjectsSorter: MatchSorterOptions<BTOProject>['sorter'] = (
   rankedItems
 ) => [...rankedItems].sort((a, b) => -a.item.date.localeCompare(b.item.date));

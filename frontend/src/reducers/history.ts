@@ -8,29 +8,26 @@ import {
 import type { RootState } from '../app/store';
 import { Group } from '../types/groups';
 import { BTOProject, ChartDataPoint, PriceDataPoint } from '../types/history';
-import { aggregateBTOProjects, getChartData } from '../utils/history';
+import { getChartData, transformRawBTOData } from '../utils/history';
 
-interface BTOProjectsData {
-  projects: BTOProject[];
-  aggregations: BTOProject[];
-}
+export type BTOProjectsData = Record<string, BTOProject>;
 
 interface HistoryState {
   groups: Record<string, Group>;
   resaleRawData: Record<string, PriceDataPoint[]>;
+  btoRawData: Record<string, BTOProjectsData>;
   monthlyChartData: ChartDataPoint[];
   yearlyChartData: ChartDataPoint[];
-  btoProjectsRecord: Record<string, BTOProjectsData>;
-  displayedBTOProjectsRecord: Record<string, BTOProjectsData>;
+  selectedBTOProjectIds: Record<string, string[]>;
 }
 
 const initialState: HistoryState = {
   groups: {},
   resaleRawData: {},
+  btoRawData: {},
   monthlyChartData: [],
   yearlyChartData: [],
-  btoProjectsRecord: {},
-  displayedBTOProjectsRecord: {},
+  selectedBTOProjectIds: {},
 };
 
 const slice = createSlice({
@@ -47,38 +44,26 @@ const slice = createSlice({
       state.groups[action.payload.id] = action.payload.group;
     },
     removeGroup: (state, action: PayloadAction<string>) => {
-      const { type } = state.groups[action.payload];
+      delete state.resaleRawData[action.payload];
+      delete state.btoRawData[action.payload];
+      delete state.selectedBTOProjectIds[action.payload];
       delete state.groups[action.payload];
-      if (type === 'resale') {
-        delete state.resaleRawData[action.payload];
-        const [monthlyData, yearlyData] = getChartData(state.resaleRawData);
-        state.monthlyChartData = monthlyData;
-        state.yearlyChartData = yearlyData;
-      } else {
-        delete state.btoProjectsRecord[action.payload];
-        delete state.displayedBTOProjectsRecord[action.payload];
-      }
+      const [monthlyData, yearlyData] = getChartData(
+        state.resaleRawData,
+        state.btoRawData
+      );
+      state.monthlyChartData = monthlyData;
+      state.yearlyChartData = yearlyData;
     },
     resetGroups: (state) => {
       state.groups = initialState.groups;
     },
-    updateDisplayedBTOProjects: (
+    updateSelectedBTOProjects: (
       state,
-      action: PayloadAction<{ id: string; projects: BTOProject[] }>
+      action: PayloadAction<{ id: string; projectIds: string[] }>
     ) => {
-      if (state.displayedBTOProjectsRecord[action.payload.id] != null) {
-        state.displayedBTOProjectsRecord[action.payload.id].projects =
-          action.payload.projects;
-      }
-    },
-    updateDisplayedBTOAggregations: (
-      state,
-      action: PayloadAction<{ id: string; aggregations: BTOProject[] }>
-    ) => {
-      if (state.displayedBTOProjectsRecord[action.payload.id] != null) {
-        state.displayedBTOProjectsRecord[action.payload.id].aggregations =
-          action.payload.aggregations;
-      }
+      state.selectedBTOProjectIds[action.payload.id] =
+        action.payload.projectIds;
     },
   },
   extraReducers: (builder) => {
@@ -87,31 +72,26 @@ const slice = createSlice({
         getResaleGraph.matchFulfilled,
         (state, action: PayloadAction<ResaleGraphDataResponse>) => {
           state.resaleRawData[action.payload.id] = action.payload.data;
-          const [monthlyData, yearlyData] = getChartData(state.resaleRawData);
+          const [monthlyData, yearlyData] = getChartData(
+            state.resaleRawData,
+            state.btoRawData
+          );
           state.monthlyChartData = monthlyData;
           state.yearlyChartData = yearlyData;
-          delete state.btoProjectsRecord[action.payload.id];
-          delete state.displayedBTOProjectsRecord[action.payload.id];
         }
       )
       .addMatcher(
         getBTOGraph.matchFulfilled,
         (state, action: PayloadAction<BTOGraphDataResponse>) => {
-          const aggregations = aggregateBTOProjects(action.payload.data);
-          state.btoProjectsRecord[action.payload.id] = {
-            projects: action.payload.data,
-            aggregations,
-          };
-          state.displayedBTOProjectsRecord[action.payload.id] = {
-            projects: [],
-            aggregations,
-          };
-          if (state.resaleRawData[action.payload.id] != null) {
-            delete state.resaleRawData[action.payload.id];
-            const [monthlyData, yearlyData] = getChartData(state.resaleRawData);
-            state.monthlyChartData = monthlyData;
-            state.yearlyChartData = yearlyData;
-          }
+          const projectsData = transformRawBTOData(action.payload.data);
+          state.btoRawData[action.payload.id] = projectsData;
+          state.selectedBTOProjectIds[action.payload.id] = [];
+          const [monthlyData, yearlyData] = getChartData(
+            state.resaleRawData,
+            state.btoRawData
+          );
+          state.monthlyChartData = monthlyData;
+          state.yearlyChartData = yearlyData;
         }
       );
   },
@@ -122,8 +102,7 @@ export const {
   updateGroup,
   removeGroup,
   resetGroups,
-  updateDisplayedBTOProjects,
-  updateDisplayedBTOAggregations,
+  updateSelectedBTOProjects,
 } = slice.actions;
 
 export const selectGroups = (state: RootState): Group[] =>
@@ -140,25 +119,26 @@ export const selectMonthlyChartData = (state: RootState): ChartDataPoint[] =>
 export const selectYearlyChartData = (state: RootState): ChartDataPoint[] =>
   state.history.yearlyChartData;
 
-export const selectDisplayedBTOProjectsRecord = (
+export const selectBTORawData = (
   state: RootState
-): Record<string, BTOProjectsData> => state.history.displayedBTOProjectsRecord;
-
-export const selectBTOProjects =
+): Record<string, BTOProjectsData> => state.history.btoRawData;
+export const selectAllBTOProjects = (state: RootState): BTOProjectsData => {
+  let projectsData: BTOProjectsData = {};
+  Object.values(state.history.btoRawData).forEach((projects) => {
+    projectsData = { ...projectsData, ...projects };
+  });
+  return projectsData;
+};
+export const selectBTOProjectsOfGroup =
   (id: string) =>
-  (state: RootState): BTOProject[] =>
-    state.history.btoProjectsRecord[id]?.projects ?? [];
-export const selectBTOAggregations =
+  (state: RootState): BTOProjectsData =>
+    state.history.btoRawData[id] ?? {};
+export const selectSelectedBTOProjectIdsOfGroup =
   (id: string) =>
-  (state: RootState): BTOProject[] =>
-    state.history.btoProjectsRecord[id]?.aggregations ?? [];
-export const selectDisplayedBTOProjects =
-  (id: string) =>
-  (state: RootState): BTOProject[] =>
-    state.history.displayedBTOProjectsRecord[id]?.projects ?? [];
-export const selectDisplayedBTOAggregations =
-  (id: string) =>
-  (state: RootState): BTOProject[] =>
-    state.history.displayedBTOProjectsRecord[id]?.aggregations ?? [];
+  (state: RootState): string[] =>
+    state.history.selectedBTOProjectIds[id] ?? [];
+export const selectSelectedBTOProjectIds = (
+  state: RootState
+): Record<string, string[]> => state.history.selectedBTOProjectIds;
 
 export default slice.reducer;

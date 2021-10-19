@@ -4,8 +4,6 @@ import {
   Label,
   Line,
   LineChart,
-  ReferenceDot,
-  ReferenceLine,
   ResponsiveContainer,
   Tooltip as ChartTooltip,
   XAxis,
@@ -22,12 +20,13 @@ import {
   formatPriceToThousand,
   formatProjectName,
 } from '../../utils/history';
-import { convertFlatTypeToFrontend } from '../../utils/groups';
 import { useAppSelector } from '../../app/hooks';
 import {
-  selectDisplayedBTOProjectsRecord,
+  selectAllBTOProjects,
+  selectBTORawData,
   selectGroups,
   selectMonthlyChartData,
+  selectSelectedBTOProjectIds,
   selectYearlyChartData,
 } from '../../reducers/history';
 import { Group } from '../../types/groups';
@@ -44,9 +43,9 @@ const HistoryChart = (props: Props) => {
   const monthlyChartData = useAppSelector(selectMonthlyChartData);
   const yearlyChartData = useAppSelector(selectYearlyChartData);
 
-  const displayedBTOProjectsRecord = useAppSelector(
-    selectDisplayedBTOProjectsRecord
-  );
+  const btoProjects = useAppSelector(selectAllBTOProjects);
+  const btoProjectsByGroup = useAppSelector(selectBTORawData);
+  const selectedBTOProjectIds = useAppSelector(selectSelectedBTOProjectIds);
 
   const [getPng, { ref, isLoading }] = useCurrentPng();
 
@@ -62,7 +61,7 @@ const HistoryChart = (props: Props) => {
     chartMode === ChartMode.Monthly ? monthlyChartData : yearlyChartData;
 
   const getGroup = (id: string): Group | undefined => {
-    const group = groups.filter((g) => g.id === id);
+    const group = groups.filter((g) => g.type === 'resale' && g.id === id);
     return group.length === 0 ? undefined : group[0];
   };
 
@@ -108,10 +107,13 @@ const HistoryChart = (props: Props) => {
               chartMode === ChartMode.Monthly ? formatDate : undefined
             }
             formatter={(value: number, id: string) => {
-              const formatterGroup = getGroup(id);
+              const resaleGroupName = getGroup(id)?.name;
+              const btoProjectName = btoProjects[id]
+                ? formatProjectName(btoProjects[id].name)
+                : '';
               return [
                 value == null ? 'No Data' : `$${formatPrice(value)}`,
-                formatterGroup?.name ?? '',
+                resaleGroupName ?? btoProjectName,
               ];
             }}
           />
@@ -124,92 +126,51 @@ const HistoryChart = (props: Props) => {
             }
             alwaysShowText
           />
-          {groups.map(({ id, color }) => (
-            <Line
-              type="linear"
-              key={id}
-              dataKey={id}
-              stroke={
-                selectedGroup !== id && selectedGroup != null
-                  ? `${color}88`
-                  : color
-              }
-              strokeWidth={selectedGroup === id ? 3 : 2}
-              connectNulls
-              dot={false}
-            />
-          ))}
-          {groups.map(({ id, color }) => (
-            <>
-              {displayedBTOProjectsRecord[id] &&
-                displayedBTOProjectsRecord[id].projects &&
-                displayedBTOProjectsRecord[id].projects.map(
-                  ({ name, price, date, flatType }) => (
-                    <>
-                      <ReferenceLine
-                        y={price}
-                        stroke={
-                          selectedGroup !== id && selectedGroup != null
-                            ? `${color}88`
-                            : color
-                        }
-                        strokeWidth={selectedGroup === id ? 3 : 2}
-                        strokeDasharray="7 3"
-                        ifOverflow="extendDomain"
-                      >
-                        <Label
-                          position="left"
-                          value={formatPriceToThousand(price)}
-                        />
-                        <Label
-                          position="insideBottomLeft"
-                          value={`${formatProjectName(
-                            name
-                          )} (${convertFlatTypeToFrontend(flatType)})`}
-                        />
-                      </ReferenceLine>
-                      <ReferenceDot
-                        x={date}
-                        y={price}
-                        r={5}
-                        fill={
-                          selectedGroup !== id && selectedGroup != null
-                            ? `${color}88`
-                            : color
-                        }
-                        stroke="none"
-                        ifOverflow="extendDomain"
-                      >
-                        <Label position="bottom" value={formatDate(date)} />
-                      </ReferenceDot>
-                    </>
-                  )
-                )}
-              {displayedBTOProjectsRecord[id] &&
-                displayedBTOProjectsRecord[id].aggregations &&
-                displayedBTOProjectsRecord[id].aggregations.map(
-                  ({ name, price }) => (
-                    <ReferenceLine
-                      y={price}
-                      stroke={
-                        selectedGroup !== id && selectedGroup != null
-                          ? `${color}88`
-                          : color
-                      }
-                      strokeWidth={selectedGroup === id ? 3 : 2}
-                      strokeDasharray="7 3"
-                      ifOverflow="extendDomain"
-                    >
-                      <Label
-                        position="left"
-                        value={formatPriceToThousand(price)}
-                      />
-                      <Label position="insideBottomLeft" value={name} />
-                    </ReferenceLine>
-                  )
-                )}
-            </>
-          ))}
+          {groups
+            .filter((g) => g.type === 'resale')
+            .map(({ id, color }) => (
+              <Line
+                type="linear"
+                key={id}
+                dataKey={id}
+                stroke={`${color}cc`}
+                strokeWidth={selectedGroup === id ? 3 : 2}
+                connectNulls
+                dot={false}
+                activeDot={{ r: 4.5 }}
+              />
+            ))}
+          {groups
+            .filter((g) => g.type === 'bto')
+            .map(({ id: groupId, color }) => (
+              <>
+                {btoProjectsByGroup[groupId] &&
+                  Object.keys(btoProjectsByGroup[groupId]).map((id) => (
+                    <Line
+                      type="linear"
+                      key={id}
+                      dataKey={id}
+                      stroke={`${color}cc`}
+                      strokeWidth={selectedGroup === groupId ? 3 : 2}
+                      dot={{
+                        r: 3.5,
+                        stroke: selectedBTOProjectIds[groupId].includes(id)
+                          ? 'black'
+                          : `${color}cc`,
+                        fill: selectedBTOProjectIds[groupId].includes(id)
+                          ? `${color}cc`
+                          : 'white',
+                      }}
+                      activeDot={{
+                        r: 4.5,
+                        stroke: selectedBTOProjectIds[groupId].includes(id)
+                          ? 'black'
+                          : 'white',
+                      }}
+                    />
+                  ))}
+              </>
+            ))}
         </LineChart>
       </ResponsiveContainer>
       {groups.length > 0 && (

@@ -30,21 +30,19 @@ import { useGetBTOGraphQuery } from '../../api/history';
 import { useAppSelector } from '../../app/hooks';
 import {
   removeGroup,
-  selectBTOAggregations,
-  selectBTOProjects,
-  selectDisplayedBTOAggregations,
-  selectDisplayedBTOProjects,
-  updateDisplayedBTOAggregations,
-  updateDisplayedBTOProjects,
+  selectBTOProjectsOfGroup,
+  selectSelectedBTOProjectIdsOfGroup,
   updateGroup,
+  updateSelectedBTOProjects,
 } from '../../reducers/history';
 import { BTOGroup, Group } from '../../types/groups';
 import { BTOProject } from '../../types/history';
 import {
+  btoProjectsSorter,
+  convertFlatTypeToFrontend,
+  isSameBTOProject,
   mapFormValuesToGroupFilters,
   mapGroupToFormValues,
-  convertFlatTypeToFrontend,
-  btoProjectsSorter,
 } from '../../utils/groups';
 import { compareDates, formatDate } from '../../utils/history';
 import { FormPaper, ModalPaper } from '../styled';
@@ -68,21 +66,19 @@ interface Props {
 const BTOGroupAccordion = (props: Props) => {
   const dispatch = useDispatch();
   const { group, expanded, onChangeSelectedGroup, onDuplicateGroup } = props;
+  const projectsRecord = useAppSelector(selectBTOProjectsOfGroup(group.id));
+  const projects = Object.values(projectsRecord);
+  const selectedProjectIds = useAppSelector(
+    selectSelectedBTOProjectIdsOfGroup(group.id)
+  );
+  const selectedProjects = selectedProjectIds.map(
+    (projectId) => projectsRecord[projectId]
+  );
 
   useGetBTOGraphQuery({
     ...group.filters,
     id: group.id,
   });
-
-  const projects = useAppSelector(selectBTOProjects(group.id));
-  const aggregations = useAppSelector(selectBTOAggregations(group.id));
-
-  const displayedProjects = useAppSelector(
-    selectDisplayedBTOProjects(group.id)
-  );
-  const displayedAggregations = useAppSelector(
-    selectDisplayedBTOAggregations(group.id)
-  );
 
   const [displayedModal, setDisplayedModal] = useState<DisplayedModal>(
     DisplayedModal.Hidden
@@ -113,26 +109,26 @@ const BTOGroupAccordion = (props: Props) => {
     onChangeSelectedGroup(false);
   };
 
-  const handleChangeDisplayedProjects = (
+  const handleChangeSelectedProjects = (
     event: SyntheticEvent,
-    selectedProjects: BTOProject[]
+    newSelectedProjects: BTOProject[]
   ) => {
-    dispatch(
-      updateDisplayedBTOProjects({
-        id: group.id,
-        projects: selectedProjects,
+    const newSelectedProjectIds = newSelectedProjects
+      .map((selectedProject) => {
+        const selectedRecord = Object.entries(projectsRecord).filter(
+          ([id, project]) => isSameBTOProject(selectedProject, project)
+        );
+        if (selectedRecord.length === 0) {
+          return '';
+        }
+        return selectedRecord[0][0];
       })
-    );
-  };
+      .filter((projectId) => projectId !== '');
 
-  const handleChangeDisplayedAggregations = (
-    event: SyntheticEvent,
-    selectedAggregations: BTOProject[]
-  ) => {
     dispatch(
-      updateDisplayedBTOAggregations({
+      updateSelectedBTOProjects({
         id: group.id,
-        aggregations: selectedAggregations,
+        projectIds: newSelectedProjectIds,
       })
     );
   };
@@ -153,75 +149,8 @@ const BTOGroupAccordion = (props: Props) => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Autocomplete
-                onChange={handleChangeDisplayedAggregations}
-                value={displayedAggregations ?? []}
-                multiple
-                disableCloseOnSelect
-                options={
-                  aggregations
-                    ? [...aggregations].sort((left, right) =>
-                        left.name.localeCompare(right.name)
-                      )
-                    : []
-                }
-                renderOption={(optionProps, option, { selected }) => (
-                  // eslint-disable-next-line react/jsx-props-no-spreading
-                  <li {...optionProps}>
-                    <Stack
-                      direction="row"
-                      justifyContent="space-between"
-                      alignItems="center"
-                      sx={{ width: '100%' }}
-                    >
-                      <Stack spacing={0.5}>
-                        <Typography>{option.name}</Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <AttachMoneyRounded fontSize="small" />
-                          <Typography variant="body2">
-                            {option.price}
-                          </Typography>
-                          <BedroomParentRounded fontSize="small" />
-                          <Typography variant="body2">
-                            {convertFlatTypeToFrontend(option.flatType)}
-                          </Typography>
-                        </Stack>
-                      </Stack>
-                      {selected && <CheckRoundedIcon fontSize="small" />}
-                    </Stack>
-                  </li>
-                )}
-                isOptionEqualToValue={(option, value) =>
-                  option.flatType === value.flatType
-                }
-                getOptionLabel={(option) => option.name}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Aggregated BTO data"
-                    placeholder={
-                      displayedAggregations == null ||
-                      displayedAggregations.length === 0
-                        ? 'Select an aggregation to show on chart'
-                        : ''
-                    }
-                  />
-                )}
-                filterOptions={(options, { inputValue }) =>
-                  matchSorter(options, inputValue, {
-                    keys: [
-                      'name',
-                      'price',
-                      (item: BTOProject) =>
-                        convertFlatTypeToFrontend(item.flatType),
-                    ],
-                  })
-                }
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Autocomplete
-                onChange={handleChangeDisplayedProjects}
-                value={displayedProjects ?? []}
+                onChange={handleChangeSelectedProjects}
+                value={selectedProjects ?? []}
                 multiple
                 disableCloseOnSelect
                 options={
@@ -265,24 +194,20 @@ const BTOGroupAccordion = (props: Props) => {
                   </li>
                 )}
                 isOptionEqualToValue={(option, value) =>
-                  option.name === value.name &&
-                  option.date === value.date &&
-                  option.flatType === value.flatType
+                  isSameBTOProject(option, value)
                 }
                 getOptionLabel={(option) => option.name}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     label={
-                      displayedProjects == null ||
-                      displayedProjects.length === 0
-                        ? 'Select specific BTO projects'
-                        : 'Displayed BTO Projects'
+                      selectedProjects == null || selectedProjects.length === 0
+                        ? 'Mark specific BTO projects'
+                        : 'Marked BTO Projects'
                     }
                     placeholder={
-                      displayedProjects == null ||
-                      displayedProjects.length === 0
-                        ? 'Select a project to show on chart'
+                      selectedProjects == null || selectedProjects.length === 0
+                        ? 'Mark a project on the chart'
                         : ''
                     }
                   />
@@ -293,8 +218,6 @@ const BTOGroupAccordion = (props: Props) => {
                       'name',
                       'price',
                       (item: BTOProject) => formatDate(item.date),
-                      (item: BTOProject) =>
-                        convertFlatTypeToFrontend(item.flatType),
                     ],
                     sorter: btoProjectsSorter,
                   })
