@@ -5,6 +5,11 @@ import { useDispatch } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 import { useAppSelector } from '../../app/hooks';
 import { createGroup, selectGroups } from '../../reducers/history';
+import {
+  incrementColorCount,
+  selectColorCount,
+  setColorCount,
+} from '../../reducers/colors';
 import { BTOGroup, Group, GroupFilters, ResaleGroup } from '../../types/groups';
 import {
   getGroupColor,
@@ -24,6 +29,7 @@ const GroupList = (props: Props) => {
   const dispatch = useDispatch();
   const { selectedGroup, onChangeSelectedGroup } = props;
   const groups = useAppSelector(selectGroups);
+  const colorCount = useAppSelector(selectColorCount);
   const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
 
   const handleCreateGroup: SubmitHandler<CreateGroupFormValues> = (
@@ -33,36 +39,37 @@ const GroupList = (props: Props) => {
       mapCreateFormValuesToGroupFilters(data);
     if (groupFilters.length === 1) {
       const groupId = uuidv4();
+      const color = getGroupColor(colorCount);
       const group: Group = {
         type: data.type,
         id: groupId,
         name: data.name === '' ? 'New Group' : data.name,
-        color: getGroupColor(groups.length),
+        color,
         filters: groupFilters[0],
       };
 
       dispatch(createGroup(group));
+      dispatch(incrementColorCount(color));
       onChangeSelectedGroup(groupId)(true);
     } else {
-      const createdGroups = groupFilters.map((filters, index) => {
+      const colorCountCopy = { ...colorCount };
+      const firstGroupId = uuidv4();
+      for (let i = 0; i < groupFilters.length; i += 1) {
         const groupId = uuidv4();
+        const color = getGroupColor(colorCountCopy);
         const group: Group = {
           type: data.type,
-          id: groupId,
+          id: i === 0 ? firstGroupId : groupId,
           name:
-            data.name === ''
-              ? `New Group ${index + 1}`
-              : `${data.name} ${index + 1}`,
-          color: getGroupColor(groups.length + index),
-          filters,
+            data.name === '' ? `New Group ${i + 1}` : `${data.name} ${i + 1}`,
+          color,
+          filters: groupFilters[i],
         };
-        return group;
-      });
-
-      createdGroups.forEach((group) => {
         dispatch(createGroup(group));
-      });
-      onChangeSelectedGroup(createdGroups[0].id)(true);
+        colorCountCopy[color] += 1;
+      }
+      dispatch(setColorCount(colorCountCopy));
+      onChangeSelectedGroup(firstGroupId)(true);
     }
 
     setShowCreateForm(false);
@@ -70,6 +77,7 @@ const GroupList = (props: Props) => {
 
   const handleCreateBTOGroup = (group: Group) => {
     const groupId = uuidv4();
+    const color = getGroupColor(colorCount);
     const {
       minStorey,
       maxStorey,
@@ -81,22 +89,25 @@ const GroupList = (props: Props) => {
       type: 'bto',
       id: groupId,
       name: `${group.name} (BTO)`,
-      color: getGroupColor(groups.length),
+      color,
       filters: btoFilters,
     };
     dispatch(createGroup(btoGroup));
+    dispatch(incrementColorCount(color));
     onChangeSelectedGroup(groupId)(true);
   };
 
   const handleDuplicateGroup = (group: Group) => {
     const groupId = uuidv4();
+    const color = getGroupColor(colorCount);
     const duplicatedGroup: Group = {
       ...group,
       id: groupId,
       name: `${group.name} (Copy)`,
-      color: getGroupColor(groups.length),
+      color,
     };
     dispatch(createGroup(duplicatedGroup));
+    dispatch(incrementColorCount(color));
     onChangeSelectedGroup(groupId)(true);
   };
 

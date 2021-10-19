@@ -192,17 +192,20 @@ export const mapUpdateFormValuesToGroupFilters = (
   return groupFilters;
 };
 
-export const getGroupColor = (index: number): GroupColor => {
-  const colors = [
-    GroupColor.Color1,
-    GroupColor.Color2,
-    GroupColor.Color3,
-    GroupColor.Color4,
-    GroupColor.Color5,
-    GroupColor.Color6,
-    GroupColor.Color7,
-    GroupColor.Color8,
-  ];
+export const getGroupColor = (
+  colorCount: Record<GroupColor, number>
+): GroupColor => {
+  let minCount = colorCount[GroupColor.Color1];
+  let colors: GroupColor[] = [GroupColor.Color1];
 
-  return colors[index % 8];
+  Object.entries(colorCount).forEach(([color, count]) => {
+    if (count < minCount) {
+      minCount = count;
+      colors = [color as GroupColor];
+    } else if (count === minCount) {
+      colors.push(color as GroupColor);
+    }
+  });
+
+  return colors[Math.floor(Math.random() * colors.length)];
 };

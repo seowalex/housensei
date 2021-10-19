@@ -23,6 +23,7 @@ import { useDispatch } from 'react-redux';
 
 import { useGetBTOGraphQuery, useGetResaleGraphQuery } from '../../api/history';
 import { removeGroup, updateGroup } from '../../reducers/history';
+import { decrementColorCount } from '../../reducers/colors';
 import { Group, ResaleGroup } from '../../types/groups';
 import {
   mapUpdateFormValuesToGroupFilters,
@@ -102,6 +103,7 @@ const ResaleGroupAccordion = (props: Props) => {
 
   const onDeleteGroup = () => {
     dispatch(removeGroup(group.id));
+    dispatch(decrementColorCount(group.color));
     setDisplayedModal(DisplayedModal.Hidden);
     onChangeSelectedGroup(false);
   };

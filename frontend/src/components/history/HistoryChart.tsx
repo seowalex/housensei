@@ -129,24 +129,29 @@ const HistoryChart = (props: Props) => {
             alwaysShowText
           />
           {groups
-            .filter((g) => g.type === 'resale' && displayedGroupIds.has(g.id))
+            .filter((g) => g.type === 'resale')
             .map(({ id, color }) => (
-              <Line
-                type="linear"
-                key={id}
-                dataKey={id}
-                stroke={color}
-                strokeWidth={selectedGroup === id ? 3 : 2}
-                connectNulls
-                dot={false}
-                activeDot={{ r: 4.5 }}
-              />
+              <>
+                {displayedGroupIds.has(id) && (
+                  <Line
+                    type="linear"
+                    key={id}
+                    dataKey={id}
+                    stroke={color}
+                    strokeWidth={selectedGroup === id ? 3 : 2}
+                    connectNulls
+                    dot={false}
+                    activeDot={{ r: 4.5 }}
+                  />
+                )}
+              </>
             ))}
           {groups
-            .filter((g) => g.type === 'bto' && displayedGroupIds.has(g.id))
+            .filter((g) => g.type === 'bto')
             .map(({ id: groupId, color }) => (
               <>
-                {btoProjectsByGroup[groupId] &&
+                {displayedGroupIds.has(groupId) &&
+                  btoProjectsByGroup[groupId] &&
                   Object.keys(btoProjectsByGroup[groupId]).map((id) => (
                     <Line
                       type="linear"

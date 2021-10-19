@@ -34,6 +34,7 @@ import {
   updateGroup,
   updateSelectedBTOProjects,
 } from '../../reducers/history';
+import { decrementColorCount } from '../../reducers/colors';
 import { BTOGroup, Group } from '../../types/groups';
 import { BTOProject } from '../../types/history';
 import {
@@ -105,6 +106,7 @@ const BTOGroupAccordion = (props: Props) => {
 
   const onDeleteGroup = () => {
     dispatch(removeGroup(group.id));
+    dispatch(decrementColorCount(group.color));
     setDisplayedModal(DisplayedModal.Hidden);
     onChangeSelectedGroup(false);
   };
