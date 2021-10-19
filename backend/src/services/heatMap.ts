@@ -45,7 +45,10 @@ const getResalesByTown = async (
   const queryBuilder = getRepository(Resale)
     .createQueryBuilder('resale')
     .select('MAX(resale.coordinates)', 'coordinates')
-    .addSelect('json_agg((resale.flatType, resale.resalePrice))', 'details')
+    .addSelect(
+      "json_agg(json_build_object('flatType', resale.flatType, 'resalePrice', resale.resalePrice, 'transactionMonth', date_part('month', resale.transactionDate)))",
+      'transactions'
+    )
     .addSelect("CONCAT(resale.block, ' ', resale.streetName)", 'address')
     .addSelect('CAST(AVG(resale.resalePrice) AS int)', 'resalePrice')
     .where('coordinates IS NOT NULL');
