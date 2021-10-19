@@ -269,26 +269,26 @@ const Map = () => {
           <HeatmapLayer data={heatmapData} options={heatmapLayerOptions} />
         )}
         {town === 'Islandwide' &&
-          Object.entries(townBoundaries).map(([townName, paths]) => (
-            <Fragment key={townName}>
+          islandHeatmap?.map((point) => (
+            <Fragment key={point.town}>
               <Polygon
-                paths={paths}
+                paths={townBoundaries[point.town as Town]}
                 options={polygonOptions}
                 onLoad={(polygon) =>
                   setPolygons((prevPolygons) => ({
                     ...prevPolygons,
-                    [townName]: polygon,
+                    [point.town]: polygon,
                   }))
                 }
-                onMouseOver={() => handlePolygonMouseOver(townName)}
-                onMouseOut={() => handlePolygonMouseOut(townName)}
-                onClick={() => handlePolygonClick(townName)}
+                onMouseOver={() => handlePolygonMouseOver(point.town)}
+                onMouseOut={() => handlePolygonMouseOut(point.town)}
+                onClick={() => handlePolygonClick(point.town)}
               />
               <InfoBox
-                position={townCoordinates[townName as Town]}
+                position={townCoordinates[point.town as Town]}
                 options={{
                   ...infoBoxOptions,
-                  visible: infoBoxes[townName as Town],
+                  visible: infoBoxes[point.town as Town],
                 }}
               >
                 <Card
@@ -307,13 +307,10 @@ const Map = () => {
                         whiteSpace: 'nowrap',
                       }}
                     >
-                      {townName}
+                      {point.town}
                     </Typography>
                     <Typography variant="caption">
-                      {formatPrice(
-                        islandHeatmap?.find((point) => point.town === townName)
-                          ?.resalePrice
-                      )}
+                      {formatPrice(point.resalePrice)}
                     </Typography>
                   </CardContent>
                 </Card>
