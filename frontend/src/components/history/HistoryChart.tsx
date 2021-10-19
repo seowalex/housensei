@@ -47,7 +47,7 @@ const HistoryChart = (props: Props) => {
   const btoProjectsByGroup = useAppSelector(selectBTORawData);
   const selectedBTOProjectIds = useAppSelector(selectSelectedBTOProjectIds);
 
-  const [getPng, { ref, isLoading }] = useCurrentPng();
+  const [getPng, { ref, isLoading: isLoadingPng }] = useCurrentPng();
 
   const handleDownload = useCallback(async () => {
     const png = await getPng();
@@ -175,7 +175,7 @@ const HistoryChart = (props: Props) => {
       </ResponsiveContainer>
       {groups.length > 0 && (
         <Button onClick={handleDownload}>
-          {isLoading ? (
+          {isLoadingPng ? (
             <Stack direction="row" spacing={1}>
               <CircularProgress size="1.5rem" />
               <Typography variant="inherit">Downloading...</Typography>

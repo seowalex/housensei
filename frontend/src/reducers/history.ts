@@ -19,6 +19,7 @@ interface HistoryState {
   monthlyChartData: ChartDataPoint[];
   yearlyChartData: ChartDataPoint[];
   selectedBTOProjectIds: Record<string, string[]>;
+  isLoadingChartData: boolean;
 }
 
 const initialState: HistoryState = {
@@ -28,6 +29,7 @@ const initialState: HistoryState = {
   monthlyChartData: [],
   yearlyChartData: [],
   selectedBTOProjectIds: {},
+  isLoadingChartData: false,
 };
 
 const slice = createSlice({
@@ -36,6 +38,7 @@ const slice = createSlice({
   reducers: {
     createGroup: (state, action: PayloadAction<Group>) => {
       state.groups[action.payload.id] = action.payload;
+      state.isLoadingChartData = true;
     },
     updateGroup: (
       state,
@@ -78,11 +81,13 @@ const slice = createSlice({
           );
           state.monthlyChartData = monthlyData;
           state.yearlyChartData = yearlyData;
+          state.isLoadingChartData = false;
         }
       )
       .addMatcher(
         getBTOGraph.matchFulfilled,
         (state, action: PayloadAction<BTOGraphDataResponse>) => {
+          state.isLoadingChartData = true;
           const projectsData = transformRawBTOData(action.payload.data);
           state.btoRawData[action.payload.id] = projectsData;
           state.selectedBTOProjectIds[action.payload.id] = [];
@@ -92,6 +97,7 @@ const slice = createSlice({
           );
           state.monthlyChartData = monthlyData;
           state.yearlyChartData = yearlyData;
+          state.isLoadingChartData = false;
         }
       );
   },
@@ -140,5 +146,8 @@ export const selectSelectedBTOProjectIdsOfGroup =
 export const selectSelectedBTOProjectIds = (
   state: RootState
 ): Record<string, string[]> => state.history.selectedBTOProjectIds;
+
+export const selectIsLoadingChartData = (state: RootState): boolean =>
+  state.history.isLoadingChartData;
 
 export default slice.reducer;
