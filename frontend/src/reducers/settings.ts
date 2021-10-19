@@ -3,6 +3,7 @@ import type { RootState } from '../app/store';
 
 export interface SettingsState {
   darkMode: boolean | null;
+  drawerOpen: boolean;
   heatmap: {
     showHeatmap: boolean;
     showPrices: boolean;
@@ -15,6 +16,7 @@ export interface SettingsState {
 
 const initialState: SettingsState = {
   darkMode: null,
+  drawerOpen: true,
   heatmap: {
     showHeatmap: true,
     showPrices: true,
@@ -31,6 +33,9 @@ const slice = createSlice({
   reducers: {
     setDarkMode: (state, action: PayloadAction<boolean>) => {
       state.darkMode = action.payload;
+    },
+    setDrawerOpen: (state, action: PayloadAction<boolean>) => {
+      state.drawerOpen = action.payload;
     },
     setShowHeatmap: (state, action: PayloadAction<boolean>) => {
       state.heatmap.showHeatmap = action.payload;
@@ -49,6 +54,7 @@ const slice = createSlice({
 
 export const {
   setDarkMode,
+  setDrawerOpen,
   setShowHeatmap,
   setShowHeatmapPrices,
   setHeatmapPriceRangeLower,
@@ -56,6 +62,7 @@ export const {
 } = slice.actions;
 
 export const selectDarkMode = (state: RootState) => state.settings.darkMode;
+export const selectDrawerOpen = (state: RootState) => state.settings.drawerOpen;
 export const selectShowHeatmap = (state: RootState) =>
   state.settings.heatmap.showHeatmap;
 export const selectShowHeatmapPrices = (state: RootState) =>
