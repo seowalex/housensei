@@ -1,7 +1,9 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  Box,
   Card,
   CardContent,
+  CircularProgress,
   Typography,
   useMediaQuery,
   useTheme,
@@ -79,17 +81,17 @@ const Map = () => {
 
   const debouncedYear = useDebounce(year, 500);
 
-  const { data: islandHeatmap } = useGetIslandHeatmapQuery(
-    town === 'Islandwide' ? debouncedYear : skipToken
-  );
-  const { data: townHeatmap } = useGetTownHeatmapQuery(
-    town === 'Islandwide'
-      ? skipToken
-      : {
-          year: debouncedYear,
-          town,
-        }
-  );
+  const { data: islandHeatmap, isFetching: isIslandFetching } =
+    useGetIslandHeatmapQuery(town === 'Islandwide' ? debouncedYear : skipToken);
+  const { data: townHeatmap, isFetching: isTownFetching } =
+    useGetTownHeatmapQuery(
+      town === 'Islandwide'
+        ? skipToken
+        : {
+            year: debouncedYear,
+            town,
+          }
+    );
 
   const mapOptions: google.maps.MapOptions = useMemo(
     () => ({
@@ -212,6 +214,7 @@ const Map = () => {
     if (google && zoom) {
       if (zoom < 15) {
         dispatch(setTown('Islandwide'));
+        setSearchMarkers([]);
       } else {
         for (const [townName, polygon] of Object.entries(polygons)) {
           if (
@@ -331,6 +334,24 @@ const Map = () => {
           <Marker position={position} />
         ))}
       </GoogleMap>
+      {(town === 'Islandwide' ? isIslandFetching : isTownFetching) && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            height: '100%',
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            pointerEvents: 'none',
+            backgroundColor: 'rgba(117, 117, 117, 0.2)',
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      )}
       <MapOverlay
         map={map}
         searchBox={searchBox}
