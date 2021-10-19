@@ -18,6 +18,7 @@ interface HistoryState {
   btoRawData: Record<string, BTOProjectsData>;
   monthlyChartData: ChartDataPoint[];
   yearlyChartData: ChartDataPoint[];
+  displayedGroupIds: Record<string, boolean>;
   selectedBTOProjectIds: Record<string, string[]>;
   isLoadingChartData: boolean;
 }
@@ -28,6 +29,7 @@ const initialState: HistoryState = {
   btoRawData: {},
   monthlyChartData: [],
   yearlyChartData: [],
+  displayedGroupIds: {},
   selectedBTOProjectIds: {},
   isLoadingChartData: false,
 };
@@ -38,6 +40,7 @@ const slice = createSlice({
   reducers: {
     createGroup: (state, action: PayloadAction<Group>) => {
       state.groups[action.payload.id] = action.payload;
+      state.displayedGroupIds[action.payload.id] = true;
       state.isLoadingChartData = true;
     },
     updateGroup: (
@@ -45,12 +48,14 @@ const slice = createSlice({
       action: PayloadAction<{ id: string; group: Group }>
     ) => {
       state.groups[action.payload.id] = action.payload.group;
+      state.displayedGroupIds[action.payload.id] = true;
     },
     removeGroup: (state, action: PayloadAction<string>) => {
       delete state.resaleRawData[action.payload];
       delete state.btoRawData[action.payload];
       delete state.selectedBTOProjectIds[action.payload];
       delete state.groups[action.payload];
+      delete state.displayedGroupIds[action.payload];
       const [monthlyData, yearlyData] = getChartData(
         state.resaleRawData,
         state.btoRawData
@@ -58,15 +63,18 @@ const slice = createSlice({
       state.monthlyChartData = monthlyData;
       state.yearlyChartData = yearlyData;
     },
-    resetGroups: (state) => {
-      state.groups = initialState.groups;
-    },
     updateSelectedBTOProjects: (
       state,
       action: PayloadAction<{ id: string; projectIds: string[] }>
     ) => {
       state.selectedBTOProjectIds[action.payload.id] =
         action.payload.projectIds;
+    },
+    updateDisplayedGroups: (
+      state,
+      action: PayloadAction<{ id: string; show: boolean }>
+    ) => {
+      state.displayedGroupIds[action.payload.id] = action.payload.show;
     },
   },
   extraReducers: (builder) => {
@@ -107,8 +115,8 @@ export const {
   createGroup,
   updateGroup,
   removeGroup,
-  resetGroups,
   updateSelectedBTOProjects,
+  updateDisplayedGroups,
 } = slice.actions;
 
 export const selectGroups = (state: RootState): Group[] =>
@@ -149,5 +157,15 @@ export const selectSelectedBTOProjectIds = (
 
 export const selectIsLoadingChartData = (state: RootState): boolean =>
   state.history.isLoadingChartData;
+export const selectDisplayedGroupIds = (state: RootState): Set<string> =>
+  new Set(
+    Object.keys(state.history.displayedGroupIds).filter(
+      (id) => state.history.displayedGroupIds[id]
+    )
+  );
+export const selectIsGroupDisplayed =
+  (id: string) =>
+  (state: RootState): boolean =>
+    !!state.history.displayedGroupIds[id];
 
 export default slice.reducer;

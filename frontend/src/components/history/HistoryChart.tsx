@@ -24,6 +24,7 @@ import { useAppSelector } from '../../app/hooks';
 import {
   selectAllBTOProjects,
   selectBTORawData,
+  selectDisplayedGroupIds,
   selectGroups,
   selectMonthlyChartData,
   selectSelectedBTOProjectIds,
@@ -46,6 +47,7 @@ const HistoryChart = (props: Props) => {
   const btoProjects = useAppSelector(selectAllBTOProjects);
   const btoProjectsByGroup = useAppSelector(selectBTORawData);
   const selectedBTOProjectIds = useAppSelector(selectSelectedBTOProjectIds);
+  const displayedGroupIds = useAppSelector(selectDisplayedGroupIds);
 
   const [getPng, { ref, isLoading: isLoadingPng }] = useCurrentPng();
 
@@ -127,13 +129,13 @@ const HistoryChart = (props: Props) => {
             alwaysShowText
           />
           {groups
-            .filter((g) => g.type === 'resale')
+            .filter((g) => g.type === 'resale' && displayedGroupIds.has(g.id))
             .map(({ id, color }) => (
               <Line
                 type="linear"
                 key={id}
                 dataKey={id}
-                stroke={`${color}cc`}
+                stroke={color}
                 strokeWidth={selectedGroup === id ? 3 : 2}
                 connectNulls
                 dot={false}
@@ -141,7 +143,7 @@ const HistoryChart = (props: Props) => {
               />
             ))}
           {groups
-            .filter((g) => g.type === 'bto')
+            .filter((g) => g.type === 'bto' && displayedGroupIds.has(g.id))
             .map(({ id: groupId, color }) => (
               <>
                 {btoProjectsByGroup[groupId] &&
@@ -150,15 +152,15 @@ const HistoryChart = (props: Props) => {
                       type="linear"
                       key={id}
                       dataKey={id}
-                      stroke={`${color}cc`}
+                      stroke={color}
                       strokeWidth={selectedGroup === groupId ? 3 : 2}
                       dot={{
                         r: 3.5,
                         stroke: selectedBTOProjectIds[groupId].includes(id)
                           ? 'black'
-                          : `${color}cc`,
+                          : color,
                         fill: selectedBTOProjectIds[groupId].includes(id)
-                          ? `${color}cc`
+                          ? color
                           : 'white',
                       }}
                       activeDot={{

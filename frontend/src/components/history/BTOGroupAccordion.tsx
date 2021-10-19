@@ -1,25 +1,24 @@
 import {
   AttachMoneyRounded,
-  BedroomParentRounded,
-  CalendarTodayRounded,
+  BedRounded as BedRoundedIcon,
+  CalendarTodayRounded as CalendarTodayRoundedIcon,
   CheckRounded as CheckRoundedIcon,
-  ControlPointDuplicateRounded,
-  DeleteRounded as DeleteRoundedIcon,
   EditRounded as EditRoundedIcon,
   ExpandMoreRounded as ExpandMoreRoundedIcon,
+  WarningRounded as WarningRoundedIcon,
 } from '@mui/icons-material';
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Alert,
+  AlertTitle,
   Autocomplete,
   Button,
   Grid,
-  IconButton,
   Modal,
   Stack,
   TextField,
-  Tooltip,
   Typography,
 } from '@mui/material';
 import { matchSorter } from 'match-sorter';
@@ -46,6 +45,7 @@ import {
 } from '../../utils/groups';
 import { compareDates, formatDate } from '../../utils/history';
 import { FormPaper, ModalPaper } from '../styled';
+import GroupAccordionToolbar from './GroupAccordionToolbar';
 import GroupDetails from './GroupDetails';
 import GroupSummary from './GroupSummary';
 import UpdateGroupForm, { UpdateGroupFormValues } from './UpdateGroupForm';
@@ -75,7 +75,7 @@ const BTOGroupAccordion = (props: Props) => {
     (projectId) => projectsRecord[projectId]
   );
 
-  useGetBTOGraphQuery({
+  const { data: btoQueryResponse } = useGetBTOGraphQuery({
     ...group.filters,
     id: group.id,
   });
@@ -107,6 +107,18 @@ const BTOGroupAccordion = (props: Props) => {
     dispatch(removeGroup(group.id));
     setDisplayedModal(DisplayedModal.Hidden);
     onChangeSelectedGroup(false);
+  };
+
+  const handleDisplayUpdateModal = () => {
+    setDisplayedModal(DisplayedModal.Update);
+  };
+
+  const handleDisplayDeleteModal = () => {
+    setDisplayedModal(DisplayedModal.Delete);
+  };
+
+  const handleDuplicateGroup = () => {
+    onDuplicateGroup(group);
   };
 
   const handleChangeSelectedProjects = (
@@ -175,7 +187,7 @@ const BTOGroupAccordion = (props: Props) => {
                       <Stack spacing={0.5}>
                         <Typography>{option.name}</Typography>
                         <Stack direction="row" spacing={1} alignItems="center">
-                          <CalendarTodayRounded fontSize="small" />
+                          <CalendarTodayRoundedIcon fontSize="small" />
                           <Typography variant="body2">
                             {formatDate(option.date)}
                           </Typography>
@@ -183,7 +195,7 @@ const BTOGroupAccordion = (props: Props) => {
                           <Typography variant="body2">
                             {option.price}
                           </Typography>
-                          <BedroomParentRounded fontSize="small" />
+                          <BedRoundedIcon fontSize="small" />
                           <Typography variant="body2">
                             {convertFlatTypeToFrontend(option.flatType)}
                           </Typography>
@@ -228,26 +240,23 @@ const BTOGroupAccordion = (props: Props) => {
               <GroupDetails group={group} />
             </Grid>
             <Grid item>
-              <Stack justifyContent="flex-end" sx={{ height: '100%' }}>
-                <Tooltip title="Duplicate" placement="left" arrow>
-                  <IconButton onClick={() => onDuplicateGroup(group)}>
-                    <ControlPointDuplicateRounded fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-                <IconButton
-                  onClick={() => setDisplayedModal(DisplayedModal.Update)}
-                >
-                  <EditRoundedIcon fontSize="small" />
-                </IconButton>
-                <IconButton
-                  onClick={() => setDisplayedModal(DisplayedModal.Delete)}
-                  color="error"
-                >
-                  <DeleteRoundedIcon fontSize="small" />
-                </IconButton>
-              </Stack>
+              <GroupAccordionToolbar
+                groupId={group.id}
+                onDisplayUpdateModal={handleDisplayUpdateModal}
+                onDisplayDeleteModal={handleDisplayDeleteModal}
+                onDuplicateGroup={handleDuplicateGroup}
+              />
             </Grid>
           </Grid>
+          {btoQueryResponse?.data.length === 0 && (
+            <Grid item>
+              <Alert severity="warning" icon={<WarningRoundedIcon />}>
+                <AlertTitle>No projects found!</AlertTitle>
+                Try making your filters less specific with the{' '}
+                <EditRoundedIcon fontSize="small" /> icon.
+              </Alert>
+            </Grid>
+          )}
         </AccordionDetails>
       </Accordion>
       <Modal

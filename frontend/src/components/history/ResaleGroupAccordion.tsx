@@ -1,9 +1,7 @@
 import {
-  ControlPointDuplicateRounded as ControlPointDuplicateRoundedIcon,
-  DeleteRounded as DeleteRoundedIcon,
   EditRounded as EditRoundedIcon,
   ExpandMoreRounded as ExpandMoreRoundedIcon,
-  NewReleasesRounded,
+  NewReleasesRounded as NewReleasesRoundedIcon,
   WarningRounded as WarningRoundedIcon,
 } from '@mui/icons-material';
 import {
@@ -15,10 +13,8 @@ import {
   Button,
   Collapse,
   Grid,
-  IconButton,
   Modal,
   Stack,
-  Tooltip,
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
@@ -33,6 +29,7 @@ import {
   mapGroupToUpdateFormValues,
 } from '../../utils/groups';
 import { FormPaper, ModalPaper } from '../styled';
+import GroupAccordionToolbar from './GroupAccordionToolbar';
 import GroupDetails from './GroupDetails';
 import GroupSummary from './GroupSummary';
 import UpdateGroupForm, { UpdateGroupFormValues } from './UpdateGroupForm';
@@ -109,6 +106,18 @@ const ResaleGroupAccordion = (props: Props) => {
     onChangeSelectedGroup(false);
   };
 
+  const handleDisplayUpdateModal = () => {
+    setDisplayedModal(DisplayedModal.Update);
+  };
+
+  const handleDisplayDeleteModal = () => {
+    setDisplayedModal(DisplayedModal.Delete);
+  };
+
+  const handleDuplicateGroup = () => {
+    onDuplicateGroup(group);
+  };
+
   return (
     <>
       <Accordion
@@ -126,32 +135,20 @@ const ResaleGroupAccordion = (props: Props) => {
                 <GroupDetails group={group} />
               </Grid>
               <Grid item>
-                <Stack justifyContent="flex-end" sx={{ height: '100%' }}>
-                  <Tooltip title="Duplicate" placement="left" arrow>
-                    <IconButton onClick={() => onDuplicateGroup(group)}>
-                      <ControlPointDuplicateRoundedIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <IconButton
-                    onClick={() => setDisplayedModal(DisplayedModal.Update)}
-                  >
-                    <EditRoundedIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => setDisplayedModal(DisplayedModal.Delete)}
-                    color="error"
-                  >
-                    <DeleteRoundedIcon fontSize="small" />
-                  </IconButton>
-                </Stack>
+                <GroupAccordionToolbar
+                  groupId={group.id}
+                  onDisplayUpdateModal={handleDisplayUpdateModal}
+                  onDisplayDeleteModal={handleDisplayDeleteModal}
+                  onDuplicateGroup={handleDuplicateGroup}
+                />
               </Grid>
             </Grid>
             {resaleQueryResponse?.data.length === 0 && (
               <Grid item>
                 <Alert severity="warning" icon={<WarningRoundedIcon />}>
                   <AlertTitle>No data found!</AlertTitle>
-                  Try changing your filters with the{' '}
-                  <EditRoundedIcon fontSize="small" /> icon to be less specific.
+                  Try making your filters less specific with the{' '}
+                  <EditRoundedIcon fontSize="small" /> icon.
                 </Alert>
               </Grid>
             )}
@@ -165,7 +162,7 @@ const ResaleGroupAccordion = (props: Props) => {
               >
                 <Alert
                   severity="success"
-                  icon={<NewReleasesRounded />}
+                  icon={<NewReleasesRoundedIcon />}
                   onClose={() => setShowBTOAlert(false)}
                 >
                   <AlertTitle>{`${
