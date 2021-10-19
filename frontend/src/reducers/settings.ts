@@ -8,8 +8,8 @@ export interface SettingsState {
     showHeatmap: boolean;
     showPrices: boolean;
     priceRange: {
-      lower: number | null;
-      upper: number | null;
+      lower: number;
+      upper: number;
     };
   };
 }
@@ -21,8 +21,8 @@ const initialState: SettingsState = {
     showHeatmap: true,
     showPrices: true,
     priceRange: {
-      lower: null,
-      upper: null,
+      lower: NaN,
+      upper: NaN,
     },
   },
 };

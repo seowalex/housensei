@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Autocomplete,
   Box,
@@ -83,25 +83,69 @@ const MapOverlay = ({ map }: Props) => {
         }
   );
 
-  const defaultPriceRangeLower = useMemo(
-    () =>
-      town === 'Islandwide'
-        ? Math.min(...(islandHeatmap?.map((point) => point.resalePrice) ?? []))
-        : Math.min(...(townHeatmap?.map((point) => point.resalePrice) ?? [])),
-    [town, islandHeatmap, townHeatmap]
-  );
-  const defaultPriceRangeUpper = useMemo(
-    () =>
-      town === 'Islandwide'
-        ? Math.max(...(islandHeatmap?.map((point) => point.resalePrice) ?? []))
-        : Math.max(...(townHeatmap?.map((point) => point.resalePrice) ?? [])),
-    [town, islandHeatmap, townHeatmap]
-  );
+  const defaultPriceRangeLower = useMemo(() => {
+    if (town === 'Islandwide') {
+      if (islandHeatmap) {
+        return (
+          Math.floor(
+            Math.min(...islandHeatmap.map((point) => point.resalePrice)) /
+              100000
+          ) * 100000
+        );
+      }
 
-  const priceRangeLower =
-    useAppSelector(selectHeatmapPriceRangeLower) ?? defaultPriceRangeLower;
-  const priceRangeUpper =
-    useAppSelector(selectHeatmapPriceRangeUpper) ?? defaultPriceRangeUpper;
+      return null;
+    }
+
+    if (townHeatmap) {
+      return (
+        Math.floor(
+          Math.min(...townHeatmap.map((point) => point.resalePrice)) / 100000
+        ) * 100000
+      );
+    }
+
+    return null;
+  }, [town, islandHeatmap, townHeatmap]);
+  const defaultPriceRangeUpper = useMemo(() => {
+    if (town === 'Islandwide') {
+      if (islandHeatmap) {
+        return (
+          Math.ceil(
+            Math.max(...islandHeatmap.map((point) => point.resalePrice)) /
+              100000
+          ) * 100000
+        );
+      }
+
+      return null;
+    }
+
+    if (townHeatmap) {
+      return (
+        Math.ceil(
+          Math.max(...townHeatmap.map((point) => point.resalePrice)) / 100000
+        ) * 100000
+      );
+    }
+
+    return null;
+  }, [town, islandHeatmap, townHeatmap]);
+
+  const priceRangeLower = useAppSelector(selectHeatmapPriceRangeLower);
+  const priceRangeUpper = useAppSelector(selectHeatmapPriceRangeUpper);
+
+  useEffect(() => {
+    if (Number.isNaN(priceRangeLower) && defaultPriceRangeLower) {
+      dispatch(setHeatmapPriceRangeLower(defaultPriceRangeLower));
+    }
+  }, [dispatch, priceRangeLower, defaultPriceRangeLower]);
+
+  useEffect(() => {
+    if (Number.isNaN(priceRangeUpper) && defaultPriceRangeUpper) {
+      dispatch(setHeatmapPriceRangeUpper(defaultPriceRangeUpper));
+    }
+  }, [dispatch, priceRangeUpper, defaultPriceRangeUpper]);
 
   const handleTownChange = (_: React.SyntheticEvent, townName: string) => {
     dispatch(setTown(townName as Town | 'Islandwide'));
