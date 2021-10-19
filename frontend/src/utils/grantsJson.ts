@@ -1,9 +1,9 @@
 const MARITALSTATUS = 'maritalStatus';
 const SINGLENATIONALITY = 'singleNationality';
-const SINGLEFIRSTTIMER = 'coupleFirstTimer';
+const SINGLEFIRSTTIMER = 'singleFirstTimer';
 const AGE = 'age';
 const WORKINGATLEASTAYEAR = 'workingAtLeastAYear';
-const COUPLENATIONALITY = 'singleNationality';
+const COUPLENATIONALITY = 'coupleNationality';
 const COUPLEFIRSTTIMER = 'coupleFirstTimer';
 const MONTHLYINCOME = 'monthlyIncome';
 
@@ -16,29 +16,29 @@ const RECEIVEDPROXIMITYBEFORE = 'receivedProximityBefore';
 const PROXIMITYSTATUS = 'proximityStatus';
 
 const singleEHG = {
-  attribute: 'maritalStatus',
+  attribute: MARITALSTATUS,
   options: {
     single: {
-      attribute: 'singleNationality',
+      attribute: SINGLENATIONALITY,
       options: {
-        citizen: {
-          attribute: 'singleFirstTimer',
+        SC: {
+          attribute: SINGLEFIRSTTIMER,
           options: {
             yes: {
-              attribute: 'age',
+              attribute: AGE,
               options: {
-                'Above 35': {
-                  attribute: 'workingAtLeastAYear',
+                yes: {
+                  attribute: WORKINGATLEASTAYEAR,
                   options: {
                     yes: {
-                      attribute: 'housingType',
+                      attribute: HOUSINGTYPE,
                       options: {
                         BTO: true,
                         Resale: {
-                          attribute: 'lease',
+                          attribute: LEASE,
                           options: {
-                            'More than 20 years': true,
-                            'Less than 20 years': false,
+                            yes: true,
+                            no: false,
                           },
                         },
                         EC: false,
@@ -47,34 +47,35 @@ const singleEHG = {
                     no: false,
                   },
                 },
-                'Below 35': false,
+                no: false,
               },
             },
             no: false,
           },
         },
-        'non-Citizen': false,
+        PR: false,
+        F: false,
       },
     },
     couple: {
-      attribute: 'coupleNationality',
+      attribute: COUPLENATIONALITY,
       options: {
         'SC/SC': {
-          attribute: 'coupleFirstTimer',
+          attribute: COUPLEFIRSTTIMER,
           options: {
-            'FT/FT': false,
-            'FT/ST': {
-              attribute: 'workingAtLeastAYear',
+            'yes/yes': false,
+            'yes/no': {
+              attribute: WORKINGATLEASTAYEAR,
               options: {
                 yes: {
-                  attribute: 'housingType',
+                  attribute: HOUSINGTYPE,
                   options: {
                     BTO: true,
                     Resale: {
-                      attribute: 'lease',
+                      attribute: LEASE,
                       options: {
-                        'More than 20 years': true,
-                        'Less than 20 years': false,
+                        yes: true,
+                        no: false,
                       },
                     },
                     EC: true,
@@ -86,21 +87,21 @@ const singleEHG = {
           },
         },
         'SC/PR': {
-          attribute: 'coupleFirstTimer',
+          attribute: COUPLEFIRSTTIMER,
           options: {
-            'FT/FT': false,
-            'FT/ST': {
-              attribute: 'workingAtLeastAYear',
+            'yes/yes': false,
+            'yes/no': {
+              attribute: WORKINGATLEASTAYEAR,
               options: {
                 yes: {
-                  attribute: 'housingType',
+                  attribute: HOUSINGTYPE,
                   options: {
                     BTO: true,
                     Resale: {
-                      attribute: 'lease',
+                      attribute: LEASE,
                       options: {
-                        'More than 20 years': true,
-                        'Less than 20 years': false,
+                        yes: true,
+                        no: false,
                       },
                     },
                     EC: true,
@@ -112,21 +113,21 @@ const singleEHG = {
           },
         },
         'SC/F': {
-          attribute: 'singleFirstTimer',
+          attribute: SINGLEFIRSTTIMER,
           options: {
             no: false,
             yes: {
-              attribute: 'workingAtLeastAYear',
+              attribute: WORKINGATLEASTAYEAR,
               options: {
                 yes: {
-                  attribute: 'housingType',
+                  attribute: HOUSINGTYPE,
                   options: {
                     BTO: true,
                     Resale: {
-                      attribute: 'lease',
+                      attribute: LEASE,
                       options: {
-                        'More than 20 years': true,
-                        'Less than 20 years': false,
+                        yes: true,
+                        no: false,
                       },
                     },
                     EC: true,
@@ -143,36 +144,36 @@ const singleEHG = {
 };
 
 const ehg = {
-  attribute: 'maritalStatus',
+  attribute: MARITALSTATUS,
   options: {
     single: false,
     couple: {
-      attribute: 'coupleNationality',
+      attribute: COUPLENATIONALITY,
       options: {
         'SC/SC': {
-          attribute: 'coupleFirstTimer',
+          attribute: COUPLEFIRSTTIMER,
           options: {
-            'FT/FT': {
-              attribute: 'workingAtLeastAYear',
+            'yes/yes': {
+              attribute: WORKINGATLEASTAYEAR,
               options: {
                 yes: true,
                 no: false,
               },
             },
-            'FT/ST': false,
+            'yes/no': false,
           },
         },
         'SC/PR': {
-          attribute: 'coupleFirstTimer',
+          attribute: COUPLEFIRSTTIMER,
           options: {
-            'FT/FT': {
-              attribute: 'workingAtLeastAYear',
+            'yes/yes': {
+              attribute: WORKINGATLEASTAYEAR,
               options: {
                 yes: true,
                 no: false,
               },
             },
-            'FT/ST': false,
+            'yes/no': false,
           },
         },
         'SC/F': false,
@@ -182,29 +183,29 @@ const ehg = {
 };
 
 const singleGrant = {
-  attribute: 'maritalStatus',
+  attribute: MARITALSTATUS,
   options: {
     single: {
-      attribute: 'singleNationality',
+      attribute: SINGLENATIONALITY,
       options: {
         SC: {
-          attribute: 'singleFirstTimer',
+          attribute: SINGLEFIRSTTIMER,
           options: {
             yes: {
-              attribute: 'age',
+              attribute: AGE,
               options: {
-                'Above 35': {
-                  attribute: 'housingType',
+                yes: {
+                  attribute: HOUSINGTYPE,
                   options: {
                     BTO: 0,
                     Resale: {
-                      attribute: 'lease',
+                      attribute: LEASE,
                       options: {
-                        'More than 20 years': {
-                          attribute: 'monthlyIncome',
+                        yes: {
+                          attribute: MONTHLYINCOME,
                           options: {
-                            '<=7000': {
-                              attribute: 'flatSize',
+                            '<= 7000': {
+                              attribute: FLATSIZE,
                               options: {
                                 '2 Room': 25000,
                                 '3 Room': 25000,
@@ -212,16 +213,16 @@ const singleGrant = {
                                 '5 Room': 20000,
                               },
                             },
-                            '>7000': 0,
+                            '> 7000': 0,
                           },
                         },
-                        'Less than 20 years': 0,
+                        no: 0,
                       },
                     },
                     EC: 0,
                   },
                 },
-                'Below 35': 0,
+                no: 0,
               },
             },
             no: 0,
@@ -232,25 +233,25 @@ const singleGrant = {
       },
     },
     couple: {
-      attribute: 'coupleNationality',
+      attribute: COUPLENATIONALITY,
       options: {
         'SC/SC': 0,
         'SC/PR': 0,
         'SC/F': {
-          attribute: 'singleFirstTimer',
+          attribute: SINGLEFIRSTTIMER,
           options: {
             yes: {
-              attribute: 'housingType',
+              attribute: HOUSINGTYPE,
               options: {
                 BTO: 0,
                 Resale: {
-                  attribute: 'lease',
+                  attribute: LEASE,
                   options: {
-                    'More than 20 years': {
-                      attribute: 'monthlyIncome',
+                    yes: {
+                      attribute: MONTHLYINCOME,
                       options: {
-                        '<=14000': {
-                          attribute: 'flatSize',
+                        '<= 14000': {
+                          attribute: FLATSIZE,
                           options: {
                             '2 Room': 25000,
                             '3 Room': 25000,
@@ -258,10 +259,10 @@ const singleGrant = {
                             '5 Room': 20000,
                           },
                         },
-                        '>14000': 0,
+                        '> 14000': 0,
                       },
                     },
-                    'Less than 20 years': 0,
+                    no: 0,
                   },
                 },
                 EC: 0,
@@ -296,9 +297,9 @@ const familyGrant = {
                       attribute: LIVINGWITHEXTENDEDFAMILY,
                       options: {
                         yes: {
-                          attribute: 'monthlyIncome',
+                          attribute: MONTHLYINCOME,
                           options: {
-                            '<=21000': {
+                            '<= 21000': {
                               attribute: FLATSIZE,
                               options: {
                                 '1 Room': 0,
@@ -310,13 +311,13 @@ const familyGrant = {
                                 Studio: 40000,
                               },
                             },
-                            '>21000': 0,
+                            '> 21000': 0,
                           },
                         },
                         no: {
-                          attribute: 'monthlyIncome, 14000',
+                          attribute: MONTHLYINCOME,
                           options: {
-                            yes: {
+                            '<= 14000': {
                               attribute: FLATSIZE,
                               options: {
                                 '1 Room': 0,
@@ -328,7 +329,7 @@ const familyGrant = {
                                 Studio: 40000,
                               },
                             },
-                            no: 0,
+                            '> 14000': 0,
                           },
                         },
                       },
@@ -344,9 +345,9 @@ const familyGrant = {
                       attribute: LIVINGWITHEXTENDEDFAMILY,
                       options: {
                         yes: {
-                          attribute: 'monthlyIncome',
+                          attribute: MONTHLYINCOME,
                           options: {
-                            '<=21000': {
+                            '<= 21000': {
                               attribute: FLATSIZE,
                               options: {
                                 '1 Room': 0,
@@ -358,13 +359,13 @@ const familyGrant = {
                                 Studio: 30000,
                               },
                             },
-                            '>21000': 0,
+                            '> 21000': 0,
                           },
                         },
                         no: {
-                          attribute: 'monthlyIncome',
+                          attribute: MONTHLYINCOME,
                           options: {
-                            '<=14000': {
+                            '<= 14000': {
                               attribute: FLATSIZE,
                               options: {
                                 '1 Room': 0,
@@ -376,7 +377,7 @@ const familyGrant = {
                                 Studio: 30000,
                               },
                             },
-                            '>=14000': 0,
+                            '>= 14000': 0,
                           },
                         },
                       },
@@ -398,18 +399,18 @@ const familyGrant = {
               attribute: COUPLENATIONALITY,
               options: {
                 'SC/SC': {
-                  attribute: 'monthlyIncome',
+                  attribute: MONTHLYINCOME,
                   options: {
-                    '<=10000': 30000,
-                    '10000 to 11000': 20000,
-                    '11000 to 12000': 10000,
+                    '<= 10000': 30000,
+                    '> 10000 && <= 11000': 20000,
+                    '> 11000 && <= 12000': 10000,
                   },
                 },
                 'SC/PR': {
-                  attribute: 'monthlyIncome',
+                  attribute: MONTHLYINCOME,
                   options: {
-                    '<=10000': 20000,
-                    '10000 to 11000': 10000,
+                    '<= 10000': 20000,
+                    '> 10000 && <= 11000': 10000,
                   },
                 },
                 'SC/F': 0,
@@ -436,19 +437,19 @@ const halfHousingGrant = {
           attribute: COUPLENATIONALITY,
           options: {
             'SC/SC': {
-              attribute: 'monthlyIncome',
+              attribute: MONTHLYINCOME,
               options: {
-                '<=10000': 15000,
-                '10000 to 11000': 10000,
-                '11000 to 12000': 5000,
+                '<= 10000': 15000,
+                '> 10000 && <= 11000': 10000,
+                '> 11000 && <= 12000': 5000,
               },
             },
             'SC/PR': {
-              attribute: 'monthlyIncome',
+              attribute: MONTHLYINCOME,
               options: {
-                '<=10000': 15000,
-                '10000 to 11000': 10000,
-                '11000 to 12000': 5000,
+                '<= 10000': 15000,
+                '> 10000 && <= 11000': 10000,
+                '> 11000 && <= 12000': 5000,
               },
             },
             'SC/F': 0,
@@ -461,23 +462,23 @@ const halfHousingGrant = {
       attribute: LEASE,
       options: {
         yes: {
-          attribute: 'maritalStatus',
+          attribute: MARITALSTATUS,
           options: {
             single: 0,
             couple: {
-              attribute: 'coupleNationality',
+              attribute: COUPLENATIONALITY,
               options: {
                 'SC/SC': {
-                  attribute: 'coupleFirstTimer',
+                  attribute: COUPLEFIRSTTIMER,
                   options: {
                     'yes/yes': 0,
                     'yes/no': {
                       attribute: LIVINGWITHEXTENDEDFAMILY,
                       options: {
                         yes: {
-                          attribute: 'monthlyIncome',
+                          attribute: MONTHLYINCOME,
                           options: {
-                            '<=21000': {
+                            '<= 21000': {
                               attribute: FLATSIZE,
                               options: {
                                 '1 Room': 0,
@@ -489,13 +490,13 @@ const halfHousingGrant = {
                                 Studio: 20000,
                               },
                             },
-                            '>21000': 0,
+                            '> 21000': 0,
                           },
                         },
                         no: {
-                          attribute: 'monthlyIncome',
+                          attribute: MONTHLYINCOME,
                           options: {
-                            '<=14000': {
+                            '<= 14000': {
                               attribute: FLATSIZE,
                               options: {
                                 '1 Room': 0,
@@ -507,7 +508,7 @@ const halfHousingGrant = {
                                 Studio: 20000,
                               },
                             },
-                            '>14000': 0,
+                            '> 14000': 0,
                           },
                         },
                       },
@@ -516,16 +517,16 @@ const halfHousingGrant = {
                   },
                 },
                 'SC/PR': {
-                  attribute: 'coupleFirstTimer',
+                  attribute: COUPLEFIRSTTIMER,
                   options: {
                     'yes/yes': 0,
                     'yes/no': {
                       attribute: LIVINGWITHEXTENDEDFAMILY,
                       options: {
                         yes: {
-                          attribute: 'monthlyIncome',
+                          attribute: MONTHLYINCOME,
                           options: {
-                            '<=21000': {
+                            '<= 21000': {
                               attribute: FLATSIZE,
                               options: {
                                 '1 Room': 0,
@@ -537,13 +538,13 @@ const halfHousingGrant = {
                                 Studio: 20000,
                               },
                             },
-                            '>21000': 0,
+                            '> 21000': 0,
                           },
                         },
                         no: {
-                          attribute: 'monthlyIncome',
+                          attribute: MONTHLYINCOME,
                           options: {
-                            '<=14000': {
+                            '<= 14000': {
                               attribute: FLATSIZE,
                               options: {
                                 '1 Room': 0,
@@ -555,7 +556,7 @@ const halfHousingGrant = {
                                 Studio: 20000,
                               },
                             },
-                            '>14000': 0,
+                            '> 14000': 0,
                           },
                         },
                       },
@@ -575,27 +576,27 @@ const halfHousingGrant = {
 };
 
 const proximityGrant = {
-  attribute: 'receivedProximityBefore',
+  attribute: RECEIVEDPROXIMITYBEFORE,
   options: {
     yes: 0,
     no: {
-      attribute: 'housingType',
+      attribute: HOUSINGTYPE,
       options: {
         BTO: 0,
         Resale: {
-          attribute: 'lease',
+          attribute: LEASE,
           options: {
-            'More than 20 years': {
-              attribute: 'maritalStatus',
+            yes: {
+              attribute: MARITALSTATUS,
               options: {
                 single: {
-                  attribute: 'singleNationality',
+                  attribute: SINGLENATIONALITY,
                   options: {
                     SC: {
-                      attribute: 'proximityStatus',
+                      attribute: PROXIMITYSTATUS,
                       options: {
                         'Within 4km': {
-                          attribute: 'flatSize',
+                          attribute: FLATSIZE,
                           options: {
                             '2 Room': 10000,
                             '3 Room': 10000,
@@ -612,13 +613,13 @@ const proximityGrant = {
                   },
                 },
                 couple: {
-                  attribute: 'coupleNationality',
+                  attribute: COUPLENATIONALITY,
                   options: {
                     'SC/SC': {
-                      attribute: 'proximityStatus',
+                      attribute: PROXIMITYSTATUS,
                       options: {
                         'Within 4km': {
-                          attribute: 'flatSize',
+                          attribute: FLATSIZE,
                           options: {
                             '2 Room': 20000,
                             '3 Room': 20000,
@@ -627,7 +628,7 @@ const proximityGrant = {
                           },
                         },
                         'Live together': {
-                          attribute: 'flatSize',
+                          attribute: FLATSIZE,
                           options: {
                             '2 Room': 30000,
                             '3 Room': 30000,
@@ -639,10 +640,10 @@ const proximityGrant = {
                       },
                     },
                     'SC/PR': {
-                      attribute: 'proximityStatus',
+                      attribute: PROXIMITYSTATUS,
                       options: {
                         'Within 4km': {
-                          attribute: 'flatSize',
+                          attribute: FLATSIZE,
                           options: {
                             '2 Room': 20000,
                             '3 Room': 20000,
@@ -651,7 +652,7 @@ const proximityGrant = {
                           },
                         },
                         'Live together': {
-                          attribute: 'flatSize',
+                          attribute: FLATSIZE,
                           options: {
                             '2 Room': 30000,
                             '3 Room': 30000,
@@ -667,7 +668,7 @@ const proximityGrant = {
                 },
               },
             },
-            'Less than 20 years': 0,
+            no: 0,
           },
         },
         EC: 0,
