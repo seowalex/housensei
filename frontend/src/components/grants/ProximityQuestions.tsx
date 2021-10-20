@@ -13,12 +13,12 @@ const ProximityQuestions = (props: StepProps) => {
   ];
 
   const proximityStatusOptions = [
-    { label: 'Yes, within 4km', value: 'Within 4km' },
+    { label: 'Yes, within 4km', value: 'within 4km' },
     {
       label: 'Yes, we intend to live together',
-      value: 'Live together',
+      value: 'live together',
     },
-    { label: 'No', value: 'No' },
+    { label: 'No', value: 'no' },
   ];
 
   return (

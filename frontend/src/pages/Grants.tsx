@@ -19,7 +19,7 @@ import ProximityQuestions from '../components/grants/ProximityQuestions';
 
 export type GrantsFormValues = {
   // user questions
-  maritalStatus: 'Single' | 'Couple' | '';
+  maritalStatus: 'single' | 'couple' | '';
   ownNationality: 'SC' | 'PR' | 'F' | '';
   partnerNationality: 'SC' | 'PR' | 'F' | '';
   ownFirstTimer: boolean | '';
@@ -44,7 +44,7 @@ export type GrantsFormValues = {
 
   // proximity questions
   receivedProximityBefore: boolean | '';
-  proximityStatus: 'Within 4km' | 'Live together' | 'No' | '';
+  proximityStatus: 'within 4km' | 'live together' | 'no' | '';
 };
 
 const defaultValues: GrantsFormValues = {

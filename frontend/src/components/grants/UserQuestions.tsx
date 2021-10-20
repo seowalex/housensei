@@ -14,8 +14,8 @@ const UserQuestions = (props: StepProps) => {
   const isPartnerForeigner = watchPartnerNationality === 'F';
 
   const maritalStatusOptions = [
-    { label: 'Single', value: 'Single' },
-    { label: 'Couple', value: 'Couple' },
+    { label: 'Single', value: 'single' },
+    { label: 'Couple', value: 'couple' },
   ];
 
   const nationalityOptions = [
