@@ -39,6 +39,7 @@ import History from './pages/History';
 import NotFound from './pages/NotFound';
 import { selectDarkMode, setDarkMode } from './reducers/settings';
 import Grants from './pages/Grants';
+import ChatBot from './components/ChatBot';
 
 const drawerWidth = 240;
 
@@ -202,6 +203,7 @@ const Routes = () => {
           </Route>
         </Switch>
       </Box>
+      <ChatBot />
     </Router>
   );
 };
