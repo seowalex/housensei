@@ -1,6 +1,10 @@
 import { Grid } from '@mui/material';
 import { UseFormGetValues, FieldValues } from 'react-hook-form';
-import { getProximityGrant } from '../calculation/GrantCalculation';
+import {
+  getFamilyGrant,
+  getHalfHousingGrant,
+  getProximityGrant,
+} from '../calculation/GrantCalculation';
 import GrantCard from './GrantCard';
 
 interface Props {
@@ -23,8 +27,10 @@ const GrantsResult = (props: Props) => {
 
   console.log(fieldValues);
 
-  const familyGrant = getProximityGrant(fieldValues);
-  console.log(familyGrant);
+  const proximityGrant = getProximityGrant(fieldValues);
+  const familyGrant = getFamilyGrant(fieldValues);
+  const halfHousingGrant = getHalfHousingGrant(fieldValues);
+  console.log(halfHousingGrant);
 
   // console.log(formValues());
   return (
