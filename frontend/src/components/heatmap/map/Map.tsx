@@ -1,22 +1,12 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  CircularProgress,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Box, CircularProgress, useMediaQuery, useTheme } from '@mui/material';
 import {
   GoogleMap,
   HeatmapLayer,
-  InfoBox,
   Marker,
   Polygon,
   TransitLayer,
 } from '@react-google-maps/api';
-import { InfoBoxOptions } from '@react-google-maps/infobox';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
@@ -33,7 +23,7 @@ import {
   useGetTownHeatmapQuery,
 } from '../../../api/heatmap';
 
-import { currencyFormatter, useDebounce } from '../../../app/utils';
+import { useDebounce } from '../../../app/utils';
 import {
   singaporeCoordinates,
   townBoundaries,
@@ -42,18 +32,7 @@ import {
 import { Town } from '../../../types/towns';
 
 import MapOverlay from '../overlay/MapOverlay';
-
-const infoBoxOptions: InfoBoxOptions = {
-  boxStyle: {
-    overflow: 'visible',
-  },
-  closeBoxURL: '',
-  disableAutoPan: true,
-  enableEventPropagation: true,
-};
-
-const formatPrice = (price?: number) =>
-  price ? currencyFormatter.format(price) : '';
+import TownPolygon from './TownPolygon';
 
 const Map = () => {
   const { google } = window;
@@ -72,12 +51,6 @@ const Map = () => {
   const [map, setMap] = useState<google.maps.Map>();
   const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox>();
   const [searchMarkers, setSearchMarkers] = useState<google.maps.LatLng[]>([]);
-  const [polygons, setPolygons] = useState<{
-    [K in Town]?: google.maps.Polygon;
-  }>({});
-  const [infoBoxes, setInfoBoxes] = useState<{
-    [K in Town]?: boolean;
-  }>({});
 
   const debouncedYear = useDebounce(year, 500);
 
@@ -102,17 +75,6 @@ const Map = () => {
       zoom: 12,
     }),
     [darkMode]
-  );
-
-  const polygonOptions: google.maps.PolygonOptions = useMemo(
-    () => ({
-      fillColor: darkMode ? theme.palette.grey[500] : theme.palette.grey[600],
-      fillOpacity: 0,
-      strokeColor: darkMode ? theme.palette.grey[600] : theme.palette.grey[700],
-      strokeWeight: 2,
-      strokeOpacity: 0,
-    }),
-    [theme, darkMode]
   );
 
   const selectedPolygonOptions: google.maps.PolygonOptions = useMemo(
@@ -194,21 +156,6 @@ const Map = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
 
-  useEffect(() => {
-    for (const polygon of Object.values(polygons)) {
-      polygon?.setOptions({
-        fillOpacity: showHeatmapPrices ? 0.4 : 0,
-        strokeOpacity: showHeatmapPrices ? 1 : 0,
-      });
-    }
-
-    setInfoBoxes(
-      Object.fromEntries(
-        Object.values(Town).map((key) => [key, showHeatmapPrices])
-      )
-    );
-  }, [showHeatmapPrices, polygons]);
-
   const handleMapIdle = () => {
     const zoom = map?.getZoom();
 
@@ -217,7 +164,8 @@ const Map = () => {
         dispatch(setTown('Islandwide'));
         setSearchMarkers([]);
       } else {
-        for (const [townName, polygon] of Object.entries(polygons)) {
+        for (const [townName, paths] of Object.entries(townBoundaries)) {
+          const polygon = new google.maps.Polygon({ paths });
           if (
             google.maps.geometry.poly.containsLocation(
               map?.getCenter() ?? null,
@@ -229,38 +177,6 @@ const Map = () => {
         }
       }
     }
-  };
-
-  const handlePolygonMouseOver = (townName: string) => {
-    if (!showHeatmapPrices) {
-      polygons[townName as Town]?.setOptions({
-        fillOpacity: 0.4,
-        strokeOpacity: 1,
-      });
-      setInfoBoxes((prevInfoBoxes) => ({
-        ...prevInfoBoxes,
-        [townName]: true,
-      }));
-    }
-  };
-
-  const handlePolygonMouseOut = (townName: string) => {
-    if (!showHeatmapPrices) {
-      polygons[townName as Town]?.setOptions({
-        fillOpacity: 0,
-        strokeOpacity: 0,
-      });
-      setInfoBoxes((prevInfoBoxes) => ({
-        ...prevInfoBoxes,
-        [townName]: false,
-      }));
-    }
-  };
-
-  const handlePolygonClick = (townName: string) => {
-    dispatch(setTown(townName as Town));
-    map?.setCenter(townCoordinates[townName as Town] ?? singaporeCoordinates);
-    map?.setZoom(15);
   };
 
   return (
@@ -278,52 +194,13 @@ const Map = () => {
         )}
         {town === 'Islandwide' &&
           islandHeatmap?.map((point) => (
-            <Fragment key={point.town}>
-              <Polygon
-                paths={townBoundaries[point.town as Town]}
-                options={polygonOptions}
-                onLoad={(polygon) =>
-                  setPolygons((prevPolygons) => ({
-                    ...prevPolygons,
-                    [point.town]: polygon,
-                  }))
-                }
-                onMouseOver={() => handlePolygonMouseOver(point.town)}
-                onMouseOut={() => handlePolygonMouseOut(point.town)}
-                onClick={() => handlePolygonClick(point.town)}
-              />
-              <InfoBox
-                position={townCoordinates[point.town as Town]}
-                options={{
-                  ...infoBoxOptions,
-                  visible: infoBoxes[point.town as Town],
-                }}
-              >
-                <Card
-                  sx={{
-                    backgroundColor: darkMode
-                      ? 'rgba(18, 18, 18, 0.8)'
-                      : 'rgba(255, 255, 255, 0.8)',
-                    textAlign: 'center',
-                    m: '-25% 50% 0 -50%',
-                  }}
-                >
-                  <CardContent sx={{ p: `${theme.spacing(1)} !important` }}>
-                    <Typography
-                      variant="subtitle2"
-                      sx={{
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {point.town}
-                    </Typography>
-                    <Typography variant="caption">
-                      {formatPrice(point.resalePrice)}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </InfoBox>
-            </Fragment>
+            <TownPolygon
+              key={point.town}
+              town={point.town}
+              resalePrice={point.resalePrice}
+              showHeatmapPrices={showHeatmapPrices}
+              map={map}
+            />
           ))}
         {town !== 'Islandwide' && (
           <Polygon
