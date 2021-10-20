@@ -12,6 +12,7 @@ import {
   AlertTitle,
   Button,
   Collapse,
+  Divider,
   Grid,
   Modal,
   Paper,
@@ -35,6 +36,8 @@ import GroupAccordionToolbar from './GroupAccordionToolbar';
 import GroupDetails from './GroupDetails';
 import GroupSummary from './GroupSummary';
 import UpdateGroupForm, { UpdateGroupFormValues } from './UpdateGroupForm';
+import Logo99Co from './logos/Logo99Co';
+import LogoPropertyGuru from './logos/LogoPropertyGuru';
 
 enum DisplayedModal {
   Update,
@@ -144,6 +147,25 @@ const ResaleGroupAccordion = (props: Props) => {
                   onDisplayDeleteModal={handleDisplayDeleteModal}
                   onDuplicateGroup={handleDuplicateGroup}
                 />
+              </Grid>
+            </Grid>
+            <Grid item container direction="column" xs={12} spacing={1}>
+              <Grid item>
+                <Divider>
+                  <Typography variant="body2">
+                    Search Listings For Sale
+                  </Typography>
+                </Divider>
+              </Grid>
+              <Grid item>
+                <Stack direction="row" spacing={1}>
+                  <Button variant="outlined">
+                    <Logo99Co />
+                  </Button>
+                  <Button variant="outlined">
+                    <LogoPropertyGuru />
+                  </Button>
+                </Stack>
               </Grid>
             </Grid>
             {resaleQueryResponse?.data.length === 0 && (
