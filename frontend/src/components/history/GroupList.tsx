@@ -1,10 +1,10 @@
-import { Button, Modal, Stack } from '@mui/material';
+import { Button, Grid, Modal, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 import { useAppSelector } from '../../app/hooks';
-import { createGroup, selectGroups } from '../../reducers/history';
+import { createGroup, resetGroups, selectGroups } from '../../reducers/history';
 import {
   incrementColorCount,
   selectColorCount,
@@ -21,10 +21,16 @@ import {
   getGroupColor,
   mapCreateFormValuesToGroupFilters,
 } from '../../utils/groups';
-import { FormPaper } from '../styled';
+import { FormPaper, ModalPaper } from '../styled';
 import BTOGroupAccordion from './BTOGroupAccordion';
 import CreateGroupForm, { CreateGroupFormValues } from './CreateGroupForm';
 import ResaleGroupAccordion from './ResaleGroupAccordion';
+
+enum DisplayedModal {
+  Create,
+  Clear,
+  Hidden,
+}
 
 interface Props {
   selectedGroup: string | undefined;
@@ -36,7 +42,9 @@ const GroupList = (props: Props) => {
   const { selectedGroup, onChangeSelectedGroup } = props;
   const groups = useAppSelector(selectGroups);
   const colorCount = useAppSelector(selectColorCount);
-  const [showCreateForm, setShowCreateForm] = useState<boolean>(false);
+  const [displayedModal, setDisplayedModal] = useState<DisplayedModal>(
+    DisplayedModal.Hidden
+  );
 
   const handleCreateGroup: SubmitHandler<CreateGroupFormValues> = (
     data: CreateGroupFormValues
@@ -78,7 +86,7 @@ const GroupList = (props: Props) => {
       onChangeSelectedGroup(firstGroupId)(true);
     }
 
-    setShowCreateForm(false);
+    setDisplayedModal(DisplayedModal.Hidden);
   };
 
   const handleCreateBTOGroup = (group: Group) => {
@@ -119,13 +127,31 @@ const GroupList = (props: Props) => {
 
   return (
     <Stack spacing={2} sx={{ width: '100%' }}>
-      <Button
-        variant="contained"
-        size="large"
-        onClick={() => setShowCreateForm(true)}
-      >
-        New Group
-      </Button>
+      <Grid container direction="row" spacing={2}>
+        <Grid item xs>
+          <Button
+            variant="contained"
+            size="large"
+            onClick={() => setDisplayedModal(DisplayedModal.Create)}
+            sx={{ width: '100%' }}
+          >
+            New Group
+          </Button>
+        </Grid>
+        {groups.length > 0 && (
+          <Grid item xs={6}>
+            <Button
+              variant="outlined"
+              size="large"
+              onClick={() => setDisplayedModal(DisplayedModal.Clear)}
+              sx={{ width: '100%' }}
+              color="error"
+            >
+              Clear Groups
+            </Button>
+          </Grid>
+        )}
+      </Grid>
       <Stack spacing={0}>
         {groups.map((group) =>
           group.type === 'resale' ? (
@@ -147,19 +173,53 @@ const GroupList = (props: Props) => {
         )}
       </Stack>
       <Modal
-        open={showCreateForm}
+        open={displayedModal === DisplayedModal.Create}
         onClose={(event, reason) => {
           if (reason !== 'backdropClick') {
-            setShowCreateForm(false);
+            setDisplayedModal(DisplayedModal.Hidden);
           }
         }}
       >
         <FormPaper>
           <CreateGroupForm
             onSubmit={handleCreateGroup}
-            handleClose={() => setShowCreateForm(false)}
+            handleClose={() => setDisplayedModal(DisplayedModal.Hidden)}
           />
         </FormPaper>
+      </Modal>
+      <Modal
+        open={displayedModal === DisplayedModal.Clear}
+        onClose={() => setDisplayedModal(DisplayedModal.Hidden)}
+      >
+        <ModalPaper>
+          <Stack spacing={2}>
+            <Typography variant="h5" textAlign="center">
+              Clear All Groups?
+            </Typography>
+            <Typography sx={{ p: '0rem 1rem' }}>
+              Are you sure you want to clear all groups?
+            </Typography>
+            <Stack direction="row" spacing={2}>
+              <Button
+                variant="outlined"
+                onClick={() => setDisplayedModal(DisplayedModal.Hidden)}
+                sx={{ width: '50%' }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  dispatch(resetGroups());
+                  setDisplayedModal(DisplayedModal.Hidden);
+                }}
+                sx={{ width: '50%' }}
+              >
+                Clear All
+              </Button>
+            </Stack>
+          </Stack>
+        </ModalPaper>
       </Modal>
     </Stack>
   );

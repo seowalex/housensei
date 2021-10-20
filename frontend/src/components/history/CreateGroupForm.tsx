@@ -99,10 +99,7 @@ const CreateGroupForm = (props: Props) => {
         </IconButton>
         <Grid item xs={12}>
           <Box sx={{ p: '0.5rem 0rem' }}>
-            <Typography
-              variant="h4"
-              sx={{ textAlign: 'center', width: '100%' }}
-            >
+            <Typography variant="h4" sx={{ textAlign: 'center' }}>
               Create Groups
             </Typography>
           </Box>
@@ -146,9 +143,7 @@ const CreateGroupForm = (props: Props) => {
           />
         </Grid>
         <Grid item xs={12}>
-          <Divider>
-            {/* <Typography variant="h6">Filters</Typography> */}
-          </Divider>
+          <Divider />
         </Grid>
         <Grid item xs={12} lg={6}>
           <FormAutocompleteInput

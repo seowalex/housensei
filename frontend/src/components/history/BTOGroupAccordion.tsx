@@ -17,6 +17,7 @@ import {
   Button,
   Grid,
   Modal,
+  Paper,
   Stack,
   TextField,
   Typography,
@@ -27,6 +28,7 @@ import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useGetBTOGraphQuery } from '../../api/history';
 import { useAppSelector } from '../../app/hooks';
+import { decrementColorCount } from '../../reducers/colors';
 import {
   removeGroup,
   selectBTOProjectsOfGroup,
@@ -34,7 +36,6 @@ import {
   updateGroup,
   updateSelectedBTOProjects,
 } from '../../reducers/history';
-import { decrementColorCount } from '../../reducers/colors';
 import { BTOGroup, Group } from '../../types/groups';
 import { BTOProject } from '../../types/history';
 import {
@@ -282,14 +283,19 @@ const BTOGroupAccordion = (props: Props) => {
         onClose={() => setDisplayedModal(DisplayedModal.Hidden)}
       >
         <ModalPaper>
-          <Stack spacing={1}>
-            <Typography display="inline">
+          <Stack spacing={2}>
+            <Typography variant="h5" textAlign="center">
+              Delete Group?
+            </Typography>
+            <Typography sx={{ p: '0rem 1rem' }}>
               Are you sure you want to delete this group?
             </Typography>
-            <Stack direction="row" justifyContent="center">
-              <GroupSummary group={group} />
-            </Stack>
-            <GroupDetails group={group} />
+            <Paper sx={{ p: '1rem' }} elevation={3}>
+              <Stack spacing={1}>
+                <GroupSummary group={group} />
+                <GroupDetails group={group} />
+              </Stack>
+            </Paper>
             <Stack direction="row" spacing={2}>
               <Button
                 variant="outlined"
