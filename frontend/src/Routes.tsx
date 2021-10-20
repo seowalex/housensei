@@ -213,6 +213,7 @@ const Routes = () => {
           </Route>
         </Switch>
       </Box>
+
       <ChatBot />
     </Router>
   );
