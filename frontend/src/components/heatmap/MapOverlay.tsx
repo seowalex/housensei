@@ -337,7 +337,6 @@ const MapOverlay = ({
         >
           <Button
             variant="contained"
-            size="large"
             onClick={() => setShowSettings(true)}
             sx={{
               p: '12px',
