@@ -1,8 +1,9 @@
 import {
+  ArrowRightAltRounded as ArrowRightAltRoundedIcon,
   EditRounded as EditRoundedIcon,
   ExpandMoreRounded as ExpandMoreRoundedIcon,
-  NewReleasesRounded as NewReleasesRoundedIcon,
-  WarningRounded as WarningRoundedIcon,
+  MoreVertRounded as MoreVertRoundedIcon,
+  WarningAmberRounded as WarningAmberRoundedIcon,
 } from '@mui/icons-material';
 import {
   Accordion,
@@ -32,8 +33,8 @@ import {
   mapGroupToUpdateFormValues,
 } from '../../utils/groups';
 import { FormPaper, ModalPaper } from '../styled';
-import GroupAccordionToolbar from './GroupAccordionToolbar';
 import GroupDetails from './GroupDetails';
+import GroupAdditionalFilters from './GroupAdditionalFilters';
 import GroupSummary from './GroupSummary';
 import UpdateGroupForm, { UpdateGroupFormValues } from './UpdateGroupForm';
 import Logo99Co from './logos/Logo99Co';
@@ -138,18 +139,13 @@ const ResaleGroupAccordion = (props: Props) => {
         </AccordionSummary>
         <AccordionDetails>
           <Grid container spacing={1}>
-            <Grid item container xs={12}>
-              <Grid item xs>
-                <GroupDetails group={group} />
-              </Grid>
-              <Grid item>
-                <GroupAccordionToolbar
-                  groupId={group.id}
-                  onDisplayUpdateModal={handleDisplayUpdateModal}
-                  onDisplayDeleteModal={handleDisplayDeleteModal}
-                  onDuplicateGroup={handleDuplicateGroup}
-                />
-              </Grid>
+            <Grid item xs={12}>
+              <GroupDetails
+                group={group}
+                onDisplayUpdateModal={handleDisplayUpdateModal}
+                onDisplayDeleteModal={handleDisplayDeleteModal}
+                onDuplicateGroup={handleDuplicateGroup}
+              />
             </Grid>
             <Grid item container direction="column" xs={12} spacing={1}>
               <Grid item>
@@ -180,10 +176,12 @@ const ResaleGroupAccordion = (props: Props) => {
             </Grid>
             {resaleQueryResponse?.data.length === 0 && (
               <Grid item>
-                <Alert severity="warning" icon={<WarningRoundedIcon />}>
-                  <AlertTitle>No data found!</AlertTitle>
-                  Try making your filters less specific with the{' '}
-                  <EditRoundedIcon fontSize="small" /> icon.
+                <Alert severity="warning" icon={<WarningAmberRoundedIcon />}>
+                  <AlertTitle>No resale data found!</AlertTitle>
+                  Try editing your filters to be less specific. Click
+                  <MoreVertRoundedIcon fontSize="small" />
+                  <ArrowRightAltRoundedIcon fontSize="small" />
+                  <EditRoundedIcon fontSize="small" />
                 </Alert>
               </Grid>
             )}
@@ -197,7 +195,6 @@ const ResaleGroupAccordion = (props: Props) => {
               >
                 <Alert
                   severity="success"
-                  icon={<NewReleasesRoundedIcon />}
                   onClose={() => setShowBTOAlert(false)}
                 >
                   <AlertTitle>{`${
@@ -251,7 +248,8 @@ const ResaleGroupAccordion = (props: Props) => {
             <Paper sx={{ p: '1rem' }} elevation={3}>
               <Stack spacing={1}>
                 <GroupSummary group={group} />
-                <GroupDetails group={group} />
+                <Typography variant="h6">{group.name}</Typography>
+                <GroupAdditionalFilters group={group} />
               </Stack>
             </Paper>
             <Stack direction="row" spacing={2}>

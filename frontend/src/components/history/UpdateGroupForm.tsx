@@ -25,7 +25,7 @@ import FormSwitchInput, {
 } from '../forms/FormSwitchInput';
 import FormTextInput from '../forms/FormTextInput';
 import { townRegions } from '../../app/constants';
-import { CloseRounded } from '@mui/icons-material';
+import { CloseRounded as CloseRoundedIcon } from '@mui/icons-material';
 
 export interface Range<T> {
   lower: T;
@@ -91,7 +91,7 @@ const UpdateGroupForm = (props: Props) => {
             handleClose();
           }}
         >
-          <CloseRounded fontSize="large" />
+          <CloseRoundedIcon fontSize="large" />
         </IconButton>
         <Grid item xs={12}>
           <Box sx={{ p: '0.5rem 0rem' }}>

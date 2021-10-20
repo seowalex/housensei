@@ -1,11 +1,13 @@
 import {
-  AttachMoneyRounded,
+  ArrowRightAltRounded as ArrowRightAltRoundedIcon,
+  AttachMoneyRounded as AttachMoneyRoundedIcon,
   BedRounded as BedRoundedIcon,
   CalendarTodayRounded as CalendarTodayRoundedIcon,
   CheckRounded as CheckRoundedIcon,
   EditRounded as EditRoundedIcon,
   ExpandMoreRounded as ExpandMoreRoundedIcon,
-  WarningRounded as WarningRoundedIcon,
+  MoreVertRounded as MoreVertRoundedIcon,
+  WarningAmberRounded as WarningAmberRoundedIcon,
 } from '@mui/icons-material';
 import {
   Accordion,
@@ -15,6 +17,7 @@ import {
   AlertTitle,
   Autocomplete,
   Button,
+  Divider,
   Grid,
   Modal,
   Paper,
@@ -47,8 +50,8 @@ import {
 } from '../../utils/groups';
 import { compareDates, formatDate } from '../../utils/dates';
 import { FormPaper, ModalPaper } from '../styled';
-import GroupAccordionToolbar from './GroupAccordionToolbar';
 import GroupDetails from './GroupDetails';
+import GroupAdditionalFilters from './GroupAdditionalFilters';
 import GroupSummary from './GroupSummary';
 import UpdateGroupForm, { UpdateGroupFormValues } from './UpdateGroupForm';
 
@@ -161,105 +164,117 @@ const BTOGroupAccordion = (props: Props) => {
           <GroupSummary group={group} />
         </AccordionSummary>
         <AccordionDetails>
-          <Grid container spacing={2}>
+          <Grid container spacing={1}>
             <Grid item xs={12}>
-              <Autocomplete
-                onChange={handleChangeSelectedProjects}
-                value={selectedProjects ?? []}
-                multiple
-                disableCloseOnSelect
-                options={
-                  projects
-                    ? [...projects].sort((left, right) => {
-                        if (compareDates(left.date, right.date) === 0) {
-                          return left.flatType.localeCompare(right.flatType);
-                        }
-                        return -compareDates(left.date, right.date);
-                      })
-                    : []
-                }
-                renderOption={(optionProps, option, { selected }) => (
-                  // eslint-disable-next-line react/jsx-props-no-spreading
-                  <li {...optionProps}>
-                    <Stack
-                      direction="row"
-                      justifyContent="space-between"
-                      alignItems="center"
-                      sx={{ width: '100%' }}
-                    >
-                      <Stack spacing={0.5}>
-                        <Typography>{option.name}</Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <CalendarTodayRoundedIcon fontSize="small" />
-                          <Typography variant="body2">
-                            {formatDate(option.date)}
-                          </Typography>
-                          <AttachMoneyRounded fontSize="small" />
-                          <Typography variant="body2">
-                            {option.price}
-                          </Typography>
-                          <BedRoundedIcon fontSize="small" />
-                          <Typography variant="body2">
-                            {convertFlatTypeToFrontend(option.flatType)}
-                          </Typography>
-                        </Stack>
-                      </Stack>
-                      {selected && <CheckRoundedIcon fontSize="small" />}
-                    </Stack>
-                  </li>
-                )}
-                isOptionEqualToValue={(option, value) =>
-                  isSameBTOProject(option, value)
-                }
-                getOptionLabel={(option) => option.name}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={
-                      selectedProjects == null || selectedProjects.length === 0
-                        ? 'Mark specific BTO projects'
-                        : 'Marked BTO Projects'
-                    }
-                    placeholder={
-                      selectedProjects == null || selectedProjects.length === 0
-                        ? 'Mark a project on the chart'
-                        : ''
-                    }
-                  />
-                )}
-                filterOptions={(options, { inputValue }) =>
-                  matchSorter(options, inputValue, {
-                    keys: [
-                      'name',
-                      'price',
-                      (item: BTOProject) => formatDate(item.date),
-                    ],
-                    sorter: btoProjectsSorter,
-                  })
-                }
-              />
-            </Grid>
-            <Grid item xs>
-              <GroupDetails group={group} />
-            </Grid>
-            <Grid item>
-              <GroupAccordionToolbar
-                groupId={group.id}
+              <GroupDetails
+                group={group}
                 onDisplayUpdateModal={handleDisplayUpdateModal}
                 onDisplayDeleteModal={handleDisplayDeleteModal}
                 onDuplicateGroup={handleDuplicateGroup}
               />
             </Grid>
-          </Grid>
-          {btoQueryResponse?.data.length === 0 && (
-            <Grid item>
-              <Alert severity="warning" icon={<WarningRoundedIcon />}>
-                <AlertTitle>No projects found!</AlertTitle>
-                Try making your filters less specific with the{' '}
-                <EditRoundedIcon fontSize="small" /> icon.
-              </Alert>
+            <Grid item container direction="column" xs={12} spacing={1}>
+              <Grid item>
+                <Divider>
+                  <Typography variant="body2">Mark BTO Projects</Typography>
+                </Divider>
+              </Grid>
+              <Grid item>
+                <Autocomplete
+                  onChange={handleChangeSelectedProjects}
+                  value={selectedProjects ?? []}
+                  multiple
+                  disableCloseOnSelect
+                  options={
+                    projects
+                      ? [...projects].sort((left, right) => {
+                          if (compareDates(left.date, right.date) === 0) {
+                            return left.flatType.localeCompare(right.flatType);
+                          }
+                          return -compareDates(left.date, right.date);
+                        })
+                      : []
+                  }
+                  renderOption={(optionProps, option, { selected }) => (
+                    // eslint-disable-next-line react/jsx-props-no-spreading
+                    <li {...optionProps}>
+                      <Stack
+                        direction="row"
+                        justifyContent="space-between"
+                        alignItems="center"
+                        sx={{ width: '100%' }}
+                      >
+                        <Stack spacing={0.5}>
+                          <Typography>{option.name}</Typography>
+                          <Stack
+                            direction="row"
+                            spacing={1}
+                            alignItems="center"
+                          >
+                            <CalendarTodayRoundedIcon fontSize="small" />
+                            <Typography variant="body2">
+                              {formatDate(option.date)}
+                            </Typography>
+                            <AttachMoneyRoundedIcon fontSize="small" />
+                            <Typography variant="body2">
+                              {option.price}
+                            </Typography>
+                            <BedRoundedIcon fontSize="small" />
+                            <Typography variant="body2">
+                              {convertFlatTypeToFrontend(option.flatType)}
+                            </Typography>
+                          </Stack>
+                        </Stack>
+                        {selected && <CheckRoundedIcon fontSize="small" />}
+                      </Stack>
+                    </li>
+                  )}
+                  isOptionEqualToValue={(option, value) =>
+                    isSameBTOProject(option, value)
+                  }
+                  getOptionLabel={(option) => option.name}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label={
+                        selectedProjects == null ||
+                        selectedProjects.length === 0
+                          ? 'Select BTO Projects'
+                          : 'Marked'
+                      }
+                      placeholder={
+                        selectedProjects == null ||
+                        selectedProjects.length === 0
+                          ? 'Mark a project on the chart'
+                          : ''
+                      }
+                    />
+                  )}
+                  filterOptions={(options, { inputValue }) =>
+                    matchSorter(options, inputValue, {
+                      keys: [
+                        'name',
+                        'price',
+                        (item: BTOProject) => formatDate(item.date),
+                      ],
+                      sorter: btoProjectsSorter,
+                    })
+                  }
+                />
+              </Grid>
             </Grid>
-          )}
+            {btoQueryResponse?.data.length === 0 && (
+              <Grid item>
+                <Alert severity="warning" icon={<WarningAmberRoundedIcon />}>
+                  <AlertTitle>No BTO projects found!</AlertTitle>
+                  Try editing your filters to be less specific. Click
+                  <MoreVertRoundedIcon fontSize="small" />
+                  <ArrowRightAltRoundedIcon fontSize="small" />
+                  <EditRoundedIcon fontSize="small" />
+                </Alert>
+              </Grid>
+            )}
+          </Grid>
         </AccordionDetails>
       </Accordion>
       <Modal
@@ -293,7 +308,8 @@ const BTOGroupAccordion = (props: Props) => {
             <Paper sx={{ p: '1rem' }} elevation={3}>
               <Stack spacing={1}>
                 <GroupSummary group={group} />
-                <GroupDetails group={group} />
+                <Typography variant="h6">{group.name}</Typography>
+                <GroupAdditionalFilters group={group} />
               </Stack>
             </Paper>
             <Stack direction="row" spacing={2}>

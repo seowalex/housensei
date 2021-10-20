@@ -16,7 +16,7 @@ import {
   SubmitHandler,
   useForm,
 } from 'react-hook-form';
-import { CloseRounded } from '@mui/icons-material';
+import { CloseRounded as CloseRoundedIcon } from '@mui/icons-material';
 import { FlatType } from '../../types/groups';
 import { Town } from '../../types/towns';
 import FormAutocompleteInput from '../forms/FormAutocompleteInput';
@@ -95,7 +95,7 @@ const CreateGroupForm = (props: Props) => {
           sx={{ position: 'absolute', top: '0', right: '0', margin: '1rem' }}
           onClick={handleClose}
         >
-          <CloseRounded fontSize="large" />
+          <CloseRoundedIcon fontSize="large" />
         </IconButton>
         <Grid item xs={12}>
           <Box sx={{ p: '0.5rem 0rem' }}>
