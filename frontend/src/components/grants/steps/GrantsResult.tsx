@@ -6,7 +6,7 @@ interface Props {
   formValues: UseFormGetValues<FieldValues>;
 }
 
-const GrantsCalculation = (props: Props) => {
+const GrantsResult = (props: Props) => {
   const { formValues } = props;
 
   const values = formValues();
@@ -69,4 +69,4 @@ const GrantsCalculation = (props: Props) => {
   );
 };
 
-export default GrantsCalculation;
+export default GrantsResult;

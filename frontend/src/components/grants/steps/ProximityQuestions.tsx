@@ -1,5 +1,5 @@
 import { Grid } from '@mui/material';
-import FormRadioInput from './FormRadioInput';
+import FormRadioInput from '../FormRadioInput';
 import StepProps from './StepProps';
 
 const ProximityQuestions = (props: StepProps) => {

@@ -12,10 +12,10 @@ import {
   UseFormReturn,
 } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import UserQuestions from '../components/grants/UserQuestions';
-import GrantsCalculation from '../components/grants/GrantsCalculation';
-import HousingQuestions from '../components/grants/HousingQuestions';
-import ProximityQuestions from '../components/grants/ProximityQuestions';
+import UserQuestions from '../components/grants/steps/UserQuestions';
+import GrantsResult from '../components/grants/steps/GrantsResult';
+import HousingQuestions from '../components/grants/steps/HousingQuestions';
+import ProximityQuestions from '../components/grants/steps/ProximityQuestions';
 
 export type GrantsFormValues = {
   // user questions
@@ -78,7 +78,7 @@ function getStepContent(step: number, form: UseFormReturn<FieldValues>) {
     case 2:
       return <ProximityQuestions form={form} />;
     case 3:
-      return <GrantsCalculation formValues={form.getValues} />;
+      return <GrantsResult formValues={form.getValues} />;
     default:
       return 'Unknown step';
   }

@@ -1,6 +1,6 @@
 import { Grid } from '@mui/material';
-import { FlatType } from '../../types/groups';
-import FormRadioInput from './FormRadioInput';
+import { FlatType } from '../../../types/groups';
+import FormRadioInput from '../FormRadioInput';
 import StepProps from './StepProps';
 
 const HousingQuestions = (props: StepProps) => {

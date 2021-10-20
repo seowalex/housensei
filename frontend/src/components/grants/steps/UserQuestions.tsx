@@ -1,6 +1,6 @@
 import { Grid } from '@mui/material';
-import FormRadioInput from './FormRadioInput';
-import FormNumberTextFieldInput from './FormNumberTextFieldInput';
+import FormRadioInput from '../FormRadioInput';
+import FormNumberTextFieldInput from '../FormNumberTextFieldInput';
 import StepProps from './StepProps';
 
 const UserQuestions = (props: StepProps) => {
