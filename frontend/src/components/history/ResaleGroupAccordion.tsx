@@ -38,6 +38,8 @@ import GroupSummary from './GroupSummary';
 import UpdateGroupForm, { UpdateGroupFormValues } from './UpdateGroupForm';
 import Logo99Co from './logos/Logo99Co';
 import LogoPropertyGuru from './logos/LogoPropertyGuru';
+import { get99CoLink } from '../../utils/propertySites/99co';
+import { getPropertyGuruLink } from '../../utils/propertySites/propertyGuru';
 
 enum DisplayedModal {
   Update,
@@ -159,10 +161,18 @@ const ResaleGroupAccordion = (props: Props) => {
               </Grid>
               <Grid item>
                 <Stack direction="row" spacing={1}>
-                  <Button variant="outlined">
+                  <Button
+                    variant="outlined"
+                    href={get99CoLink(group.filters)}
+                    target="_blank"
+                  >
                     <Logo99Co />
                   </Button>
-                  <Button variant="outlined">
+                  <Button
+                    variant="outlined"
+                    href={getPropertyGuruLink(group.filters)}
+                    target="_blank"
+                  >
                     <LogoPropertyGuru />
                   </Button>
                 </Stack>
