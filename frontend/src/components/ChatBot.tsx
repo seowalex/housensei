@@ -2,14 +2,14 @@ import { ChatWidget } from '@papercups-io/chat-widget';
 
 const ChatBot = () => {
   const GREETING =
-    "Hello! Thank you for trying out Housensei! What do you like or don't like about Housensei? Any feedback is greatly appreciated :)";
+    'Hello! Thank you for visiting Housensei! How do you find Housensei so far? Any feedback is greatly appreciated :)';
   const TITLE = 'Welcome to Housensei';
   const SUBTITILE = 'Feel free to provide any feedback you have 😊';
 
   return (
     <ChatWidget
-      token={process.env.CHAT_TOKEN ?? ''}
-      inbox={process.env.CHAT_INBOXID}
+      token={import.meta.env.VITE_CHAT_TOKEN}
+      inbox="e1b231f1-e569-49ae-ae10-de77578a5d7c"
       title={TITLE}
       subtitle={SUBTITILE}
       primaryColor="#1890ff"
