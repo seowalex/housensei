@@ -45,7 +45,7 @@ import {
   mapUpdateFormValuesToGroupFilters,
   mapGroupToUpdateFormValues,
 } from '../../utils/groups';
-import { compareDates, formatDate } from '../../utils/history';
+import { compareDates, formatDate } from '../../utils/dates';
 import { FormPaper, ModalPaper } from '../styled';
 import GroupAccordionToolbar from './GroupAccordionToolbar';
 import GroupDetails from './GroupDetails';

@@ -14,8 +14,8 @@ import { useCallback } from 'react';
 import { useCurrentPng } from 'recharts-to-png';
 import { Button, CircularProgress, Stack, Typography } from '@mui/material';
 import { ChartMode } from '../../types/history';
+import { formatDate } from '../../utils/dates';
 import {
-  formatDate,
   formatPrice,
   formatPriceToThousand,
   formatProjectName,
