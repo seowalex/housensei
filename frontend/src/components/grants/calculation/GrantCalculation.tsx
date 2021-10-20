@@ -1,8 +1,12 @@
 /* eslint-disable no-param-reassign */
-/* eslint-disable import/prefer-default-export  */
-import proximityGrantTree from '../../../utils/grant_json/proximityGrant.json';
+import ehgTree from '../../../utils/grant_json/EHG.json';
+import ehgIncome from '../../../utils/grant_json/EHGIncome.json';
 import familyGrantTree from '../../../utils/grant_json/familyGrant.json';
 import halfHousingGrantTree from '../../../utils/grant_json/halfHousingGrant.json';
+import proximityGrantTree from '../../../utils/grant_json/proximityGrant.json';
+import singleEhgTree from '../../../utils/grant_json/singleEHG.json';
+import singleEhgIncome from '../../../utils/grant_json/singleEHGIncome.json';
+// import singleGrantTree from '../../../utils/grant_json/singleGrant.json';
 
 type Tree =
   | {
@@ -69,6 +73,102 @@ const recurseTree = (
       recurseTree(fieldValues, chosenSubTree, grantValues);
     }
   }
+};
+
+type BooleanTree =
+  | {
+      attribute: string;
+      options: Record<string, BooleanTree>;
+    }
+  | boolean;
+
+const recurseBooleanTree = (
+  fieldValues: Record<string, string | number>,
+  tree: BooleanTree,
+  certainty: {
+    true: number;
+    false: number;
+  }
+) => {
+  if (typeof tree === 'boolean') {
+    if (tree) {
+      certainty.true += 1;
+    } else {
+      certainty.false += 1;
+    }
+  } else {
+    const { attribute } = tree;
+    const subTrees = tree.options;
+    const fieldValue = fieldValues[attribute]; // grab from form
+    const chosenSubTree = subTrees[fieldValue];
+    if (!fieldValue) {
+      // user indicated unsure -> recurse down all subtrees
+      Object.values(subTrees).forEach((subTree) => {
+        recurseBooleanTree(fieldValues, subTree, certainty);
+      });
+    } else if (!chosenSubTree) {
+      // no option in subtree -> might not get
+      certainty.false += 1;
+    } else {
+      recurseBooleanTree(fieldValues, chosenSubTree, certainty);
+    }
+  }
+};
+
+const getEHGGrantValue = (
+  monthlyIncome: string,
+  table: Array<{ income: number; amount: number }>
+) => {
+  console.log(monthlyIncome);
+  console.log(table);
+  const parsedMonthlyIncome = Number(monthlyIncome);
+  return table
+    .slice(0, -1)
+    .find(
+      (row, idx) =>
+        parsedMonthlyIncome === 0 &&
+        parsedMonthlyIncome > row.income &&
+        parsedMonthlyIncome <= table[idx + 1].income
+    )?.amount;
+};
+
+export const getEHGGrant = (fieldValues: Record<string, any>) => {
+  const certainty = {
+    true: 0,
+    false: 0,
+  };
+  recurseBooleanTree(fieldValues, ehgTree, certainty);
+
+  const grantValue = getEHGGrantValue(fieldValues.monthlyIncome, ehgIncome);
+
+  if (certainty.true === 0) {
+    return null;
+  }
+  if (certainty.false > 0) {
+    return [0, grantValue];
+  }
+  return [grantValue];
+};
+
+export const getSingleEHGGrant = (fieldValues: Record<string, any>) => {
+  const certainty = {
+    true: 0,
+    false: 0,
+  };
+  recurseBooleanTree(fieldValues, singleEhgTree, certainty);
+
+  const grantValue = getEHGGrantValue(
+    fieldValues.monthlyIncome,
+    singleEhgIncome
+  );
+
+  if (certainty.true === 0) {
+    return null;
+  }
+  if (certainty.false > 0) {
+    return [0, grantValue];
+  }
+  return [grantValue];
 };
 
 export const getFamilyGrant = (fieldValues: Record<string, any>) => {

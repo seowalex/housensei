@@ -62,5 +62,9 @@
     {
         "income": 8500,
         "amount": 5000
+    },
+    {
+        "income": 9000,
+        "amount": 0
     }
 ]

@@ -1,9 +1,11 @@
 import { Grid } from '@mui/material';
 import { UseFormGetValues, FieldValues } from 'react-hook-form';
 import {
+  getEHGGrant,
   getFamilyGrant,
   getHalfHousingGrant,
   getProximityGrant,
+  getSingleEHGGrant,
 } from '../calculation/GrantCalculation';
 import GrantCard from './GrantCard';
 
@@ -27,10 +29,12 @@ const GrantsResult = (props: Props) => {
 
   console.log(fieldValues);
 
+  const ehgGrant = getEHGGrant(fieldValues);
   const proximityGrant = getProximityGrant(fieldValues);
   const familyGrant = getFamilyGrant(fieldValues);
   const halfHousingGrant = getHalfHousingGrant(fieldValues);
-  console.log(halfHousingGrant);
+  const singleEhgGrant = getSingleEHGGrant(fieldValues);
+  console.log(ehgGrant);
 
   // console.log(formValues());
   return (
