@@ -220,6 +220,7 @@ const Map = () => {
           townHeatmap?.map((point) => (
             <FlatMarker
               key={point.address}
+              town={town}
               address={point.address}
               coordinates={{
                 lat: point.coordinates[0],

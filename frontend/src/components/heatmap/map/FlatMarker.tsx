@@ -10,16 +10,29 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
+  Tooltip,
 } from '@mui/material';
 import { Marker } from '@react-google-maps/api';
-import { Close as CloseIcon } from '@mui/icons-material';
+import {
+  Addchart as AddchartIcon,
+  Close as CloseIcon,
+} from '@mui/icons-material';
 import { format, parse } from 'date-fns';
+import { v4 as uuidv4 } from 'uuid';
 
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { FlatTransaction } from '../../../api/heatmap';
+import { createGroup, selectGroups } from '../../../reducers/history';
+
 import { currencyFormatter } from '../../../app/utils';
-import { convertFlatTypeToFrontend } from '../../../utils/groups';
+import {
+  convertFlatTypeToFrontend,
+  getGroupColor,
+} from '../../../utils/groups';
+import type { Town } from '../../../types/towns';
 
 interface Props {
+  town: Town;
   address: string;
   coordinates: google.maps.LatLngLiteral;
   transactions: FlatTransaction[];
@@ -59,7 +72,10 @@ const getComparator = <Key extends keyof FlatTransaction>(
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 
-const FlatMarker = ({ address, coordinates, transactions }: Props) => {
+const FlatMarker = ({ town, address, coordinates, transactions }: Props) => {
+  const dispatch = useAppDispatch();
+  const groups = useAppSelector(selectGroups);
+
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<OrderBy>('transactionMonth');
   const [marker, setMarker] = useState<google.maps.Marker>();
@@ -76,6 +92,20 @@ const FlatMarker = ({ address, coordinates, transactions }: Props) => {
       opacity: 0,
     });
   };
+
+  const handleAddGroup = (transaction: FlatTransaction) =>
+    dispatch(
+      createGroup({
+        type: 'resale',
+        id: uuidv4(),
+        name: address,
+        color: getGroupColor(groups.length),
+        filters: {
+          towns: [town],
+          flatTypes: [transaction.flatType],
+        },
+      })
+    );
 
   const handleSort = (property: OrderBy) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -152,6 +182,7 @@ const FlatMarker = ({ address, coordinates, transactions }: Props) => {
                     Resale Registration Date
                   </TableSortLabel>
                 </TableCell>
+                <TableCell />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -178,6 +209,21 @@ const FlatMarker = ({ address, coordinates, transactions }: Props) => {
                         ),
                         'MMM yyyy'
                       )}
+                    </TableCell>
+                    <TableCell padding="none">
+                      <Tooltip
+                        title="Add to Price History"
+                        placement="top"
+                        disableInteractive
+                      >
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          onClick={() => handleAddGroup(transaction)}
+                        >
+                          <AddchartIcon fontSize="inherit" />
+                        </IconButton>
+                      </Tooltip>
                     </TableCell>
                   </TableRow>
                 ))}
