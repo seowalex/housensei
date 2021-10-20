@@ -44,6 +44,7 @@ import {
   setDrawerOpen,
 } from './reducers/settings';
 import Grants from './pages/Grants';
+import ChatBot from './components/ChatBot';
 
 const drawerWidth = 240;
 
@@ -212,6 +213,7 @@ const Routes = () => {
           </Route>
         </Switch>
       </Box>
+      <ChatBot />
     </Router>
   );
 };
