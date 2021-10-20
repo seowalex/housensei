@@ -17,6 +17,7 @@ import {
   Addchart as AddchartIcon,
   Close as CloseIcon,
 } from '@mui/icons-material';
+import { useSnackbar } from 'notistack';
 import { format, parse } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -74,6 +75,7 @@ const getComparator = <Key extends keyof FlatTransaction>(
 
 const FlatMarker = ({ town, address, coordinates, transactions }: Props) => {
   const dispatch = useAppDispatch();
+  const { enqueueSnackbar } = useSnackbar();
   const groups = useAppSelector(selectGroups);
 
   const [order, setOrder] = useState<Order>('asc');
@@ -93,12 +95,12 @@ const FlatMarker = ({ town, address, coordinates, transactions }: Props) => {
     });
   };
 
-  const handleAddGroup = (transaction: FlatTransaction) =>
+  const handleAddGroup = (transaction: FlatTransaction) => {
     dispatch(
       createGroup({
         type: 'resale',
         id: uuidv4(),
-        name: address,
+        name: `${town} (${convertFlatTypeToFrontend(transaction.flatType)})`,
         color: getGroupColor(groups.length),
         filters: {
           towns: [town],
@@ -106,6 +108,20 @@ const FlatMarker = ({ town, address, coordinates, transactions }: Props) => {
         },
       })
     );
+
+    enqueueSnackbar(
+      <span>
+        Added{' '}
+        <strong>
+          {town} ({convertFlatTypeToFrontend(transaction.flatType)})
+        </strong>{' '}
+        resale flats to Price History.
+      </span>,
+      {
+        variant: 'success',
+      }
+    );
+  };
 
   const handleSort = (property: OrderBy) => {
     const isAsc = orderBy === property && order === 'asc';
