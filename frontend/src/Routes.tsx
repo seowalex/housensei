@@ -37,8 +37,14 @@ import { useAppDispatch, useAppSelector } from './app/hooks';
 import Heatmap from './pages/Heatmap';
 import History from './pages/History';
 import NotFound from './pages/NotFound';
-import { selectDarkMode, setDarkMode } from './reducers/settings';
+import {
+  selectDarkMode,
+  selectDrawerOpen,
+  setDarkMode,
+  setDrawerOpen,
+} from './reducers/settings';
 import Grants from './pages/Grants';
+import ChatBot from './components/ChatBot';
 
 const drawerWidth = 240;
 
@@ -77,7 +83,16 @@ const Routes = () => {
   const isDesktop = useMediaQuery('(min-width: 600px)');
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const darkMode = useAppSelector(selectDarkMode) ?? prefersDarkMode;
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const drawerOpen = useAppSelector(selectDrawerOpen);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
+  const handleDrawerOpen = () => {
+    if (isDesktop) {
+      dispatch(setDrawerOpen(!drawerOpen));
+    } else {
+      setMobileDrawerOpen(true);
+    }
+  };
 
   const drawer = (
     <List>
@@ -137,11 +152,7 @@ const Routes = () => {
         }}
       >
         <Toolbar>
-          <IconButton
-            edge="start"
-            onClick={() => setDrawerOpen(!drawerOpen)}
-            sx={{ mr: 2 }}
-          >
+          <IconButton edge="start" onClick={handleDrawerOpen} sx={{ mr: 2 }}>
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
@@ -171,8 +182,8 @@ const Routes = () => {
         </MiniDrawer>
         <Drawer
           variant="temporary"
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(!drawerOpen)}
+          open={mobileDrawerOpen}
+          onClose={() => setMobileDrawerOpen(false)}
           ModalProps={{
             keepMounted: true,
           }}
@@ -202,6 +213,8 @@ const Routes = () => {
           </Route>
         </Switch>
       </Box>
+
+      <ChatBot />
     </Router>
   );
 };

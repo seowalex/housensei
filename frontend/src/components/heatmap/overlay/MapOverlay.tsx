@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 import {
   Autocomplete,
   Box,
@@ -13,42 +13,48 @@ import {
   Typography,
 } from '@mui/material';
 import { Settings as SettingsIcon } from '@mui/icons-material';
+import { StandaloneSearchBox } from '@react-google-maps/api';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 import { matchSorter } from 'match-sorter';
 
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import {
   selectTown,
   selectYear,
   setTown,
   setYear,
-} from '../../reducers/heatmap';
+} from '../../../reducers/heatmap';
 import {
   selectHeatmapPriceRangeLower,
   selectHeatmapPriceRangeUpper,
   selectShowHeatmap,
   setHeatmapPriceRangeLower,
   setHeatmapPriceRangeUpper,
-} from '../../reducers/settings';
+} from '../../../reducers/settings';
 import {
   useGetIslandHeatmapQuery,
   useGetTownHeatmapQuery,
-} from '../../api/heatmap';
+} from '../../../api/heatmap';
 
-import { useDebounce } from '../../app/utils';
-import { townSorter } from '../../utils/towns';
+import { useDebounce } from '../../../app/utils';
+import { townSorter } from '../../../utils/towns';
 import {
   singaporeCoordinates,
   townCoordinates,
   townRegions,
-} from '../../app/constants';
-import { Town } from '../../types/towns';
+} from '../../../app/constants';
+import { Town } from '../../../types/towns';
 
 import Settings from './Settings';
 import PriceRange from './PriceRange';
 
 interface Props {
   map?: google.maps.Map;
+  searchBox?: google.maps.places.SearchBox;
+  setSearchBox: Dispatch<
+    SetStateAction<google.maps.places.SearchBox | undefined>
+  >;
+  setSearchMarkers: Dispatch<SetStateAction<google.maps.LatLng[]>>;
 }
 
 const currentYear = new Date().getFullYear();
@@ -61,7 +67,12 @@ const yearMarks = [
   return { value, label: value.toString() };
 });
 
-const MapOverlay = ({ map }: Props) => {
+const MapOverlay = ({
+  map,
+  searchBox,
+  setSearchBox,
+  setSearchMarkers,
+}: Props) => {
   const dispatch = useAppDispatch();
   const showHeatmap = useAppSelector(selectShowHeatmap);
   const town = useAppSelector(selectTown);
@@ -83,25 +94,105 @@ const MapOverlay = ({ map }: Props) => {
         }
   );
 
-  const defaultPriceRangeLower = useMemo(
-    () =>
-      town === 'Islandwide'
-        ? Math.min(...(islandHeatmap?.map((point) => point.resalePrice) ?? []))
-        : Math.min(...(townHeatmap?.map((point) => point.resalePrice) ?? [])),
-    [town, islandHeatmap, townHeatmap]
-  );
-  const defaultPriceRangeUpper = useMemo(
-    () =>
-      town === 'Islandwide'
-        ? Math.max(...(islandHeatmap?.map((point) => point.resalePrice) ?? []))
-        : Math.max(...(townHeatmap?.map((point) => point.resalePrice) ?? [])),
-    [town, islandHeatmap, townHeatmap]
-  );
+  const defaultPriceRangeLower = useMemo(() => {
+    if (town === 'Islandwide') {
+      if (islandHeatmap) {
+        return (
+          Math.floor(
+            Math.min(...islandHeatmap.map((point) => point.resalePrice)) /
+              100000
+          ) * 100000
+        );
+      }
 
-  const priceRangeLower =
-    useAppSelector(selectHeatmapPriceRangeLower) ?? defaultPriceRangeLower;
-  const priceRangeUpper =
-    useAppSelector(selectHeatmapPriceRangeUpper) ?? defaultPriceRangeUpper;
+      return null;
+    }
+
+    if (townHeatmap) {
+      return (
+        Math.floor(
+          Math.min(...townHeatmap.map((point) => point.resalePrice)) / 100000
+        ) * 100000
+      );
+    }
+
+    return null;
+  }, [town, islandHeatmap, townHeatmap]);
+  const defaultPriceRangeUpper = useMemo(() => {
+    if (town === 'Islandwide') {
+      if (islandHeatmap) {
+        return (
+          Math.ceil(
+            Math.max(...islandHeatmap.map((point) => point.resalePrice)) /
+              100000
+          ) * 100000
+        );
+      }
+
+      return null;
+    }
+
+    if (townHeatmap) {
+      return (
+        Math.ceil(
+          Math.max(...townHeatmap.map((point) => point.resalePrice)) / 100000
+        ) * 100000
+      );
+    }
+
+    return null;
+  }, [town, islandHeatmap, townHeatmap]);
+
+  const priceRangeLower = useAppSelector(selectHeatmapPriceRangeLower);
+  const priceRangeUpper = useAppSelector(selectHeatmapPriceRangeUpper);
+
+  useEffect(() => {
+    if (Number.isNaN(priceRangeLower) && defaultPriceRangeLower) {
+      dispatch(setHeatmapPriceRangeLower(defaultPriceRangeLower));
+    }
+  }, [dispatch, priceRangeLower, defaultPriceRangeLower]);
+
+  useEffect(() => {
+    if (Number.isNaN(priceRangeUpper) && defaultPriceRangeUpper) {
+      dispatch(setHeatmapPriceRangeUpper(defaultPriceRangeUpper));
+    }
+  }, [dispatch, priceRangeUpper, defaultPriceRangeUpper]);
+
+  const setMapViewport = () => {
+    if (!map || !searchBox) {
+      return;
+    }
+
+    const places = searchBox.getPlaces();
+
+    if (places?.length === 0) {
+      return;
+    }
+
+    setSearchMarkers([]);
+
+    const bounds = new google.maps.LatLngBounds();
+
+    places?.forEach((place) => {
+      if (!place.geometry || !place.geometry.location) {
+        return;
+      }
+
+      const { location } = place.geometry;
+
+      if (location) {
+        setSearchMarkers((markers) => [...markers, location]);
+      }
+
+      if (place.geometry.viewport) {
+        bounds.union(place.geometry.viewport);
+      } else {
+        bounds.extend(place.geometry.location);
+      }
+    });
+
+    map.fitBounds(bounds);
+  };
 
   const handleTownChange = (_: React.SyntheticEvent, townName: string) => {
     dispatch(setTown(townName as Town | 'Islandwide'));
@@ -124,6 +215,26 @@ const MapOverlay = ({ map }: Props) => {
         spacing={2}
         sx={{ position: 'absolute', top: 0, p: 2, pointerEvents: 'none' }}
       >
+        <Grid item xs={12} md="auto">
+          <StandaloneSearchBox
+            onPlacesChanged={setMapViewport}
+            onLoad={setSearchBox}
+          >
+            <TextField
+              placeholder="Search..."
+              sx={{
+                width: {
+                  xs: '100%',
+                  md: 400,
+                },
+                pointerEvents: 'auto',
+                '.MuiInputBase-root': {
+                  backgroundColor: (theme) => theme.palette.background.default,
+                },
+              }}
+            />
+          </StandaloneSearchBox>
+        </Grid>
         <Grid item xs={12} md="auto">
           <Autocomplete
             options={['Islandwide'].concat(
@@ -226,7 +337,6 @@ const MapOverlay = ({ map }: Props) => {
         >
           <Button
             variant="contained"
-            size="large"
             onClick={() => setShowSettings(true)}
             sx={{
               p: '12px',
@@ -257,15 +367,31 @@ const MapOverlay = ({ map }: Props) => {
                 pointerEvents: 'auto',
               }}
             >
-              <CardContent sx={{ p: '0 12px 12px !important' }}>
+              <CardContent
+                sx={{ position: 'relative', p: '0 12px 12px !important' }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    position: 'absolute',
+                    top: 12,
+                    left: 0,
+                    width: '100%',
+                    textAlign: 'center',
+                  }}
+                >
+                  Average Resale Price
+                </Typography>
                 <Stack direction="row" justifyContent="space-between">
                   <PriceRange
                     priceRange={priceRangeLower}
                     setHeatmapPriceRange={setHeatmapPriceRangeLower}
+                    max={priceRangeUpper}
                   />
                   <PriceRange
                     priceRange={priceRangeUpper}
                     setHeatmapPriceRange={setHeatmapPriceRangeUpper}
+                    min={priceRangeLower}
                   />
                 </Stack>
                 <Box

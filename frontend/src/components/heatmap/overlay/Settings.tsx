@@ -15,13 +15,14 @@ import {
   Settings as SettingsIcon,
 } from '@mui/icons-material';
 
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import {
   selectShowHeatmap,
   selectShowHeatmapPrices,
   setShowHeatmap,
   setShowHeatmapPrices,
-} from '../../reducers/settings';
+} from '../../../reducers/settings';
+import { selectTown } from '../../../reducers/heatmap';
 
 interface Props extends DialogProps {
   onClose: () => void;
@@ -31,6 +32,7 @@ const Settings = ({ onClose, ...props }: Props) => {
   const dispatch = useAppDispatch();
   const showHeatmap = useAppSelector(selectShowHeatmap);
   const showHeatmapPrices = useAppSelector(selectShowHeatmapPrices);
+  const town = useAppSelector(selectTown);
 
   return (
     <Dialog onClose={onClose} {...props}>
@@ -73,6 +75,7 @@ const Settings = ({ onClose, ...props }: Props) => {
                 }
               />
             }
+            disabled={town !== 'Islandwide'}
             label="Show towns/prices"
           />
         </FormGroup>

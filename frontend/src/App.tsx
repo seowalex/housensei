@@ -7,6 +7,7 @@ import {
   createTheme,
   useMediaQuery,
 } from '@mui/material';
+import { SnackbarProvider } from 'notistack';
 
 import { useAppSelector } from './app/hooks';
 import { selectDarkMode } from './reducers/settings';
@@ -59,7 +60,9 @@ const App = () => {
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Routes />
+        <SnackbarProvider maxSnack={1}>
+          <Routes />
+        </SnackbarProvider>
       </ThemeProvider>
     </StyledEngineProvider>
   );

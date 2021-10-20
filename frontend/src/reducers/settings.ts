@@ -4,12 +4,13 @@ import { ColorTheme, rainbowTheme } from '../types/themes';
 
 export interface SettingsState {
   darkMode: boolean | null;
+  drawerOpen: boolean;
   heatmap: {
     showHeatmap: boolean;
     showPrices: boolean;
     priceRange: {
-      lower: number | null;
-      upper: number | null;
+      lower: number;
+      upper: number;
     };
   };
   colorTheme: ColorTheme;
@@ -17,12 +18,13 @@ export interface SettingsState {
 
 const initialState: SettingsState = {
   darkMode: null,
+  drawerOpen: true,
   heatmap: {
     showHeatmap: true,
     showPrices: true,
     priceRange: {
-      lower: null,
-      upper: null,
+      lower: NaN,
+      upper: NaN,
     },
   },
   colorTheme: rainbowTheme,
@@ -34,6 +36,9 @@ const slice = createSlice({
   reducers: {
     setDarkMode: (state, action: PayloadAction<boolean>) => {
       state.darkMode = action.payload;
+    },
+    setDrawerOpen: (state, action: PayloadAction<boolean>) => {
+      state.drawerOpen = action.payload;
     },
     setShowHeatmap: (state, action: PayloadAction<boolean>) => {
       state.heatmap.showHeatmap = action.payload;
@@ -55,6 +60,7 @@ const slice = createSlice({
 
 export const {
   setDarkMode,
+  setDrawerOpen,
   setShowHeatmap,
   setShowHeatmapPrices,
   setHeatmapPriceRangeLower,
@@ -63,6 +69,7 @@ export const {
 } = slice.actions;
 
 export const selectDarkMode = (state: RootState) => state.settings.darkMode;
+export const selectDrawerOpen = (state: RootState) => state.settings.drawerOpen;
 export const selectShowHeatmap = (state: RootState) =>
   state.settings.heatmap.showHeatmap;
 export const selectShowHeatmapPrices = (state: RootState) =>
