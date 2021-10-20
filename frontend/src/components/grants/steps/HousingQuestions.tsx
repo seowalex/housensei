@@ -28,7 +28,7 @@ const HousingQuestions = (props: StepProps) => {
   function ToArray(enumme: Record<string, string>) {
     return Object.keys(enumme).map((key) => ({
       label: enumme[key],
-      value: key,
+      value: enumme[key],
     }));
   }
   const flatSizeOptions = ToArray(FlatType);
@@ -67,6 +67,7 @@ const HousingQuestions = (props: StepProps) => {
               name="flatSize"
               form={form}
               options={flatSizeOptions}
+              required
             />
           </Grid>
         </>

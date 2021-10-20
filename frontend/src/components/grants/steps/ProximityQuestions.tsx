@@ -31,6 +31,7 @@ const ProximityQuestions = (props: StepProps) => {
           name="receivedProximityBefore"
           form={form}
           options={receivedProximityBeforeOptions}
+          required
         />
       </Grid>
       <Grid item>
@@ -41,7 +42,6 @@ const ProximityQuestions = (props: StepProps) => {
           name="proximityStatus"
           form={form}
           options={proximityStatusOptions}
-          required
         />
       </Grid>
     </Grid>

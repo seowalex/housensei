@@ -1,5 +1,6 @@
 import { Grid } from '@mui/material';
 import { UseFormGetValues, FieldValues } from 'react-hook-form';
+import { getProximityGrant } from '../calculation/GrantCalculation';
 import GrantCard from './GrantCard';
 
 interface Props {
@@ -12,7 +13,7 @@ const GrantsResult = (props: Props) => {
   const values = formValues();
 
   // TODO is a string, not a bool
-  const parseJson = {
+  const fieldValues = {
     ...values,
     singleNationality: values.ownNationality,
     coupleNationality: `${values.ownNationality}/${values.partnerNationality}`,
@@ -20,7 +21,10 @@ const GrantsResult = (props: Props) => {
     coupleFirstTimer: `${values.ownFirstTimer}/${values.partnerFirstTimer}`,
   };
 
-  console.log(parseJson);
+  console.log(fieldValues);
+
+  const familyGrant = getProximityGrant(fieldValues);
+  console.log(familyGrant);
 
   // console.log(formValues());
   return (
