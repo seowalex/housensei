@@ -31,7 +31,7 @@ const addWhereClauses = (
   queryBuilder: SelectQueryBuilder<Resale>
 ) => {
   if (queries.years) {
-    queryBuilder.where(
+    queryBuilder.andWhere(
       'date_part(\'year\', "transactionDate") IN (:...years)',
       {
         years: queries.years instanceof Array ? queries.years : [queries.years],
