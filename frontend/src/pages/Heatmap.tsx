@@ -2,7 +2,7 @@ import { CircularProgress, Container } from '@mui/material';
 import { useJsApiLoader } from '@react-google-maps/api';
 import { UseLoadScriptOptions } from '@react-google-maps/api/src/useJsApiLoader';
 
-import Map from '../components/heatmap/Map';
+import Map from '../components/heatmap/map/Map';
 
 const apiOptions: UseLoadScriptOptions = {
   googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,

@@ -9,9 +9,9 @@ import {
 import { Edit as EditIcon } from '@mui/icons-material';
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 
-import { useAppDispatch } from '../../app/hooks';
+import { useAppDispatch } from '../../../app/hooks';
 
-import { currencyFormatter } from '../../app/utils';
+import { currencyFormatter } from '../../../app/utils';
 
 interface Props {
   priceRange: number;

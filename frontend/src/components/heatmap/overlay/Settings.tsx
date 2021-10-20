@@ -15,14 +15,14 @@ import {
   Settings as SettingsIcon,
 } from '@mui/icons-material';
 
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import {
   selectShowHeatmap,
   selectShowHeatmapPrices,
   setShowHeatmap,
   setShowHeatmapPrices,
-} from '../../reducers/settings';
-import { selectTown } from '../../reducers/heatmap';
+} from '../../../reducers/settings';
+import { selectTown } from '../../../reducers/heatmap';
 
 interface Props extends DialogProps {
   onClose: () => void;

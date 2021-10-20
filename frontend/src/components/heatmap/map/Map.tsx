@@ -19,29 +19,29 @@ import {
 import { InfoBoxOptions } from '@react-google-maps/infobox';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { selectTown, selectYear, setTown } from '../../reducers/heatmap';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
+import { selectTown, selectYear, setTown } from '../../../reducers/heatmap';
 import {
   selectDarkMode,
   selectHeatmapPriceRangeLower,
   selectHeatmapPriceRangeUpper,
   selectShowHeatmap,
   selectShowHeatmapPrices,
-} from '../../reducers/settings';
+} from '../../../reducers/settings';
 import {
   useGetIslandHeatmapQuery,
   useGetTownHeatmapQuery,
-} from '../../api/heatmap';
+} from '../../../api/heatmap';
 
-import { currencyFormatter, useDebounce } from '../../app/utils';
+import { currencyFormatter, useDebounce } from '../../../app/utils';
 import {
   singaporeCoordinates,
   townBoundaries,
   townCoordinates,
-} from '../../app/constants';
-import { Town } from '../../types/towns';
+} from '../../../app/constants';
+import { Town } from '../../../types/towns';
 
-import MapOverlay from './MapOverlay';
+import MapOverlay from '../overlay/MapOverlay';
 
 const infoBoxOptions: InfoBoxOptions = {
   boxStyle: {
@@ -117,6 +117,7 @@ const Map = () => {
 
   const selectedPolygonOptions: google.maps.PolygonOptions = useMemo(
     () => ({
+      clickable: false,
       fillOpacity: 0,
       strokeColor: theme.palette.error.light,
       strokeWeight: 3,
@@ -331,7 +332,7 @@ const Map = () => {
           />
         )}
         {searchMarkers.map((position) => (
-          <Marker position={position} />
+          <Marker key={position.toString()} position={position} />
         ))}
       </GoogleMap>
       {(town === 'Islandwide' ? isIslandFetching : isTownFetching) && (

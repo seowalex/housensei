@@ -17,33 +17,33 @@ import { StandaloneSearchBox } from '@react-google-maps/api';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 import { matchSorter } from 'match-sorter';
 
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import {
   selectTown,
   selectYear,
   setTown,
   setYear,
-} from '../../reducers/heatmap';
+} from '../../../reducers/heatmap';
 import {
   selectHeatmapPriceRangeLower,
   selectHeatmapPriceRangeUpper,
   selectShowHeatmap,
   setHeatmapPriceRangeLower,
   setHeatmapPriceRangeUpper,
-} from '../../reducers/settings';
+} from '../../../reducers/settings';
 import {
   useGetIslandHeatmapQuery,
   useGetTownHeatmapQuery,
-} from '../../api/heatmap';
+} from '../../../api/heatmap';
 
-import { useDebounce } from '../../app/utils';
-import { townSorter } from '../../utils/towns';
+import { useDebounce } from '../../../app/utils';
+import { townSorter } from '../../../utils/towns';
 import {
   singaporeCoordinates,
   townCoordinates,
   townRegions,
-} from '../../app/constants';
-import { Town } from '../../types/towns';
+} from '../../../app/constants';
+import { Town } from '../../../types/towns';
 
 import Settings from './Settings';
 import PriceRange from './PriceRange';

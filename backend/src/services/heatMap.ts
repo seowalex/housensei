@@ -131,7 +131,7 @@ const getResalesByTown = async (
     .createQueryBuilder('resale')
     .select('MAX(resale.coordinates)', 'coordinates')
     .addSelect(
-      "json_agg(json_build_object('flatType', resale.flatType, 'resalePrice', resale.resalePrice, 'transactionMonth', date_part('month', resale.transactionDate)))",
+      "json_agg(json_build_object('flatType', resale.flatType, 'resalePrice', resale.resalePrice, 'transactionMonth', to_char(resale.transactionDate, 'YYYY-MM')))",
       'transactions'
     )
     .addSelect("CONCAT(resale.block, ' ', resale.streetName)", 'address')
