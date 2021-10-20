@@ -33,6 +33,7 @@ import { Town } from '../../../types/towns';
 
 import MapOverlay from '../overlay/MapOverlay';
 import TownPolygon from './TownPolygon';
+import FlatMarker from './FlatMarker';
 
 const Map = () => {
   const { google } = window;
@@ -209,8 +210,24 @@ const Map = () => {
           />
         )}
         {searchMarkers.map((position) => (
-          <Marker key={position.toString()} position={position} />
+          <Marker
+            key={position.toString()}
+            position={position}
+            clickable={false}
+          />
         ))}
+        {town !== 'Islandwide' &&
+          townHeatmap?.map((point) => (
+            <FlatMarker
+              key={point.address}
+              address={point.address}
+              coordinates={{
+                lat: point.coordinates[0],
+                lng: point.coordinates[1],
+              }}
+              transactions={point.transactions}
+            />
+          ))}
       </GoogleMap>
       {(town === 'Islandwide' ? isIslandFetching : isTownFetching) && (
         <Box

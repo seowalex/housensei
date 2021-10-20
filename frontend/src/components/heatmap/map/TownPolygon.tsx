@@ -69,7 +69,7 @@ const TownPolygon = ({ town, resalePrice, showHeatmapPrices, map }: Props) => {
     setShowInfoBox(showHeatmapPrices);
   }, [polygon, showHeatmapPrices]);
 
-  const handlePolygonMouseOver = () => {
+  const handleMouseOver = () => {
     if (!showHeatmapPrices) {
       polygon?.setOptions({
         fillOpacity: 0.4,
@@ -79,7 +79,7 @@ const TownPolygon = ({ town, resalePrice, showHeatmapPrices, map }: Props) => {
     }
   };
 
-  const handlePolygonMouseOut = () => {
+  const handleMouseOut = () => {
     if (!showHeatmapPrices) {
       polygon?.setOptions({
         fillOpacity: 0,
@@ -89,7 +89,7 @@ const TownPolygon = ({ town, resalePrice, showHeatmapPrices, map }: Props) => {
     }
   };
 
-  const handlePolygonClick = () => {
+  const handleClick = () => {
     dispatch(setTown(town as Town));
     map?.setCenter(townCoordinates[town as Town] ?? singaporeCoordinates);
     map?.setZoom(15);
@@ -101,9 +101,9 @@ const TownPolygon = ({ town, resalePrice, showHeatmapPrices, map }: Props) => {
         paths={townBoundaries[town as Town]}
         options={polygonOptions}
         onLoad={setPolygon}
-        onMouseOver={() => handlePolygonMouseOver()}
-        onMouseOut={() => handlePolygonMouseOut()}
-        onClick={() => handlePolygonClick()}
+        onMouseOver={handleMouseOver}
+        onMouseOut={handleMouseOut}
+        onClick={handleClick}
       />
       <InfoBox
         position={townCoordinates[town as Town]}

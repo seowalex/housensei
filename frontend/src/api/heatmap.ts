@@ -1,5 +1,6 @@
 import api from './base';
 import type { Town } from '../types/towns';
+import type { BackendFlatType } from '../types/groups';
 
 interface IslandHeatmapResponse {
   town: string;
@@ -15,6 +16,13 @@ interface TownHeatmapResponse {
   address: string;
   coordinates: [number, number];
   resalePrice: number;
+  transactions: FlatTransaction[];
+}
+
+export interface FlatTransaction {
+  flatType: BackendFlatType;
+  resalePrice: number;
+  transactionMonth: string;
 }
 
 const extendedApi = api.injectEndpoints({
