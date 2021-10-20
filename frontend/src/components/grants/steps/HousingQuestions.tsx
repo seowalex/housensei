@@ -6,7 +6,7 @@ import StepProps from './StepProps';
 const HousingQuestions = (props: StepProps) => {
   const { form } = props;
   const watchMartialStatus = form.watch('maritalStatus');
-  const isCouple = watchMartialStatus === 'Couple';
+  const isCouple = watchMartialStatus === 'couple';
   const watchHousingType = form.watch('housingType');
   const isResale = watchHousingType === 'Resale';
 

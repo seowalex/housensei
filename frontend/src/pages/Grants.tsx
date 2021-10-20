@@ -103,7 +103,7 @@ const Grants = () => {
       maritalStatus: yup.string().required('Must indicate marital status'),
       ownNationality: yup.string().required('Must indicate nationality'),
       partnerNationality: yup.mixed().when('maritalStatus', {
-        is: 'Couple',
+        is: 'couple',
         then: yup.string().required("Must indicate partner's nationality"),
       }),
       ownFirstTimer: yup
@@ -131,7 +131,7 @@ const Grants = () => {
               // eslint-disable-next-line react/no-this-in-sfc
               this.parent.partnerNationality === 'F' ||
               // eslint-disable-next-line react/no-this-in-sfc
-              this.parent.maritalStatus !== 'Couple'
+              this.parent.maritalStatus !== 'couple'
             ) {
               return true;
             }

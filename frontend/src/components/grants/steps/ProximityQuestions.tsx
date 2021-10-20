@@ -5,7 +5,7 @@ import StepProps from './StepProps';
 const ProximityQuestions = (props: StepProps) => {
   const { form } = props;
   const watchMartialStatus = form.watch('maritalStatus');
-  const isCouple = watchMartialStatus === 'Couple';
+  const isCouple = watchMartialStatus === 'couple';
 
   const receivedProximityBeforeOptions = [
     { label: 'Yes', value: true },
