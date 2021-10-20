@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   IconButton,
   InputAdornment,
@@ -16,16 +16,45 @@ import { currencyFormatter } from '../../app/utils';
 interface Props {
   priceRange: number;
   setHeatmapPriceRange: ActionCreatorWithPayload<number, string>;
+  min?: number;
+  max?: number;
 }
 
-const PriceRange = ({ priceRange, setHeatmapPriceRange }: Props) => {
+const PriceRange = ({ priceRange, setHeatmapPriceRange, min, max }: Props) => {
   const dispatch = useAppDispatch();
+  const [value, setValue] = useState(priceRange);
   const [priceRangeOpen, setPriceRangeOpen] = useState(false);
+
+  useEffect(() => {
+    setValue(priceRange);
+  }, [priceRange]);
 
   const handleEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Escape' || event.key === 'Enter') {
+      if (
+        value >= (min ?? Number.NEGATIVE_INFINITY) &&
+        value <= (max ?? Number.POSITIVE_INFINITY)
+      ) {
+        dispatch(setHeatmapPriceRange(value));
+      } else {
+        setValue(priceRange);
+      }
+
       setPriceRangeOpen(false);
     }
+  };
+
+  const handleBlur = () => {
+    if (
+      value >= (min ?? Number.NEGATIVE_INFINITY) &&
+      value <= (max ?? Number.POSITIVE_INFINITY)
+    ) {
+      dispatch(setHeatmapPriceRange(value));
+    } else {
+      setValue(priceRange);
+    }
+
+    setPriceRangeOpen(false);
   };
 
   return priceRangeOpen ? (
@@ -33,10 +62,11 @@ const PriceRange = ({ priceRange, setHeatmapPriceRange }: Props) => {
       type="number"
       size="small"
       variant="outlined"
-      value={priceRange}
-      onChange={(event) =>
-        dispatch(setHeatmapPriceRange(parseInt(event.target.value, 10)))
-      }
+      value={value}
+      onChange={(event) => setValue(parseInt(event.target.value, 10))}
+      onBlur={handleBlur}
+      onKeyDown={handleEnter}
+      autoFocus
       InputProps={{
         startAdornment: (
           <InputAdornment
@@ -49,10 +79,12 @@ const PriceRange = ({ priceRange, setHeatmapPriceRange }: Props) => {
             $
           </InputAdornment>
         ),
-        onBlur: () => setPriceRangeOpen(false),
-        onKeyDown: handleEnter,
-        autoFocus: true,
-        sx: {
+      }}
+      sx={{
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        p: '8px 0 4px',
+        '.MuiInputBase-root': {
           fontSize: (theme) => theme.typography.body2,
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
@@ -62,9 +94,6 @@ const PriceRange = ({ priceRange, setHeatmapPriceRange }: Props) => {
             p: '3px 4px',
           },
         },
-      }}
-      sx={{
-        p: '8px 0 4px',
       }}
     />
   ) : (

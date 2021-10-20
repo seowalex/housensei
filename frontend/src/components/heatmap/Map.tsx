@@ -1,7 +1,9 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import {
+  Box,
   Card,
   CardContent,
+  CircularProgress,
   Typography,
   useMediaQuery,
   useTheme,
@@ -10,6 +12,7 @@ import {
   GoogleMap,
   HeatmapLayer,
   InfoBox,
+  Marker,
   Polygon,
   TransitLayer,
 } from '@react-google-maps/api';
@@ -67,6 +70,8 @@ const Map = () => {
   const year = useAppSelector(selectYear);
 
   const [map, setMap] = useState<google.maps.Map>();
+  const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox>();
+  const [searchMarkers, setSearchMarkers] = useState<google.maps.LatLng[]>([]);
   const [polygons, setPolygons] = useState<{
     [K in Town]?: google.maps.Polygon;
   }>({});
@@ -76,17 +81,17 @@ const Map = () => {
 
   const debouncedYear = useDebounce(year, 500);
 
-  const { data: islandHeatmap } = useGetIslandHeatmapQuery(
-    town === 'Islandwide' ? debouncedYear : skipToken
-  );
-  const { data: townHeatmap } = useGetTownHeatmapQuery(
-    town === 'Islandwide'
-      ? skipToken
-      : {
-          year: debouncedYear,
-          town,
-        }
-  );
+  const { data: islandHeatmap, isFetching: isIslandFetching } =
+    useGetIslandHeatmapQuery(town === 'Islandwide' ? debouncedYear : skipToken);
+  const { data: townHeatmap, isFetching: isTownFetching } =
+    useGetTownHeatmapQuery(
+      town === 'Islandwide'
+        ? skipToken
+        : {
+            year: debouncedYear,
+            town,
+          }
+    );
 
   const mapOptions: google.maps.MapOptions = useMemo(
     () => ({
@@ -209,6 +214,7 @@ const Map = () => {
     if (google && zoom) {
       if (zoom < 15) {
         dispatch(setTown('Islandwide'));
+        setSearchMarkers([]);
       } else {
         for (const [townName, polygon] of Object.entries(polygons)) {
           if (
@@ -261,6 +267,7 @@ const Map = () => {
       <GoogleMap
         mapContainerStyle={{ height: '100%' }}
         options={mapOptions}
+        onBoundsChanged={() => searchBox?.setBounds(map?.getBounds() ?? null)}
         onLoad={setMap}
         onIdle={handleMapIdle}
       >
@@ -269,26 +276,26 @@ const Map = () => {
           <HeatmapLayer data={heatmapData} options={heatmapLayerOptions} />
         )}
         {town === 'Islandwide' &&
-          Object.entries(townBoundaries).map(([townName, paths]) => (
-            <Fragment key={townName}>
+          islandHeatmap?.map((point) => (
+            <Fragment key={point.town}>
               <Polygon
-                paths={paths}
+                paths={townBoundaries[point.town as Town]}
                 options={polygonOptions}
                 onLoad={(polygon) =>
                   setPolygons((prevPolygons) => ({
                     ...prevPolygons,
-                    [townName]: polygon,
+                    [point.town]: polygon,
                   }))
                 }
-                onMouseOver={() => handlePolygonMouseOver(townName)}
-                onMouseOut={() => handlePolygonMouseOut(townName)}
-                onClick={() => handlePolygonClick(townName)}
+                onMouseOver={() => handlePolygonMouseOver(point.town)}
+                onMouseOut={() => handlePolygonMouseOut(point.town)}
+                onClick={() => handlePolygonClick(point.town)}
               />
               <InfoBox
-                position={townCoordinates[townName as Town]}
+                position={townCoordinates[point.town as Town]}
                 options={{
                   ...infoBoxOptions,
-                  visible: infoBoxes[townName as Town],
+                  visible: infoBoxes[point.town as Town],
                 }}
               >
                 <Card
@@ -307,13 +314,10 @@ const Map = () => {
                         whiteSpace: 'nowrap',
                       }}
                     >
-                      {townName}
+                      {point.town}
                     </Typography>
                     <Typography variant="caption">
-                      {formatPrice(
-                        islandHeatmap?.find((point) => point.town === townName)
-                          ?.resalePrice
-                      )}
+                      {formatPrice(point.resalePrice)}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -326,8 +330,34 @@ const Map = () => {
             options={selectedPolygonOptions}
           />
         )}
+        {searchMarkers.map((position) => (
+          <Marker position={position} />
+        ))}
       </GoogleMap>
-      <MapOverlay map={map} />
+      {(town === 'Islandwide' ? isIslandFetching : isTownFetching) && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            height: '100%',
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            pointerEvents: 'none',
+            backgroundColor: 'rgba(117, 117, 117, 0.2)',
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      )}
+      <MapOverlay
+        map={map}
+        searchBox={searchBox}
+        setSearchBox={setSearchBox}
+        setSearchMarkers={setSearchMarkers}
+      />
     </>
   );
 };

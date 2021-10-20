@@ -1,0 +1,127 @@
+{
+    "attribute": "maritalStatus",
+    "options": {
+      "single": {
+        "attribute": "singleNationality",
+        "options": {
+          "SC": {
+            "attribute": "singleFirstTimer",
+            "options": {
+              "true": {
+                "attribute": "age",
+                "options": {
+                  "true": {
+                    "attribute": "workingAtLeastAYear",
+                    "options": {
+                      "true": {
+                        "attribute": "housingType",
+                        "options": {
+                          "BTO": true,
+                          "Resale": {
+                            "attribute": "lease",
+                            "options": {
+                              "true": true,
+                              "false": false
+                            }
+                          },
+                          "EC": false
+                        }
+                      },
+                      "false": false
+                    }
+                  },
+                  "false": false
+                }
+              },
+              "false": false
+            }
+          },
+          "PR": false,
+          "F": false
+        }
+      },
+      "couple": {
+        "attribute": "coupleNationality",
+        "options": {
+          "SC/SC": {
+            "attribute": "coupleFirstTimer",
+            "options": {
+              "true/true": false,
+              "true/false": {
+                "attribute": "workingAtLeastAYear",
+                "options": {
+                  "true": {
+                    "attribute": "housingType",
+                    "options": {
+                      "BTO": true,
+                      "Resale": {
+                        "attribute": "lease",
+                        "options": {
+                          "true": true,
+                          "false": false
+                        }
+                      },
+                      "EC": true
+                    }
+                  },
+                  "false": false
+                }
+              }
+            }
+          },
+          "SC/PR": {
+            "attribute": "coupleFirstTimer",
+            "options": {
+              "true/true": false,
+              "true/false": {
+                "attribute": "workingAtLeastAYear",
+                "options": {
+                  "true": {
+                    "attribute": "housingType",
+                    "options": {
+                      "BTO": true,
+                      "Resale": {
+                        "attribute": "lease",
+                        "options": {
+                          "true": true,
+                          "false": false
+                        }
+                      },
+                      "EC": true
+                    }
+                  },
+                  "false": false
+                }
+              }
+            }
+          },
+          "SC/F": {
+            "attribute": "singleFirstTimer",
+            "options": {
+              "false": false,
+              "true": {
+                "attribute": "workingAtLeastAYear",
+                "options": {
+                  "true": {
+                    "attribute": "housingType",
+                    "options": {
+                      "BTO": true,
+                      "Resale": {
+                        "attribute": "lease",
+                        "options": {
+                          "true": true,
+                          "false": false
+                        }
+                      },
+                      "EC": true
+                    }
+                  },
+                  "false": false
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+}
