@@ -2,20 +2,19 @@ import {
   FormControl,
   FormHelperText,
   FormLabel,
-  MenuItem,
-  Select,
+  TextField,
 } from '@mui/material';
 import { Controller, FieldValues, UseFormReturn } from 'react-hook-form';
 
 interface Props {
   name: string;
-  options: Array<{ label: string; value: any }>;
   form: UseFormReturn<FieldValues>;
   label?: string;
+  required?: boolean;
 }
 
-const FormSelectInput = (props: Props) => {
-  const { name, options, form, label } = props;
+const FormNumberTextFieldInput = (props: Props) => {
+  const { name, form, label, required } = props;
   const error = form.formState.errors[name]?.message;
 
   return (
@@ -23,15 +22,16 @@ const FormSelectInput = (props: Props) => {
       name={name}
       control={form.control}
       render={({ field: { onChange, value } }) => (
-        <FormControl component="fieldset" error={!!error}>
+        <FormControl component="fieldset" error={!!error} required={!!required}>
           <FormLabel component="legend">{label}</FormLabel>
-          <Select value={value} label={label} onChange={onChange}>
-            {options.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </Select>
+          <TextField
+            type="number"
+            size="small"
+            variant="outlined"
+            value={value}
+            onChange={onChange}
+            sx={{ width: '100%' }}
+          />
           <FormHelperText style={{ height: '5px' }}>{error}</FormHelperText>
         </FormControl>
       )}
@@ -39,4 +39,4 @@ const FormSelectInput = (props: Props) => {
   );
 };
 
-export default FormSelectInput;
+export default FormNumberTextFieldInput;

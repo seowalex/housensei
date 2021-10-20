@@ -13,10 +13,11 @@ interface Props {
   options: Array<{ label: string; value: any }>;
   form: UseFormReturn<FieldValues>;
   label?: string;
+  required?: boolean;
 }
 
 const FormSelectInput = (props: Props) => {
-  const { name, options, form, label } = props;
+  const { name, options, form, label, required } = props;
   const error = form.formState.errors[name]?.message;
 
   return (
@@ -24,7 +25,7 @@ const FormSelectInput = (props: Props) => {
       name={name}
       control={form.control}
       render={({ field: { onChange, value } }) => (
-        <FormControl component="fieldset" error={!!error}>
+        <FormControl component="fieldset" error={!!error} required={!!required}>
           <FormLabel component="legend">{label}</FormLabel>
           <RadioGroup row value={value} onChange={onChange}>
             {options.map((option) => (

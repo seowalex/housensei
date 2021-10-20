@@ -145,45 +145,18 @@ const Grants = () => {
       workingAtLeastAYear: notEmptyStrCheck(
         'Must indicate if working for at least a year'
       ),
-      monthlyIncome: notEmptyStrCheck('Must indicate monthly income'),
     }),
     yup.object({
       housingType: yup.string().required('Must indicate housing type'),
-      lease: yup.mixed().when('housingType', {
-        is: 'Resale',
-        then: notEmptyStrCheck('Must indicate resale lease'),
-      }),
       flatSize: yup.mixed().when('housingType', {
         is: 'Resale',
         then: notEmptyStrCheck('Must indicate resale flat size'),
       }),
-      livingWithExtendedFamily: yup
-        .mixed()
-        .test(
-          'livingWithExtendedFamily',
-          'Must indicate if living with extended family',
-          function (item) {
-            if (
-              // eslint-disable-next-line react/no-this-in-sfc
-              this.parent.maritalStatus !== 'Couple' ||
-              // eslint-disable-next-line react/no-this-in-sfc
-              this.parent.housingType !== 'Resale'
-            ) {
-              return true;
-            }
-            return item !== '';
-          }
-        ),
     }),
     yup.object({
       receivedProximityBefore: notEmptyStrCheck(
         'Must indicate if received proximity grant before'
       ),
-      proximityStatus: yup
-        .string()
-        .required(
-          'Must indicate intended living proximity with parents or children'
-        ),
     }),
   ];
 
@@ -231,6 +204,8 @@ const Grants = () => {
               Single), Family Grant, Proximity Housing Grant (PHG), Singles
               Grant, Half Housing Grant here.
             </Typography>
+            <br />
+            <Typography>Questions that required (*)</Typography>
           </Grid>
           <Grid item>
             <Stepper activeStep={activeStep}>

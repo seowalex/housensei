@@ -46,6 +46,7 @@ const HousingQuestions = (props: StepProps) => {
           name="housingType"
           form={form}
           options={housingTypeOptions}
+          required
         />
       </Grid>
 
