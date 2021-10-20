@@ -1,25 +1,25 @@
 import {
   AttachMoneyRounded,
-  BedroomParentRounded,
-  CalendarTodayRounded,
+  BedRounded as BedRoundedIcon,
+  CalendarTodayRounded as CalendarTodayRoundedIcon,
   CheckRounded as CheckRoundedIcon,
-  ControlPointDuplicateRounded,
-  DeleteRounded as DeleteRoundedIcon,
   EditRounded as EditRoundedIcon,
   ExpandMoreRounded as ExpandMoreRoundedIcon,
+  WarningRounded as WarningRoundedIcon,
 } from '@mui/icons-material';
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Alert,
+  AlertTitle,
   Autocomplete,
   Button,
   Grid,
-  IconButton,
   Modal,
+  Paper,
   Stack,
   TextField,
-  Tooltip,
   Typography,
 } from '@mui/material';
 import { matchSorter } from 'match-sorter';
@@ -28,28 +28,29 @@ import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useGetBTOGraphQuery } from '../../api/history';
 import { useAppSelector } from '../../app/hooks';
+import { decrementColorCount } from '../../reducers/colors';
 import {
   removeGroup,
-  selectBTOAggregations,
-  selectBTOProjects,
-  selectDisplayedBTOAggregations,
-  selectDisplayedBTOProjects,
-  updateDisplayedBTOAggregations,
-  updateDisplayedBTOProjects,
+  selectBTOProjectsOfGroup,
+  selectSelectedBTOProjectIdsOfGroup,
   updateGroup,
+  updateSelectedBTOProjects,
 } from '../../reducers/history';
 import { BTOGroup, Group } from '../../types/groups';
 import { BTOProject } from '../../types/history';
 import {
-  mapFormValuesToGroupFilters,
-  mapGroupToFormValues,
+  btoProjectsSorter,
   convertFlatTypeToFrontend,
+  isSameBTOProject,
+  mapUpdateFormValuesToGroupFilters,
+  mapGroupToUpdateFormValues,
 } from '../../utils/groups';
 import { compareDates, formatDate } from '../../utils/history';
 import { FormPaper, ModalPaper } from '../styled';
+import GroupAccordionToolbar from './GroupAccordionToolbar';
 import GroupDetails from './GroupDetails';
-import GroupForm, { GroupFormValues } from './GroupForm';
 import GroupSummary from './GroupSummary';
+import UpdateGroupForm, { UpdateGroupFormValues } from './UpdateGroupForm';
 
 enum DisplayedModal {
   Update,
@@ -67,34 +68,32 @@ interface Props {
 const BTOGroupAccordion = (props: Props) => {
   const dispatch = useDispatch();
   const { group, expanded, onChangeSelectedGroup, onDuplicateGroup } = props;
+  const projectsRecord = useAppSelector(selectBTOProjectsOfGroup(group.id));
+  const projects = Object.values(projectsRecord);
+  const selectedProjectIds = useAppSelector(
+    selectSelectedBTOProjectIdsOfGroup(group.id)
+  );
+  const selectedProjects = selectedProjectIds.map(
+    (projectId) => projectsRecord[projectId]
+  );
 
-  useGetBTOGraphQuery({
+  const { data: btoQueryResponse } = useGetBTOGraphQuery({
     ...group.filters,
     id: group.id,
   });
-
-  const projects = useAppSelector(selectBTOProjects(group.id));
-  const aggregations = useAppSelector(selectBTOAggregations(group.id));
-
-  const displayedProjects = useAppSelector(
-    selectDisplayedBTOProjects(group.id)
-  );
-  const displayedAggregations = useAppSelector(
-    selectDisplayedBTOAggregations(group.id)
-  );
 
   const [displayedModal, setDisplayedModal] = useState<DisplayedModal>(
     DisplayedModal.Hidden
   );
 
-  const onUpdateGroup: SubmitHandler<GroupFormValues> = (
-    data: GroupFormValues
+  const onUpdateGroup: SubmitHandler<UpdateGroupFormValues> = (
+    data: UpdateGroupFormValues
   ) => {
     const updatedGroup: Group = {
       ...group,
       type: data.type,
       name: data.name === '' ? group.name : data.name,
-      filters: mapFormValuesToGroupFilters(data),
+      filters: mapUpdateFormValuesToGroupFilters(data),
     };
 
     dispatch(
@@ -108,30 +107,43 @@ const BTOGroupAccordion = (props: Props) => {
 
   const onDeleteGroup = () => {
     dispatch(removeGroup(group.id));
+    dispatch(decrementColorCount(group.color));
     setDisplayedModal(DisplayedModal.Hidden);
     onChangeSelectedGroup(false);
   };
 
-  const handleChangeDisplayedProjects = (
-    event: SyntheticEvent,
-    selectedProjects: BTOProject[]
-  ) => {
-    dispatch(
-      updateDisplayedBTOProjects({
-        id: group.id,
-        projects: selectedProjects,
-      })
-    );
+  const handleDisplayUpdateModal = () => {
+    setDisplayedModal(DisplayedModal.Update);
   };
 
-  const handleChangeDisplayedAggregations = (
+  const handleDisplayDeleteModal = () => {
+    setDisplayedModal(DisplayedModal.Delete);
+  };
+
+  const handleDuplicateGroup = () => {
+    onDuplicateGroup(group);
+  };
+
+  const handleChangeSelectedProjects = (
     event: SyntheticEvent,
-    selectedAggregations: BTOProject[]
+    newSelectedProjects: BTOProject[]
   ) => {
+    const newSelectedProjectIds = newSelectedProjects
+      .map((selectedProject) => {
+        const selectedRecord = Object.entries(projectsRecord).filter(
+          ([id, project]) => isSameBTOProject(selectedProject, project)
+        );
+        if (selectedRecord.length === 0) {
+          return '';
+        }
+        return selectedRecord[0][0];
+      })
+      .filter((projectId) => projectId !== '');
+
     dispatch(
-      updateDisplayedBTOAggregations({
+      updateSelectedBTOProjects({
         id: group.id,
-        aggregations: selectedAggregations,
+        projectIds: newSelectedProjectIds,
       })
     );
   };
@@ -152,75 +164,8 @@ const BTOGroupAccordion = (props: Props) => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Autocomplete
-                onChange={handleChangeDisplayedAggregations}
-                value={displayedAggregations ?? []}
-                multiple
-                disableCloseOnSelect
-                options={
-                  aggregations
-                    ? [...aggregations].sort((left, right) =>
-                        left.name.localeCompare(right.name)
-                      )
-                    : []
-                }
-                renderOption={(optionProps, option, { selected }) => (
-                  // eslint-disable-next-line react/jsx-props-no-spreading
-                  <li {...optionProps}>
-                    <Stack
-                      direction="row"
-                      justifyContent="space-between"
-                      alignItems="center"
-                      sx={{ width: '100%' }}
-                    >
-                      <Stack spacing={0.5}>
-                        <Typography>{option.name}</Typography>
-                        <Stack direction="row" spacing={1} alignItems="center">
-                          <AttachMoneyRounded fontSize="small" />
-                          <Typography variant="body2">
-                            {option.price}
-                          </Typography>
-                          <BedroomParentRounded fontSize="small" />
-                          <Typography variant="body2">
-                            {convertFlatTypeToFrontend(option.flatType)}
-                          </Typography>
-                        </Stack>
-                      </Stack>
-                      {selected && <CheckRoundedIcon fontSize="small" />}
-                    </Stack>
-                  </li>
-                )}
-                isOptionEqualToValue={(option, value) =>
-                  option.flatType === value.flatType
-                }
-                getOptionLabel={(option) => option.name}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Aggregated BTO data"
-                    placeholder={
-                      displayedAggregations == null ||
-                      displayedAggregations.length === 0
-                        ? 'Select an aggregation to show on chart'
-                        : ''
-                    }
-                  />
-                )}
-                filterOptions={(options, { inputValue }) =>
-                  matchSorter(options, inputValue, {
-                    keys: [
-                      'name',
-                      'price',
-                      (item: BTOProject) =>
-                        convertFlatTypeToFrontend(item.flatType),
-                    ],
-                  })
-                }
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Autocomplete
-                onChange={handleChangeDisplayedProjects}
-                value={displayedProjects ?? []}
+                onChange={handleChangeSelectedProjects}
+                value={selectedProjects ?? []}
                 multiple
                 disableCloseOnSelect
                 options={
@@ -245,7 +190,7 @@ const BTOGroupAccordion = (props: Props) => {
                       <Stack spacing={0.5}>
                         <Typography>{option.name}</Typography>
                         <Stack direction="row" spacing={1} alignItems="center">
-                          <CalendarTodayRounded fontSize="small" />
+                          <CalendarTodayRoundedIcon fontSize="small" />
                           <Typography variant="body2">
                             {formatDate(option.date)}
                           </Typography>
@@ -253,7 +198,7 @@ const BTOGroupAccordion = (props: Props) => {
                           <Typography variant="body2">
                             {option.price}
                           </Typography>
-                          <BedroomParentRounded fontSize="small" />
+                          <BedRoundedIcon fontSize="small" />
                           <Typography variant="body2">
                             {convertFlatTypeToFrontend(option.flatType)}
                           </Typography>
@@ -264,24 +209,20 @@ const BTOGroupAccordion = (props: Props) => {
                   </li>
                 )}
                 isOptionEqualToValue={(option, value) =>
-                  option.name === value.name &&
-                  option.date === value.date &&
-                  option.flatType === value.flatType
+                  isSameBTOProject(option, value)
                 }
                 getOptionLabel={(option) => option.name}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     label={
-                      displayedProjects == null ||
-                      displayedProjects.length === 0
-                        ? 'Select specific BTO projects'
-                        : 'Displayed BTO Projects'
+                      selectedProjects == null || selectedProjects.length === 0
+                        ? 'Mark specific BTO projects'
+                        : 'Marked BTO Projects'
                     }
                     placeholder={
-                      displayedProjects == null ||
-                      displayedProjects.length === 0
-                        ? 'Select a project to show on chart'
+                      selectedProjects == null || selectedProjects.length === 0
+                        ? 'Mark a project on the chart'
                         : ''
                     }
                   />
@@ -292,9 +233,8 @@ const BTOGroupAccordion = (props: Props) => {
                       'name',
                       'price',
                       (item: BTOProject) => formatDate(item.date),
-                      (item: BTOProject) =>
-                        convertFlatTypeToFrontend(item.flatType),
                     ],
+                    sorter: btoProjectsSorter,
                   })
                 }
               />
@@ -303,26 +243,23 @@ const BTOGroupAccordion = (props: Props) => {
               <GroupDetails group={group} />
             </Grid>
             <Grid item>
-              <Stack justifyContent="flex-end" sx={{ height: '100%' }}>
-                <Tooltip title="Duplicate" placement="left" arrow>
-                  <IconButton onClick={() => onDuplicateGroup(group)}>
-                    <ControlPointDuplicateRounded fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-                <IconButton
-                  onClick={() => setDisplayedModal(DisplayedModal.Update)}
-                >
-                  <EditRoundedIcon fontSize="small" />
-                </IconButton>
-                <IconButton
-                  onClick={() => setDisplayedModal(DisplayedModal.Delete)}
-                  color="error"
-                >
-                  <DeleteRoundedIcon fontSize="small" />
-                </IconButton>
-              </Stack>
+              <GroupAccordionToolbar
+                groupId={group.id}
+                onDisplayUpdateModal={handleDisplayUpdateModal}
+                onDisplayDeleteModal={handleDisplayDeleteModal}
+                onDuplicateGroup={handleDuplicateGroup}
+              />
             </Grid>
           </Grid>
+          {btoQueryResponse?.data.length === 0 && (
+            <Grid item>
+              <Alert severity="warning" icon={<WarningRoundedIcon />}>
+                <AlertTitle>No projects found!</AlertTitle>
+                Try making your filters less specific with the{' '}
+                <EditRoundedIcon fontSize="small" /> icon.
+              </Alert>
+            </Grid>
+          )}
         </AccordionDetails>
       </Accordion>
       <Modal
@@ -334,11 +271,10 @@ const BTOGroupAccordion = (props: Props) => {
         }}
       >
         <FormPaper>
-          <GroupForm
-            formType="update"
+          <UpdateGroupForm
             onSubmit={onUpdateGroup}
             handleClose={() => setDisplayedModal(DisplayedModal.Hidden)}
-            currentData={mapGroupToFormValues(group)}
+            currentData={mapGroupToUpdateFormValues(group)}
           />
         </FormPaper>
       </Modal>
@@ -347,14 +283,19 @@ const BTOGroupAccordion = (props: Props) => {
         onClose={() => setDisplayedModal(DisplayedModal.Hidden)}
       >
         <ModalPaper>
-          <Stack spacing={1}>
-            <Typography display="inline">
+          <Stack spacing={2}>
+            <Typography variant="h5" textAlign="center">
+              Delete Group?
+            </Typography>
+            <Typography sx={{ p: '0rem 1rem' }}>
               Are you sure you want to delete this group?
             </Typography>
-            <Stack direction="row" justifyContent="center">
-              <GroupSummary group={group} />
-            </Stack>
-            <GroupDetails group={group} />
+            <Paper sx={{ p: '1rem' }} elevation={3}>
+              <Stack spacing={1}>
+                <GroupSummary group={group} />
+                <GroupDetails group={group} />
+              </Stack>
+            </Paper>
             <Stack direction="row" spacing={2}>
               <Button
                 variant="outlined"

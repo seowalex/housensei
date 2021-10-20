@@ -1,4 +1,13 @@
-import { Chip, Stack, Typography } from '@mui/material';
+import {
+  Chip,
+  Grid,
+  List,
+  ListItem,
+  ListItemText,
+  ListSubheader,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { Group } from '../../types/groups';
 import { convertFlatTypeToFrontend } from '../../utils/groups';
 
@@ -6,12 +15,32 @@ interface Props {
   group: Group;
 }
 
+interface GroupDetailProps {
+  label: string;
+  detail: string;
+}
+
+const GroupDetail = (props: GroupDetailProps) => {
+  const { label, detail } = props;
+
+  return (
+    <Grid item container direction="row" spacing={2}>
+      <Grid item xs={6}>
+        <Typography variant="body2" color="text.secondary">
+          {label}
+        </Typography>
+      </Grid>
+      <Grid item xs={6}>
+        <Typography variant="body2">{detail}</Typography>
+      </Grid>
+    </Grid>
+  );
+};
+
 const GroupDetails = (props: Props) => {
   const { group } = props;
-  const { type, filters } = group;
+  const { name, type, filters } = group;
   const {
-    towns,
-    flatTypes,
     minStorey,
     maxStorey,
     minFloorArea,
@@ -24,71 +53,30 @@ const GroupDetails = (props: Props) => {
 
   return (
     <Stack spacing={0.5}>
-      <Stack
-        direction="row"
-        spacing={1}
-        sx={{ p: '0.2rem 0rem' }}
-        alignItems="center"
-      >
-        {towns.length > 0 ? (
-          <>
-            {towns.slice(0, 2).map((town) => (
-              <Chip label={town} key={town} />
-            ))}
-            <Typography>
-              {towns.length > 2 ? `+${towns.length - 2}` : ''}
-            </Typography>
-          </>
-        ) : (
-          <Chip label="Any Location" />
+      <Typography variant="h6">{name}</Typography>
+      <Grid container direction="column">
+        {minStorey && maxStorey && (
+          <GroupDetail label="Storey" detail={`${minStorey} to ${maxStorey}`} />
         )}
-      </Stack>
-      <Stack
-        direction="row"
-        spacing={1}
-        sx={{ p: '0.2rem 0rem' }}
-        alignItems="center"
-      >
-        {flatTypes.length > 0 ? (
-          <>
-            {flatTypes.slice(0, 3).map((flatType) => (
-              <Chip
-                label={convertFlatTypeToFrontend(flatType)}
-                size="small"
-                variant="outlined"
-                key={flatType}
-              />
-            ))}
-            <Typography>
-              {flatTypes.length > 3 ? `+${flatTypes.length - 3}` : ''}
-            </Typography>
-          </>
-        ) : (
-          <Chip label="Any Flat Type" size="small" variant="outlined" />
+        {minFloorArea && maxFloorArea && (
+          <GroupDetail
+            label="Floor Area"
+            detail={`${minFloorArea} to ${maxFloorArea} sqm`}
+          />
         )}
-      </Stack>
-      {minStorey && maxStorey && (
-        <Typography variant="body2">
-          {`Storey: ${minStorey} to ${maxStorey}`}
-        </Typography>
-      )}
-      {minFloorArea && maxFloorArea && (
-        <Typography variant="body2">
-          {`Floor Area: ${minFloorArea} to ${maxFloorArea} sqm`}
-        </Typography>
-      )}
-      {minLeasePeriod && maxLeasePeriod && (
-        <Typography variant="body2">
-          {`Remaining Lease: ${minLeasePeriod} to ${maxLeasePeriod} years`}
-        </Typography>
-      )}
-      {startYear && endYear && (
-        <Typography variant="body2">
-          {`${
-            type === 'resale' ? 'Year of Sale' : 'Year of Launch'
-          }: ${startYear} to ${endYear}`}
-        </Typography>
-      )}
+        {minLeasePeriod && maxLeasePeriod && (
+          <GroupDetail
+            label="Remaining Lease"
+            detail={`${minLeasePeriod} to ${maxLeasePeriod} years`}
+          />
+        )}
+        {startYear && endYear && (
+          <GroupDetail
+            label={type === 'resale' ? 'Year of Sale' : 'Year of Launch'}
+            detail={`${startYear} to ${endYear}`}
+          />
+        )}
+      </Grid>
     </Stack>
   );
 };

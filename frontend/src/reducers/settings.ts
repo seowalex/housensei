@@ -1,5 +1,6 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import type { RootState } from '../app/store';
+import { ColorTheme, rainbowTheme } from '../types/themes';
 
 export interface SettingsState {
   darkMode: boolean | null;
@@ -12,6 +13,7 @@ export interface SettingsState {
       upper: number;
     };
   };
+  colorTheme: ColorTheme;
 }
 
 const initialState: SettingsState = {
@@ -25,6 +27,7 @@ const initialState: SettingsState = {
       upper: NaN,
     },
   },
+  colorTheme: rainbowTheme,
 };
 
 const slice = createSlice({
@@ -49,6 +52,9 @@ const slice = createSlice({
     setHeatmapPriceRangeUpper: (state, action: PayloadAction<number>) => {
       state.heatmap.priceRange.upper = action.payload;
     },
+    setColorTheme: (state, action: PayloadAction<ColorTheme>) => {
+      state.colorTheme = action.payload;
+    },
   },
 });
 
@@ -59,6 +65,7 @@ export const {
   setShowHeatmapPrices,
   setHeatmapPriceRangeLower,
   setHeatmapPriceRangeUpper,
+  setColorTheme,
 } = slice.actions;
 
 export const selectDarkMode = (state: RootState) => state.settings.darkMode;
@@ -71,5 +78,7 @@ export const selectHeatmapPriceRangeLower = (state: RootState) =>
   state.settings.heatmap.priceRange.lower;
 export const selectHeatmapPriceRangeUpper = (state: RootState) =>
   state.settings.heatmap.priceRange.upper;
+export const selectColorTheme = (state: RootState): ColorTheme =>
+  state.settings.colorTheme;
 
 export default slice.reducer;

@@ -1,9 +1,7 @@
 import {
-  ControlPointDuplicateRounded as ControlPointDuplicateRoundedIcon,
-  DeleteRounded as DeleteRoundedIcon,
   EditRounded as EditRoundedIcon,
   ExpandMoreRounded as ExpandMoreRoundedIcon,
-  NewReleasesRounded,
+  NewReleasesRounded as NewReleasesRoundedIcon,
   WarningRounded as WarningRoundedIcon,
 } from '@mui/icons-material';
 import {
@@ -15,10 +13,9 @@ import {
   Button,
   Collapse,
   Grid,
-  IconButton,
   Modal,
+  Paper,
   Stack,
-  Tooltip,
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
@@ -27,15 +24,17 @@ import { useDispatch } from 'react-redux';
 
 import { useGetBTOGraphQuery, useGetResaleGraphQuery } from '../../api/history';
 import { removeGroup, updateGroup } from '../../reducers/history';
+import { decrementColorCount } from '../../reducers/colors';
 import { Group, ResaleGroup } from '../../types/groups';
 import {
-  mapFormValuesToGroupFilters,
-  mapGroupToFormValues,
+  mapUpdateFormValuesToGroupFilters,
+  mapGroupToUpdateFormValues,
 } from '../../utils/groups';
 import { FormPaper, ModalPaper } from '../styled';
+import GroupAccordionToolbar from './GroupAccordionToolbar';
 import GroupDetails from './GroupDetails';
-import GroupForm, { GroupFormValues } from './GroupForm';
 import GroupSummary from './GroupSummary';
+import UpdateGroupForm, { UpdateGroupFormValues } from './UpdateGroupForm';
 
 enum DisplayedModal {
   Update,
@@ -83,14 +82,14 @@ const ResaleGroupAccordion = (props: Props) => {
   );
   const [showBTOAlert, setShowBTOAlert] = useState<boolean>(true);
 
-  const onUpdateGroup: SubmitHandler<GroupFormValues> = (
-    data: GroupFormValues
+  const onUpdateGroup: SubmitHandler<UpdateGroupFormValues> = (
+    data: UpdateGroupFormValues
   ) => {
     const updatedGroup: Group = {
       ...group,
       type: data.type,
       name: data.name === '' ? group.name : data.name,
-      filters: mapFormValuesToGroupFilters(data),
+      filters: mapUpdateFormValuesToGroupFilters(data),
     };
 
     dispatch(
@@ -100,12 +99,26 @@ const ResaleGroupAccordion = (props: Props) => {
       })
     );
     setDisplayedModal(DisplayedModal.Hidden);
+    setShowBTOAlert(true);
   };
 
   const onDeleteGroup = () => {
     dispatch(removeGroup(group.id));
+    dispatch(decrementColorCount(group.color));
     setDisplayedModal(DisplayedModal.Hidden);
     onChangeSelectedGroup(false);
+  };
+
+  const handleDisplayUpdateModal = () => {
+    setDisplayedModal(DisplayedModal.Update);
+  };
+
+  const handleDisplayDeleteModal = () => {
+    setDisplayedModal(DisplayedModal.Delete);
+  };
+
+  const handleDuplicateGroup = () => {
+    onDuplicateGroup(group);
   };
 
   return (
@@ -125,32 +138,20 @@ const ResaleGroupAccordion = (props: Props) => {
                 <GroupDetails group={group} />
               </Grid>
               <Grid item>
-                <Stack justifyContent="flex-end" sx={{ height: '100%' }}>
-                  <Tooltip title="Duplicate" placement="left" arrow>
-                    <IconButton onClick={() => onDuplicateGroup(group)}>
-                      <ControlPointDuplicateRoundedIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                  <IconButton
-                    onClick={() => setDisplayedModal(DisplayedModal.Update)}
-                  >
-                    <EditRoundedIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => setDisplayedModal(DisplayedModal.Delete)}
-                    color="error"
-                  >
-                    <DeleteRoundedIcon fontSize="small" />
-                  </IconButton>
-                </Stack>
+                <GroupAccordionToolbar
+                  groupId={group.id}
+                  onDisplayUpdateModal={handleDisplayUpdateModal}
+                  onDisplayDeleteModal={handleDisplayDeleteModal}
+                  onDuplicateGroup={handleDuplicateGroup}
+                />
               </Grid>
             </Grid>
             {resaleQueryResponse?.data.length === 0 && (
               <Grid item>
                 <Alert severity="warning" icon={<WarningRoundedIcon />}>
                   <AlertTitle>No data found!</AlertTitle>
-                  Try changing your filters with the{' '}
-                  <EditRoundedIcon fontSize="small" /> icon to be less specific.
+                  Try making your filters less specific with the{' '}
+                  <EditRoundedIcon fontSize="small" /> icon.
                 </Alert>
               </Grid>
             )}
@@ -164,20 +165,22 @@ const ResaleGroupAccordion = (props: Props) => {
               >
                 <Alert
                   severity="success"
-                  icon={<NewReleasesRounded />}
+                  icon={<NewReleasesRoundedIcon />}
                   onClose={() => setShowBTOAlert(false)}
                 >
                   <AlertTitle>{`${
                     btoQueryResponse?.data.length ?? ''
-                  } related BTO projects found!`}</AlertTitle>
+                  } BTO projects found!`}</AlertTitle>
+                  We found {btoQueryResponse?.data.length ?? ''} BTO projects
+                  with the same filters as this group.
                   <Button
-                    variant="outlined"
+                    variant="text"
                     onClick={() => {
                       setShowBTOAlert(false);
                       onCreateBTOGroup(group);
                     }}
                   >
-                    Add to chart
+                    Add BTO to chart
                   </Button>
                 </Alert>
               </Collapse>
@@ -194,11 +197,10 @@ const ResaleGroupAccordion = (props: Props) => {
         }}
       >
         <FormPaper>
-          <GroupForm
-            formType="update"
+          <UpdateGroupForm
             onSubmit={onUpdateGroup}
             handleClose={() => setDisplayedModal(DisplayedModal.Hidden)}
-            currentData={mapGroupToFormValues(group)}
+            currentData={mapGroupToUpdateFormValues(group)}
           />
         </FormPaper>
       </Modal>
@@ -207,14 +209,19 @@ const ResaleGroupAccordion = (props: Props) => {
         onClose={() => setDisplayedModal(DisplayedModal.Hidden)}
       >
         <ModalPaper>
-          <Stack spacing={1}>
-            <Typography display="inline">
+          <Stack spacing={2}>
+            <Typography variant="h5" textAlign="center">
+              Delete Group?
+            </Typography>
+            <Typography sx={{ p: '0rem 1rem' }}>
               Are you sure you want to delete this group?
             </Typography>
-            <Stack direction="row" justifyContent="center">
-              <GroupSummary group={group} />
-            </Stack>
-            <GroupDetails group={group} />
+            <Paper sx={{ p: '1rem' }} elevation={3}>
+              <Stack spacing={1}>
+                <GroupSummary group={group} />
+                <GroupDetails group={group} />
+              </Stack>
+            </Paper>
             <Stack direction="row" spacing={2}>
               <Button
                 variant="outlined"

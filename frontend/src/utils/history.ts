@@ -9,10 +9,10 @@ import {
   min,
   parseISO,
 } from 'date-fns';
+import { v4 as uuidv4 } from 'uuid';
 import { BTOGraphDataPoint } from '../api/history';
-import { BackendFlatType } from '../types/groups';
+import type { BTOProjectsData } from '../reducers/history';
 import { ChartDataPoint, PriceDataPoint } from '../types/history';
-import { convertFlatTypeToFrontend } from './groups';
 
 export const convertStringToDate = (dateString: string): Date | undefined => {
   const date = parseISO(dateString);
@@ -78,16 +78,17 @@ const upsertMap = (
   }
 };
 
-export const getChartData = (rawData: {
-  [id: string]: PriceDataPoint[];
-}): ChartDataPoint[][] => {
+export const getChartData = (
+  resaleRawData: Record<string, PriceDataPoint[]>,
+  btoRawData: Record<string, BTOProjectsData>
+): ChartDataPoint[][] => {
   const monthlyDateToDataMap = new Map<
     string,
     Array<{ id: string; price: number }>
   >();
   const yearlyDateToDataMap = new Map<string, Record<string, number[]>>();
 
-  Object.entries(rawData).forEach(([id, dataPoints]) => {
+  Object.entries(resaleRawData).forEach(([id, dataPoints]) => {
     dataPoints.forEach(({ price, date: dateString }) => {
       const dataPoint = { id, price };
       upsertMap(monthlyDateToDataMap, dateString, [dataPoint], (array) => [
@@ -105,6 +106,28 @@ export const getChartData = (rawData: {
         return { ...record, [id]: [current[0] + price, current[1] + 1] };
       });
     });
+  });
+
+  Object.values(btoRawData).forEach((projectsData) => {
+    Object.entries(projectsData).forEach(
+      ([id, { price, date: dateString }]) => {
+        const dataPoint = { id, price };
+        upsertMap(monthlyDateToDataMap, dateString, [dataPoint], (array) => [
+          ...array,
+          dataPoint,
+        ]);
+
+        const date = convertStringToDate(dateString);
+        if (date == null) {
+          return;
+        }
+        const year = getYear(date).toString();
+        upsertMap(yearlyDateToDataMap, year, { [id]: [price, 1] }, (record) => {
+          const current = record[id] ?? [0, 0];
+          return { ...record, [id]: [current[0] + price, current[1] + 1] };
+        });
+      }
+    );
   });
 
   const dates: Date[] = [];
@@ -163,38 +186,15 @@ export const getChartData = (rawData: {
   return [monthlyChartData, yearlyChartData];
 };
 
-export const aggregateBTOProjects = (
+export const transformRawBTOData = (
   dataPoints: BTOGraphDataPoint[]
-): BTOGraphDataPoint[] => {
-  const aggregatedProjectsMap = new Map<
-    BackendFlatType,
-    { totalPrice: number; count: number }
-  >();
+): BTOProjectsData => {
+  const projectsData: BTOProjectsData = {};
 
-  dataPoints.forEach(({ price, flatType }) => {
-    upsertMap(
-      aggregatedProjectsMap,
-      flatType,
-      { totalPrice: price, count: 1 },
-      (record) => ({
-        totalPrice: record.totalPrice + price,
-        count: record.count + 1,
-      })
-    );
+  dataPoints.forEach((dataPoint) => {
+    const id = uuidv4();
+    projectsData[id] = dataPoint;
   });
 
-  const aggregatedProjectsData: BTOGraphDataPoint[] = [];
-
-  aggregatedProjectsMap.forEach(({ totalPrice, count }, key) => {
-    const projectsDataPoint: BTOGraphDataPoint = {
-      name: `${convertFlatTypeToFrontend(key)} Average`,
-      price: Math.floor(totalPrice / count),
-      date: '',
-      flatType: key,
-    };
-
-    aggregatedProjectsData.push(projectsDataPoint);
-  });
-
-  return aggregatedProjectsData;
+  return projectsData;
 };

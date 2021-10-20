@@ -31,6 +31,7 @@ import {
   getGroupColor,
 } from '../../../utils/groups';
 import type { Town } from '../../../types/towns';
+import { selectColorCount } from '../../../reducers/colors';
 
 interface Props {
   town: Town;
@@ -77,6 +78,7 @@ const FlatMarker = ({ town, address, coordinates, transactions }: Props) => {
   const dispatch = useAppDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const groups = useAppSelector(selectGroups);
+  const colorCount = useAppSelector(selectColorCount);
 
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<OrderBy>('transactionMonth');
@@ -101,7 +103,7 @@ const FlatMarker = ({ town, address, coordinates, transactions }: Props) => {
         type: 'resale',
         id: uuidv4(),
         name: `${town} (${convertFlatTypeToFrontend(transaction.flatType)})`,
-        color: getGroupColor(groups.length),
+        color: getGroupColor(colorCount),
         filters: {
           towns: [town],
           flatTypes: [transaction.flatType],

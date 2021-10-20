@@ -17,8 +17,8 @@ export type QueryBto = {
   flatTypes?: FlatType[] | FlatType;
   minFloorArea?: number;
   maxFloorArea?: number;
-  startDate?: number;
-  endDate?: number;
+  startYear?: number;
+  endYear?: number;
 };
 
 export type QueryResale = {
@@ -156,21 +156,21 @@ const getBtos = async (queries: QueryBto): Promise<BTO[]> => {
     conditions.maxInternalFloorArea = LessThanOrEqual(queries.maxFloorArea);
   }
 
-  if (queries.startDate && queries.endDate) {
-    const endYear = (Number(queries.endDate) + 1).toString();
+  if (queries.startYear && queries.endYear) {
+    const endYear = (Number(queries.endYear) + 1).toString();
     conditions.launchDate = Raw(
       (launch) => `${launch} >= :start AND ${launch} < :end`,
       {
-        start: new Date(queries.startDate),
+        start: new Date(queries.startYear),
         end: new Date(endYear),
       }
     );
-  } else if (queries.startDate) {
+  } else if (queries.startYear) {
     conditions.launchDate = Raw((launch) => `${launch} >= :start`, {
-      start: new Date(queries.startDate),
+      start: new Date(queries.startYear),
     });
-  } else if (queries.endDate) {
-    const endYear = (Number(queries.endDate) + 1).toString();
+  } else if (queries.endYear) {
+    const endYear = (Number(queries.endYear) + 1).toString();
     conditions.launchDate = Raw((launch) => `${launch} < :end`, {
       end: new Date(endYear),
     });

@@ -1,4 +1,7 @@
-import { GroupFormValues } from '../components/history/GroupForm';
+import { MatchSorterOptions } from 'match-sorter';
+
+import { CreateGroupFormValues } from '../components/history/CreateGroupForm';
+import { UpdateGroupFormValues } from '../components/history/UpdateGroupForm';
 import {
   BackendFlatType,
   FlatType,
@@ -6,6 +9,7 @@ import {
   GroupColor,
   GroupFilters,
 } from '../types/groups';
+import { BTOProject } from '../types/history';
 
 const convertFlatTypeToBackend = (flatType: FlatType): BackendFlatType => {
   switch (flatType) {
@@ -51,16 +55,26 @@ export const convertFlatTypeToFrontend = (
   }
 };
 
-export const mapGroupToFormValues = (group: Group): GroupFormValues => {
+export const isSameBTOProject = (a: BTOProject, b: BTOProject) =>
+  a.name === b.name &&
+  a.date === b.date &&
+  a.price === b.price &&
+  a.flatType === b.flatType;
+
+export const btoProjectsSorter: MatchSorterOptions<BTOProject>['sorter'] = (
+  rankedItems
+) => [...rankedItems].sort((a, b) => -a.item.date.localeCompare(b.item.date));
+
+export const mapGroupToUpdateFormValues = (
+  group: Group
+): UpdateGroupFormValues => {
   const { type, name, filters } = group;
 
-  const groupFormValues: GroupFormValues = {
+  const groupFormValues: UpdateGroupFormValues = {
     name,
     type,
-    towns: filters.towns,
-    flatTypes: filters.flatTypes.map((flatType) =>
-      convertFlatTypeToFrontend(flatType)
-    ),
+    towns: filters.towns[0],
+    flatTypes: convertFlatTypeToFrontend(filters.flatTypes[0]),
     isStoreyRangeEnabled:
       filters.minStorey != null && filters.maxStorey != null,
     isFloorAreaRangeEnabled:
@@ -100,14 +114,57 @@ export const mapGroupToFormValues = (group: Group): GroupFormValues => {
   return groupFormValues;
 };
 
-export const mapFormValuesToGroupFilters = (
-  data: GroupFormValues
+export const mapCreateFormValuesToGroupFilters = (
+  data: CreateGroupFormValues
+): GroupFilters[] => {
+  const baseFilters: GroupFilters = {
+    towns: [],
+    flatTypes: [],
+  };
+
+  if (data.isFloorAreaRangeEnabled && data.floorAreaRange != null) {
+    baseFilters.minFloorArea = data.floorAreaRange.lower;
+    baseFilters.maxFloorArea = data.floorAreaRange.upper;
+  }
+
+  if (data.isYearRangeEnabled && data.yearRange != null) {
+    baseFilters.startYear = data.yearRange.lower;
+    baseFilters.endYear = data.yearRange.upper;
+  }
+
+  if (data.type === 'resale') {
+    if (data.isStoreyRangeEnabled && data.storeyRange != null) {
+      baseFilters.minStorey = data.storeyRange.lower;
+      baseFilters.maxStorey = data.storeyRange.upper;
+    }
+
+    if (data.isLeasePeriodRangeEnabled && data.leasePeriodRange != null) {
+      baseFilters.minLeasePeriod = data.leasePeriodRange.lower;
+      baseFilters.maxLeasePeriod = data.leasePeriodRange.upper;
+    }
+  }
+
+  const groupFilters: GroupFilters[] = [];
+
+  data.towns.forEach((town) => {
+    data.flatTypes.forEach((flatType) => {
+      groupFilters.push({
+        ...baseFilters,
+        towns: [town],
+        flatTypes: [convertFlatTypeToBackend(flatType)],
+      });
+    });
+  });
+
+  return groupFilters;
+};
+
+export const mapUpdateFormValuesToGroupFilters = (
+  data: UpdateGroupFormValues
 ): GroupFilters => {
   const groupFilters: GroupFilters = {
-    towns: data.towns,
-    flatTypes: data.flatTypes.map((flatType) =>
-      convertFlatTypeToBackend(flatType)
-    ),
+    towns: data.towns ? [data.towns] : [],
+    flatTypes: data.flatTypes ? [convertFlatTypeToBackend(data.flatTypes)] : [],
   };
 
   if (data.isFloorAreaRangeEnabled && data.floorAreaRange != null) {
@@ -135,17 +192,21 @@ export const mapFormValuesToGroupFilters = (
   return groupFilters;
 };
 
-export const getGroupColor = (index: number): GroupColor => {
-  const colors = [
-    GroupColor.Color1,
-    GroupColor.Color2,
-    GroupColor.Color3,
-    GroupColor.Color4,
-    GroupColor.Color5,
-    GroupColor.Color6,
-    GroupColor.Color7,
-    GroupColor.Color8,
-  ];
+export const getGroupColor = (
+  colorCount: Record<GroupColor, number>
+): GroupColor => {
+  let minCount = colorCount[GroupColor.Color1];
+  let colors: GroupColor[] = [GroupColor.Color1];
 
-  return colors[index % 8];
+  Object.entries(colorCount).forEach(([color, count]) => {
+    const groupColor: GroupColor = parseInt(color, 10);
+    if (count < minCount) {
+      minCount = count;
+      colors = [groupColor];
+    } else if (count === minCount) {
+      colors.push(groupColor);
+    }
+  });
+
+  return colors[Math.floor(Math.random() * colors.length)];
 };
