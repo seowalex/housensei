@@ -135,10 +135,11 @@ const getResalesByTown = async (
       'transactions'
     )
     .addSelect("CONCAT(resale.block, ' ', resale.streetName)", 'address')
-    .addSelect('CAST(AVG(resale.resalePrice) AS int)', 'resalePrice')
-    .where('coordinates IS NOT NULL');
+    .addSelect('CAST(AVG(resale.resalePrice) AS int)', 'resalePrice');
 
   addWhereClauses(queries, queryBuilder);
+
+  queryBuilder.andWhere('coordinates IS NOT NULL');
 
   if (queries.town) {
     queryBuilder.andWhere({ town: queries.town });
