@@ -8,27 +8,27 @@
           "SC/SC": {
             "attribute": "coupleFirstTimer",
             "options": {
-              "yes/yes": {
+              "true/true": {
                 "attribute": "workingAtLeastAYear",
                 "options": {
-                  "yes": true,
-                  "no": false
+                  "true": true,
+                  "false": false
                 }
               },
-              "yes/no": false
+              "true/false": false
             }
           },
           "SC/PR": {
             "attribute": "coupleFirstTimer",
             "options": {
-              "yes/yes": {
+              "true/true": {
                 "attribute": "workingAtLeastAYear",
                 "options": {
-                  "yes": true,
-                  "no": false
+                  "true": true,
+                  "false": false
                 }
               },
-              "yes/no": false
+              "true/false": false
             }
           },
           "SC/F": false

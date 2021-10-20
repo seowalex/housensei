@@ -7,33 +7,33 @@
           "SC": {
             "attribute": "singleFirstTimer",
             "options": {
-              "yes": {
+              "true": {
                 "attribute": "age",
                 "options": {
-                  "yes": {
+                  "true": {
                     "attribute": "workingAtLeastAYear",
                     "options": {
-                      "yes": {
+                      "true": {
                         "attribute": "housingType",
                         "options": {
                           "BTO": true,
                           "Resale": {
                             "attribute": "lease",
                             "options": {
-                              "yes": true,
-                              "no": false
+                              "true": true,
+                              "false": false
                             }
                           },
                           "EC": false
                         }
                       },
-                      "no": false
+                      "false": false
                     }
                   },
-                  "no": false
+                  "false": false
                 }
               },
-              "no": false
+              "false": false
             }
           },
           "PR": false,
@@ -46,25 +46,25 @@
           "SC/SC": {
             "attribute": "coupleFirstTimer",
             "options": {
-              "yes/yes": false,
-              "yes/no": {
+              "true/true": false,
+              "true/false": {
                 "attribute": "workingAtLeastAYear",
                 "options": {
-                  "yes": {
+                  "true": {
                     "attribute": "housingType",
                     "options": {
                       "BTO": true,
                       "Resale": {
                         "attribute": "lease",
                         "options": {
-                          "yes": true,
-                          "no": false
+                          "true": true,
+                          "false": false
                         }
                       },
                       "EC": true
                     }
                   },
-                  "no": false
+                  "false": false
                 }
               }
             }
@@ -72,25 +72,25 @@
           "SC/PR": {
             "attribute": "coupleFirstTimer",
             "options": {
-              "yes/yes": false,
-              "yes/no": {
+              "true/true": false,
+              "true/false": {
                 "attribute": "workingAtLeastAYear",
                 "options": {
-                  "yes": {
+                  "true": {
                     "attribute": "housingType",
                     "options": {
                       "BTO": true,
                       "Resale": {
                         "attribute": "lease",
                         "options": {
-                          "yes": true,
-                          "no": false
+                          "true": true,
+                          "false": false
                         }
                       },
                       "EC": true
                     }
                   },
-                  "no": false
+                  "false": false
                 }
               }
             }
@@ -98,25 +98,25 @@
           "SC/F": {
             "attribute": "singleFirstTimer",
             "options": {
-              "no": false,
-              "yes": {
+              "false": false,
+              "true": {
                 "attribute": "workingAtLeastAYear",
                 "options": {
-                  "yes": {
+                  "true": {
                     "attribute": "housingType",
                     "options": {
                       "BTO": true,
                       "Resale": {
                         "attribute": "lease",
                         "options": {
-                          "yes": true,
-                          "no": false
+                          "true": true,
+                          "false": false
                         }
                       },
                       "EC": true
                     }
                   },
-                  "no": false
+                  "false": false
                 }
               }
             }

@@ -7,17 +7,17 @@
           "SC": {
             "attribute": "singleFirstTimer",
             "options": {
-              "yes": {
+              "true": {
                 "attribute": "age",
                 "options": {
-                  "yes": {
+                  "true": {
                     "attribute": "housingType",
                     "options": {
                       "BTO": 0,
                       "Resale": {
                         "attribute": "lease",
                         "options": {
-                          "yes": {
+                          "true": {
                             "attribute": "monthlyIncome",
                             "options": {
                               "<= 7000": {
@@ -32,16 +32,16 @@
                               "> 7000": 0
                             }
                           },
-                          "no": 0
+                          "false": 0
                         }
                       },
                       "EC": 0
                     }
                   },
-                  "no": 0
+                  "false": 0
                 }
               },
-              "no": 0
+              "false": 0
             }
           },
           "PR": 0,
@@ -56,14 +56,14 @@
           "SC/F": {
             "attribute": "singleFirstTimer",
             "options": {
-              "yes": {
+              "true": {
                 "attribute": "housingType",
                 "options": {
                   "BTO": 0,
                   "Resale": {
                     "attribute": "lease",
                     "options": {
-                      "yes": {
+                      "true": {
                         "attribute": "monthlyIncome",
                         "options": {
                           "<= 14000": {
@@ -78,13 +78,13 @@
                           "> 14000": 0
                         }
                       },
-                      "no": 0
+                      "false": 0
                     }
                   },
                   "EC": 0
                 }
               },
-              "no": 0
+              "false": 0
             }
           }
         }

@@ -5,8 +5,8 @@
       "EC": {
         "attribute": "coupleFirstTimer",
         "options": {
-          "yes/yes": 0,
-          "yes/no": {
+          "true/true": 0,
+          "true/false": {
             "attribute": "coupleNationality",
             "options": {
               "SC/SC": {
@@ -30,13 +30,13 @@
               "SC/F": 0
             }
           },
-          "no/no": 0
+          "false/false": 0
         }
       },
       "Resale": {
         "attribute": "lease",
         "options": {
-          "yes": {
+          "true": {
             "attribute": "maritalStatus",
             "options": {
               "single": 0,
@@ -46,11 +46,11 @@
                   "SC/SC": {
                     "attribute": "coupleFirstTimer",
                     "options": {
-                      "yes/yes": 0,
-                      "yes/no": {
+                      "true/true": 0,
+                      "true/false": {
                         "attribute": "livingWithExtendedFamily",
                         "options": {
-                          "yes": {
+                          "true": {
                             "attribute": "monthlyIncome",
                             "options": {
                               "<= 21000": {
@@ -68,7 +68,7 @@
                               "> 21000": 0
                             }
                           },
-                          "no": {
+                          "false": {
                             "attribute": "monthlyIncome",
                             "options": {
                               "<= 14000": {
@@ -88,17 +88,17 @@
                           }
                         }
                       },
-                      "no/no": 0
+                      "false/false": 0
                     }
                   },
                   "SC/PR": {
                     "attribute": "coupleFirstTimer",
                     "options": {
-                      "yes/yes": 0,
-                      "yes/no": {
+                      "true/true": 0,
+                      "true/false": {
                         "attribute": "livingWithExtendedFamily",
                         "options": {
-                          "yes": {
+                          "true": {
                             "attribute": "monthlyIncome",
                             "options": {
                               "<= 21000": {
@@ -116,7 +116,7 @@
                               "> 21000": 0
                             }
                           },
-                          "no": {
+                          "false": {
                             "attribute": "monthlyIncome",
                             "options": {
                               "<= 14000": {
@@ -136,7 +136,7 @@
                           }
                         }
                       },
-                      "no/no": 0
+                      "false/false": 0
                     }
                   },
                   "SC/F": 0
@@ -144,7 +144,7 @@
               }
             }
           },
-          "no": 0
+          "false": 0
         }
       }
     }
