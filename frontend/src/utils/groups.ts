@@ -199,11 +199,12 @@ export const getGroupColor = (
   let colors: GroupColor[] = [GroupColor.Color1];
 
   Object.entries(colorCount).forEach(([color, count]) => {
+    const groupColor: GroupColor = parseInt(color, 10);
     if (count < minCount) {
       minCount = count;
-      colors = [color as GroupColor];
+      colors = [groupColor];
     } else if (count === minCount) {
-      colors.push(color as GroupColor);
+      colors.push(groupColor);
     }
   });
 

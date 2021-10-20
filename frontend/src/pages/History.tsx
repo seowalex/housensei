@@ -52,6 +52,7 @@ const History = () => {
                 alignItems="center"
                 justifyContent="space-between"
                 sx={{ height: '100%' }}
+                spacing={2}
               >
                 <GroupList
                   selectedGroup={selectedGroup}

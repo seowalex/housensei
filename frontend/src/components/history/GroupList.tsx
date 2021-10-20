@@ -10,7 +10,13 @@ import {
   selectColorCount,
   setColorCount,
 } from '../../reducers/colors';
-import { BTOGroup, Group, GroupFilters, ResaleGroup } from '../../types/groups';
+import {
+  BTOGroup,
+  Group,
+  GroupColor,
+  GroupFilters,
+  ResaleGroup,
+} from '../../types/groups';
 import {
   getGroupColor,
   mapCreateFormValuesToGroupFilters,
@@ -52,7 +58,7 @@ const GroupList = (props: Props) => {
       dispatch(incrementColorCount(color));
       onChangeSelectedGroup(groupId)(true);
     } else {
-      const colorCountCopy = { ...colorCount };
+      const colorCountCopy: Record<GroupColor, number> = { ...colorCount };
       const firstGroupId = uuidv4();
       for (let i = 0; i < groupFilters.length; i += 1) {
         const groupId = uuidv4();

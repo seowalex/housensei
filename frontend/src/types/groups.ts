@@ -50,12 +50,12 @@ export interface BTOGroup extends Group {
 }
 
 export enum GroupColor {
-  Color1 = '#e6261f', // 1
-  Color2 = '#e96a20', // 7
-  Color3 = '#f6cd28', // 3
-  Color4 = '#9fde3f', // 5
-  Color5 = '#3fa02c', // 8
-  Color6 = '#25b8e4', // 2
-  Color7 = '#3145d8', // 4
-  Color8 = '#b319c8', // 6
+  Color1,
+  Color2,
+  Color3,
+  Color4,
+  Color5,
+  Color6,
+  Color7,
+  Color8,
 }

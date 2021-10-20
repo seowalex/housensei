@@ -31,6 +31,7 @@ import {
   selectYearlyChartData,
 } from '../../reducers/history';
 import { Group } from '../../types/groups';
+import { selectColorTheme } from '../../reducers/settings';
 
 interface Props {
   chartMode: ChartMode;
@@ -48,6 +49,8 @@ const HistoryChart = (props: Props) => {
   const btoProjectsByGroup = useAppSelector(selectBTORawData);
   const selectedBTOProjectIds = useAppSelector(selectSelectedBTOProjectIds);
   const displayedGroupIds = useAppSelector(selectDisplayedGroupIds);
+
+  const colorTheme = useAppSelector(selectColorTheme);
 
   const [getPng, { ref, isLoading: isLoadingPng }] = useCurrentPng();
 
@@ -128,57 +131,59 @@ const HistoryChart = (props: Props) => {
             }
             alwaysShowText
           />
-          {groups
-            .filter((g) => g.type === 'resale')
-            .map(({ id, color }) => (
-              <>
-                {displayedGroupIds.has(id) && (
-                  <Line
-                    type="linear"
-                    key={id}
-                    dataKey={id}
-                    stroke={color}
-                    strokeWidth={selectedGroup === id ? 3 : 2}
-                    connectNulls
-                    dot={false}
-                    activeDot={{ r: 4.5 }}
-                  />
-                )}
-              </>
-            ))}
-          {groups
-            .filter((g) => g.type === 'bto')
-            .map(({ id: groupId, color }) => (
-              <>
-                {displayedGroupIds.has(groupId) &&
-                  btoProjectsByGroup[groupId] &&
-                  Object.keys(btoProjectsByGroup[groupId]).map((id) => (
+          {colorTheme &&
+            groups
+              .filter((g) => g.type === 'resale')
+              .map(({ id, color }) => (
+                <>
+                  {displayedGroupIds.has(id) && (
                     <Line
                       type="linear"
                       key={id}
                       dataKey={id}
-                      stroke={color}
-                      strokeWidth={selectedGroup === groupId ? 3 : 2}
-                      dot={{
-                        r: 3.5,
-                        stroke: selectedBTOProjectIds[groupId].includes(id)
-                          ? 'black'
-                          : color,
-                        fill: selectedBTOProjectIds[groupId].includes(id)
-                          ? color
-                          : 'white',
-                      }}
-                      activeDot={{
-                        r: 4.5,
-                        stroke: selectedBTOProjectIds[groupId].includes(id)
-                          ? 'black'
-                          : 'white',
-                      }}
-                      isAnimationActive={false}
+                      stroke={colorTheme[color]}
+                      strokeWidth={selectedGroup === id ? 3 : 2}
+                      connectNulls
+                      dot={false}
+                      activeDot={{ r: 4.5 }}
                     />
-                  ))}
-              </>
-            ))}
+                  )}
+                </>
+              ))}
+          {colorTheme &&
+            groups
+              .filter((g) => g.type === 'bto')
+              .map(({ id: groupId, color }) => (
+                <>
+                  {displayedGroupIds.has(groupId) &&
+                    btoProjectsByGroup[groupId] &&
+                    Object.keys(btoProjectsByGroup[groupId]).map((id) => (
+                      <Line
+                        type="linear"
+                        key={id}
+                        dataKey={id}
+                        stroke={colorTheme[color]}
+                        strokeWidth={selectedGroup === groupId ? 3 : 2}
+                        dot={{
+                          r: 3.5,
+                          stroke: selectedBTOProjectIds[groupId].includes(id)
+                            ? 'black'
+                            : colorTheme[color],
+                          fill: selectedBTOProjectIds[groupId].includes(id)
+                            ? colorTheme[color]
+                            : 'white',
+                        }}
+                        activeDot={{
+                          r: 4.5,
+                          stroke: selectedBTOProjectIds[groupId].includes(id)
+                            ? 'black'
+                            : 'white',
+                        }}
+                        isAnimationActive={false}
+                      />
+                    ))}
+                </>
+              ))}
         </LineChart>
       </ResponsiveContainer>
       {groups.length > 0 && (
