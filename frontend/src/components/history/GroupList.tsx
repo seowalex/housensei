@@ -147,7 +147,7 @@ const GroupList = (props: Props) => {
               sx={{ width: '100%' }}
               color="error"
             >
-              Clear Groups
+              Delete Groups
             </Button>
           </Grid>
         )}
@@ -194,10 +194,10 @@ const GroupList = (props: Props) => {
         <ModalPaper>
           <Stack spacing={2}>
             <Typography variant="h5" textAlign="center">
-              Clear All Groups?
+              Delete All Groups?
             </Typography>
             <Typography sx={{ p: '0rem 1rem' }}>
-              Are you sure you want to clear all groups?
+              Are you sure you want to delete all groups?
             </Typography>
             <Stack direction="row" spacing={2}>
               <Button
@@ -215,7 +215,7 @@ const GroupList = (props: Props) => {
                 }}
                 sx={{ width: '50%' }}
               >
-                Clear All
+                Delete All
               </Button>
             </Stack>
           </Stack>

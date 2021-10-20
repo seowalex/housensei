@@ -10,6 +10,7 @@ export const ModalPaper = styled(Paper)({
 });
 
 export const FormPaper = styled(ModalPaper)({
+  height: '85%',
   width: '60%',
   overflow: 'auto',
 });
