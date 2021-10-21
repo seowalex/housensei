@@ -1,11 +1,5 @@
 import { useState } from 'react';
-import {
-  BrowserRouter as Router,
-  Link,
-  Redirect,
-  Route,
-  Switch,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Link } from 'react-router-dom';
 import {
   AppBar,
   Box,
@@ -34,17 +28,14 @@ import {
 } from '@mui/icons-material';
 
 import { useAppDispatch, useAppSelector } from './app/hooks';
-import Heatmap from './pages/Heatmap';
-import History from './pages/History';
-import NotFound from './pages/NotFound';
 import {
   selectDarkMode,
   selectDrawerOpen,
   setDarkMode,
   setDrawerOpen,
 } from './reducers/settings';
-import Grants from './pages/Grants';
 import ChatBot from './components/ChatBot';
+import RouteSwitch from './RouteSwitch';
 
 const drawerWidth = 240;
 
@@ -196,22 +187,7 @@ const Routes = () => {
         >
           {drawer}
         </Drawer>
-
-        <Switch>
-          <Redirect exact from="/" to="/heatmap" />
-          <Route path="/heatmap">
-            <Heatmap />
-          </Route>
-          <Route path="/history">
-            <History />
-          </Route>
-          <Route path="/grants">
-            <Grants />
-          </Route>
-          <Route>
-            <NotFound />
-          </Route>
-        </Switch>
+        <RouteSwitch />
       </Box>
 
       <ChatBot />

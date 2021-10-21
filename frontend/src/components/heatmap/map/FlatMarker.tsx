@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ReactGA from 'react-ga';
 import {
   Dialog,
   DialogContent,
@@ -32,6 +33,7 @@ import {
 } from '../../../utils/groups';
 import type { Town } from '../../../types/towns';
 import { selectColorCount } from '../../../reducers/colors';
+import { EventCategory, HeatmapEventAction } from '../../../app/analytics';
 
 interface Props {
   town: Town;
@@ -111,6 +113,11 @@ const FlatMarker = ({ town, address, coordinates, transactions }: Props) => {
       })
     );
 
+    ReactGA.event({
+      category: EventCategory.Heatmap,
+      action: HeatmapEventAction.AddToPriceHistory,
+    });
+
     enqueueSnackbar(
       <span>
         Added{' '}
@@ -150,7 +157,13 @@ const FlatMarker = ({ town, address, coordinates, transactions }: Props) => {
         <DialogTitle>
           {address}
           <IconButton
-            onClick={() => setShowTransactions(false)}
+            onClick={() => {
+              ReactGA.event({
+                category: EventCategory.Heatmap,
+                action: HeatmapEventAction.ViewBlock,
+              });
+              setShowTransactions(false);
+            }}
             sx={{
               position: 'absolute',
               top: (theme) => theme.spacing(1),

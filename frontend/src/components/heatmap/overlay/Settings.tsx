@@ -1,3 +1,4 @@
+import ReactGA from 'react-ga';
 import {
   Dialog,
   DialogContent,
@@ -23,6 +24,7 @@ import {
   setShowHeatmapPrices,
 } from '../../../reducers/settings';
 import { selectTown } from '../../../reducers/heatmap';
+import { EventCategory, HeatmapEventAction } from '../../../app/analytics';
 
 interface Props extends DialogProps {
   onClose: () => void;
@@ -59,9 +61,13 @@ const Settings = ({ onClose, ...props }: Props) => {
             control={
               <Switch
                 checked={showHeatmap}
-                onChange={(event) =>
-                  dispatch(setShowHeatmap(event.target.checked))
-                }
+                onChange={(event) => {
+                  ReactGA.event({
+                    category: EventCategory.Heatmap,
+                    action: HeatmapEventAction.ToggleHeatMap,
+                  });
+                  dispatch(setShowHeatmap(event.target.checked));
+                }}
               />
             }
             label="Show heatmap"
@@ -70,9 +76,13 @@ const Settings = ({ onClose, ...props }: Props) => {
             control={
               <Switch
                 checked={showHeatmapPrices}
-                onChange={(event) =>
-                  dispatch(setShowHeatmapPrices(event.target.checked))
-                }
+                onChange={(event) => {
+                  ReactGA.event({
+                    category: EventCategory.Heatmap,
+                    action: HeatmapEventAction.ToggleTown,
+                  });
+                  dispatch(setShowHeatmapPrices(event.target.checked));
+                }}
               />
             }
             disabled={town !== 'Islandwide'}

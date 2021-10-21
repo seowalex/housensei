@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
+import ReactGA from 'react-ga';
 import {
   Autocomplete,
   Box,
@@ -47,6 +48,7 @@ import { Town } from '../../../types/towns';
 
 import Settings from './Settings';
 import PriceRange from './PriceRange';
+import { EventCategory, HeatmapEventAction } from '../../../app/analytics';
 
 interface Props {
   map?: google.maps.Map;
@@ -198,6 +200,10 @@ const MapOverlay = ({
     dispatch(setTown(townName as Town | 'Islandwide'));
     map?.setCenter(townCoordinates[townName as Town] ?? singaporeCoordinates);
     map?.setZoom(townName === 'Islandwide' ? 12 : 15);
+    ReactGA.event({
+      category: EventCategory.Heatmap,
+      action: HeatmapEventAction.ChangeTown,
+    });
   };
 
   const handleYearBlur = () => {
@@ -206,6 +212,10 @@ const MapOverlay = ({
     } else if (year > currentYear) {
       dispatch(setYear(currentYear));
     }
+    ReactGA.event({
+      category: EventCategory.Heatmap,
+      action: HeatmapEventAction.AdjustYear,
+    });
   };
 
   return (
@@ -217,7 +227,13 @@ const MapOverlay = ({
       >
         <Grid item xs={12} md="auto">
           <StandaloneSearchBox
-            onPlacesChanged={setMapViewport}
+            onPlacesChanged={() => {
+              ReactGA.event({
+                category: EventCategory.Heatmap,
+                action: HeatmapEventAction.SearchAddr,
+              });
+              setMapViewport();
+            }}
             onLoad={setSearchBox}
           >
             <TextField
@@ -301,6 +317,12 @@ const MapOverlay = ({
                     marks={yearMarks}
                     value={year}
                     onChange={(_, value) => dispatch(setYear(value as number))}
+                    onChangeCommitted={() => {
+                      ReactGA.event({
+                        category: EventCategory.Heatmap,
+                        action: HeatmapEventAction.AdjustYear,
+                      });
+                    }}
                     valueLabelDisplay="auto"
                   />
                 </Box>

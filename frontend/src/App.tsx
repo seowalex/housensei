@@ -1,5 +1,6 @@
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, useMemo, useEffect } from 'react';
 import { Link, LinkProps } from 'react-router-dom';
+import ReactGA from 'react-ga';
 import {
   CssBaseline,
   StyledEngineProvider,
@@ -24,6 +25,13 @@ const LinkBehavior = forwardRef<
 const App = () => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const darkMode = useAppSelector(selectDarkMode) ?? prefersDarkMode;
+  const GA_TRACKING_ID = 'UA-210554819-1';
+
+  useEffect(() => {
+    ReactGA.initialize(GA_TRACKING_ID, {
+      debug: !import.meta.env.PROD,
+    });
+  }, []);
 
   const theme = useMemo(
     () =>

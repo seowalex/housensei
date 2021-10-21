@@ -1,5 +1,6 @@
 import { Button, Grid, Modal, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
+import ReactGA from 'react-ga';
 import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
@@ -15,6 +16,7 @@ import { FormPaper, ModalPaper } from '../styled';
 import BTOGroupAccordion from './BTOGroupAccordion';
 import CreateGroupForm, { CreateGroupFormValues } from './CreateGroupForm';
 import ResaleGroupAccordion from './ResaleGroupAccordion';
+import { EventCategory, HistoryEventAction } from '../../app/analytics';
 
 enum DisplayedModal {
   Create,
@@ -75,6 +77,17 @@ const GroupList = (props: Props) => {
       onChangeSelectedGroup(firstGroupId)(true);
     }
     setDisplayedModal(DisplayedModal.Hidden);
+    if (data.type === 'resale') {
+      ReactGA.event({
+        category: EventCategory.History,
+        action: HistoryEventAction.AddResale,
+      });
+    } else {
+      ReactGA.event({
+        category: EventCategory.History,
+        action: HistoryEventAction.AddBTO,
+      });
+    }
   };
 
   const handleCreateBTOGroup = (group: Group) => {
@@ -97,6 +110,10 @@ const GroupList = (props: Props) => {
     dispatch(createGroup(btoGroup));
     dispatch(incrementColorCount(color));
     onChangeSelectedGroup(groupId)(true);
+    ReactGA.event({
+      category: EventCategory.History,
+      action: HistoryEventAction.AddBTOProjects,
+    });
   };
 
   const handleDuplicateGroup = (group: Group) => {

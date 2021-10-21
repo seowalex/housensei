@@ -21,6 +21,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
+import ReactGA from 'react-ga';
 import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 
@@ -44,6 +45,7 @@ import Logo99Co from './logos/Logo99Co';
 import LogoPropertyGuru from './logos/LogoPropertyGuru';
 import { get99CoLink } from '../../utils/propertySites/99co';
 import { getPropertyGuruLink } from '../../utils/propertySites/propertyGuru';
+import { EventCategory, HistoryEventAction } from '../../app/analytics';
 
 enum DisplayedModal {
   Update,
@@ -167,6 +169,12 @@ const ResaleGroupAccordion = (props: Props) => {
                     variant="outlined"
                     href={get99CoLink(group.filters)}
                     target="_blank"
+                    onClick={() => {
+                      ReactGA.event({
+                        category: EventCategory.History,
+                        action: HistoryEventAction.SearchListings,
+                      });
+                    }}
                   >
                     <Logo99Co />
                   </Button>
@@ -174,6 +182,12 @@ const ResaleGroupAccordion = (props: Props) => {
                     variant="outlined"
                     href={getPropertyGuruLink(group.filters)}
                     target="_blank"
+                    onClick={() => {
+                      ReactGA.event({
+                        category: EventCategory.History,
+                        action: HistoryEventAction.SearchListings,
+                      });
+                    }}
                   >
                     <LogoPropertyGuru />
                   </Button>
