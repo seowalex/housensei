@@ -22,6 +22,7 @@ export enum HistoryEventAction {
   AddResale = 'Added Resale Group',
   AddBTO = 'Added BTO Group',
   AddBTOProjects = 'Added related BTO projects from Resale Group',
+  MarkBTOProjects = 'Marked/Unmarked a BTO project on chart',
   SearchListings = 'Search listings',
 }
 

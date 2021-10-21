@@ -27,6 +27,7 @@ import {
 } from '@mui/material';
 import { matchSorter } from 'match-sorter';
 import { SyntheticEvent, useState } from 'react';
+import ReactGA from 'react-ga';
 import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useGetBTOGraphQuery } from '../../api/history';
@@ -54,6 +55,7 @@ import GroupDetails from './GroupDetails';
 import GroupAdditionalFilters from './GroupAdditionalFilters';
 import GroupSummary from './GroupSummary';
 import UpdateGroupForm, { UpdateGroupFormValues } from './UpdateGroupForm';
+import { EventCategory, HistoryEventAction } from '../../app/analytics';
 
 enum DisplayedModal {
   Update,
@@ -149,6 +151,10 @@ const BTOGroupAccordion = (props: Props) => {
         projectIds: newSelectedProjectIds,
       })
     );
+    ReactGA.event({
+      category: EventCategory.History,
+      action: HistoryEventAction.MarkBTOProjects,
+    });
   };
 
   return (
