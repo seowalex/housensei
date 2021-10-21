@@ -31,7 +31,10 @@ import { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useGetBTOGraphQuery } from '../../api/history';
 import { useAppSelector } from '../../app/hooks';
-import { decrementColorCount } from '../../reducers/colors';
+import {
+  decrementColorCount,
+  incrementColorCount,
+} from '../../reducers/colors';
 import {
   removeGroup,
   selectBTOProjectsOfGroup,
@@ -96,9 +99,12 @@ const BTOGroupAccordion = (props: Props) => {
       ...group,
       type: data.type,
       name: data.name === '' ? group.name : data.name,
+      color: data.color,
       filters: mapUpdateFormValuesToGroupFilters(data),
     };
 
+    dispatch(decrementColorCount(group.color));
+    dispatch(incrementColorCount(data.color));
     dispatch(
       updateGroup({
         id: group.id,

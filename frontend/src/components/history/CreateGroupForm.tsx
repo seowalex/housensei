@@ -16,8 +16,8 @@ import {
   SubmitHandler,
   useForm,
 } from 'react-hook-form';
-import { CloseRounded as CloseRoundedIcon } from '@mui/icons-material';
-import { FlatType } from '../../types/groups';
+import { Circle, CloseRounded as CloseRoundedIcon } from '@mui/icons-material';
+import { FlatType, GroupColor } from '../../types/groups';
 import { Town } from '../../types/towns';
 import FormAutocompleteInput from '../forms/FormAutocompleteInput';
 import FormSliderInput from '../forms/FormSliderInput';
@@ -26,6 +26,9 @@ import FormSwitchInput, {
 } from '../forms/FormSwitchInput';
 import FormTextInput from '../forms/FormTextInput';
 import { townRegions } from '../../app/constants';
+import { useAppSelector } from '../../app/hooks';
+import { selectNextColor } from '../../reducers/colors';
+import FormColorInput from '../forms/FormColorInput';
 
 export interface Range<T> {
   lower: T;
@@ -35,6 +38,7 @@ export interface Range<T> {
 export interface CreateGroupFormValues {
   name: string;
   type: 'resale' | 'bto';
+  color: GroupColor;
   towns: Town[];
   flatTypes: FlatType[];
   storeyRange?: Range<number>;
@@ -55,6 +59,7 @@ interface Props {
 const defaultFormValues: CreateGroupFormValues = {
   name: '',
   type: 'resale',
+  color: GroupColor.Color1,
   towns: [],
   flatTypes: [],
   isStoreyRangeEnabled: false,
@@ -65,6 +70,7 @@ const defaultFormValues: CreateGroupFormValues = {
 
 const CreateGroupForm = (props: Props) => {
   const { onSubmit, handleClose } = props;
+  const nextColor = useAppSelector(selectNextColor);
   const {
     formState: { isSubmitting, errors },
     watch,
@@ -73,7 +79,7 @@ const CreateGroupForm = (props: Props) => {
     setValue,
     control,
   } = useForm<CreateGroupFormValues>({
-    defaultValues: defaultFormValues,
+    defaultValues: { ...defaultFormValues, color: nextColor },
   });
 
   const watchType = watch('type');
@@ -88,6 +94,7 @@ const CreateGroupForm = (props: Props) => {
     watchTowns.length * watchFlatTypes.length > 1
       ? `Add ${watchTowns.length * watchFlatTypes.length} Groups`
       : 'Add Group';
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={2}>
@@ -104,14 +111,14 @@ const CreateGroupForm = (props: Props) => {
             </Typography>
           </Box>
         </Grid>
-        <Grid item xs={12} lg={6}>
+        <Grid item xs={12} lg="auto">
           <Stack
             direction="row"
             spacing={1}
             alignItems="center"
             sx={{ height: '100%' }}
           >
-            <Typography>Group Type: </Typography>
+            <Typography>Property Type:</Typography>
             <Controller
               name="type"
               control={control}
@@ -134,13 +141,27 @@ const CreateGroupForm = (props: Props) => {
             />
           </Stack>
         </Grid>
-        <Grid item xs={12} lg={6}>
+        <Grid item xs={12} lg>
           <FormTextInput
             name="name"
             control={control as Control<FieldValues>}
             label="Group Name (optional)"
             placeholder="New Group"
           />
+        </Grid>
+        <Grid item xs={12} lg="auto">
+          <Stack
+            direction="row"
+            spacing={0.5}
+            alignItems="center"
+            sx={{ height: '100%' }}
+          >
+            <Typography>Colour:</Typography>
+            <FormColorInput
+              name="color"
+              control={control as Control<FieldValues>}
+            />
+          </Stack>
         </Grid>
         <Grid item xs={12}>
           <Divider />

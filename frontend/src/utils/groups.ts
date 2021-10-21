@@ -68,11 +68,12 @@ export const btoProjectsSorter: MatchSorterOptions<BTOProject>['sorter'] = (
 export const mapGroupToUpdateFormValues = (
   group: Group
 ): UpdateGroupFormValues => {
-  const { type, name, filters } = group;
+  const { type, name, filters, color } = group;
 
   const groupFormValues: UpdateGroupFormValues = {
     name,
     type,
+    color,
     towns: filters.towns[0],
     flatTypes: convertFlatTypeToFrontend(filters.flatTypes[0]),
     isStoreyRangeEnabled:
