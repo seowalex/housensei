@@ -17,29 +17,37 @@ const GrantCard = (props: Props) => {
   const grantRangeDisplay = `$${
     grantRange.min === grantRange.max
       ? grantRange.min
-      : `${grantRange.min} - ${grantRange.max}`
+      : `${grantRange.min} - $${grantRange.max}`
   }`;
 
   return (
-    <Card>
+    <Card
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+      }}
+    >
       <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
-          {grantName} - {grantRangeDisplay}
+        <Typography gutterBottom variant="h5">
+          {grantName} : {grantRangeDisplay}
         </Typography>
         <Typography gutterBottom variant="body2" color="text.secondary">
           {description}
         </Typography>
+      </CardContent>
+      <CardActions>
         {linkToHDB && (
           <Link
             href={`//${linkToHDB.slice(12)}`}
             target="_blank"
             rel="noopener"
+            sx={{ paddingLeft: 1 }}
           >
             HDB Website
           </Link>
         )}
-      </CardContent>
-      <CardActions />
+      </CardActions>
     </Card>
   );
 };

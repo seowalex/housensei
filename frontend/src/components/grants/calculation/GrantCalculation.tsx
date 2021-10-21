@@ -30,7 +30,7 @@ export const getEHGGrant = (fieldValues: Record<string, any>) => {
   if (certainty.true === 0) {
     return { min: 0, max: 0 };
   }
-  if (certainty.false > 0) {
+  if (certainty.false > 0 || fieldValues.monthlyIncome === '') {
     return { min: 0, max: grantValue };
   }
   return { min: grantValue, max: grantValue };
@@ -78,7 +78,7 @@ export const getSingleEHGGrant = (fieldValues: Record<string, any>) => {
   if (certainty.true === 0) {
     return { min: 0, max: 0 };
   }
-  if (certainty.false > 0) {
+  if (certainty.false > 0 || fieldValues.monthlyIncome === '') {
     return { min: 0, max: grantValue };
   }
   return { min: grantValue, max: grantValue };
