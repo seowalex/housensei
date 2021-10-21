@@ -59,6 +59,7 @@ import GroupAdditionalFilters from './GroupAdditionalFilters';
 import GroupSummary from './GroupSummary';
 import UpdateGroupForm, { UpdateGroupFormValues } from './UpdateGroupForm';
 import { EventCategory, HistoryEventAction } from '../../app/analytics';
+import { formatProjectName } from '../../utils/history';
 
 enum DisplayedModal {
   Update,
@@ -244,7 +245,7 @@ const BTOGroupAccordion = (props: Props) => {
                   isOptionEqualToValue={(option, value) =>
                     isSameBTOProject(option, value)
                   }
-                  getOptionLabel={(option) => option.name}
+                  getOptionLabel={(option) => formatProjectName(option.name)}
                   renderInput={(params) => (
                     <TextField
                       {...params}
