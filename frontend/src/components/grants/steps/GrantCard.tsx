@@ -7,20 +7,24 @@ import { Link } from '@mui/material';
 interface Props {
   grantName: string;
   description: string;
-  value: number;
+  grantRange: { min: number; max: number };
   linkToHDB: string;
 }
 
 const GrantCard = (props: Props) => {
-  const { grantName, description, value, linkToHDB } = props;
+  const { grantName, description, grantRange, linkToHDB } = props;
+
+  const grantRangeDisplay = `$${
+    grantRange.min === grantRange.max
+      ? grantRange.min
+      : `${grantRange.min} - ${grantRange.max}`
+  }`;
+
   return (
     <Card>
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          {grantName}
-        </Typography>
-        <Typography variant="body1" component="div">
-          Estimated Grant: ${value}
+          {grantName} - {grantRangeDisplay}
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {`Sth here${description}`}

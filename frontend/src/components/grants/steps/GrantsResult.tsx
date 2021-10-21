@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import { UseFormGetValues, FieldValues } from 'react-hook-form';
 import {
   getEHGGrant,
@@ -18,67 +18,111 @@ const GrantsResult = (props: Props) => {
 
   const values = formValues();
 
-  // TODO is a string, not a bool
+  const sortAndJoinByDefinedOrder = (
+    definedOrder: Array<string>,
+    arr: Array<string>
+  ) => {
+    arr.sort((a, b) => definedOrder.indexOf(a) - definedOrder.indexOf(b));
+
+    return arr.join('/');
+  };
+
   const fieldValues = {
     ...values,
     singleNationality: values.ownNationality,
-    coupleNationality: `${values.ownNationality}/${values.partnerNationality}`,
+    coupleNationality: sortAndJoinByDefinedOrder(
+      ['SC', 'PR', 'F', ''],
+      [values.ownNationality, values.partnerNationality]
+    ),
     singleFirstTimer: values.ownFirstTimer,
-    coupleFirstTimer: `${values.ownFirstTimer}/${values.partnerFirstTimer}`,
+    coupleFirstTimer: sortAndJoinByDefinedOrder(
+      ['true', 'false', ''],
+      [values.ownFirstTimer, values.partnerFirstTimer]
+    ),
   };
 
   console.log(fieldValues);
 
   const ehgGrant = getEHGGrant(fieldValues);
-  const proximityGrant = getProximityGrant(fieldValues);
   const familyGrant = getFamilyGrant(fieldValues);
   const halfHousingGrant = getHalfHousingGrant(fieldValues);
+  const proximityGrant = getProximityGrant(fieldValues);
   const singleEhgGrant = getSingleEHGGrant(fieldValues);
-  console.log(ehgGrant);
 
-  // console.log(formValues());
+  const allGrants = [
+    ehgGrant,
+    familyGrant,
+    halfHousingGrant,
+    proximityGrant,
+    singleEhgGrant,
+  ].filter((grant) => grant.min && grant.max);
+  const minTotalGrant = allGrants
+    .map((grant) => grant.min)
+    .reduce((a, b) => Number(a) + Number(b), 0);
+  const maxTotalGrant = allGrants
+    .map((grant) => grant.max)
+    .reduce((a, b) => Number(a) + Number(b), 0);
+
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={6}>
-        <GrantCard
-          grantName="Enhanced CPF Housing Grant (EHG/EHG Single)"
-          description=""
-          value={5000}
-          linkToHDB="//hdb.gov.sg/residential/buying-a-flat/new/schemes-and-grants/cpf-housing-grants-for-hdb-flats/firsttimer-applicants"
-        />
+    <Grid container spacing={5}>
+      <Grid item xs={12}>
+        <Typography variant="h4">
+          Estimated Total Grant: $
+          {minTotalGrant === maxTotalGrant
+            ? minTotalGrant
+            : `${minTotalGrant} - $${maxTotalGrant}`}
+        </Typography>
       </Grid>
-      <Grid item xs={6}>
-        <GrantCard
-          grantName="Family Grant"
-          description=""
-          value={5000}
-          linkToHDB="//hdb.gov.sg/residential/buying-a-flat/new/schemes-and-grants/cpf-housing-grants-for-hdb-flats/firsttimer-applicants"
-        />
-      </Grid>
-      <Grid item xs={6}>
-        <GrantCard
-          grantName="Proximity Housing Grant (PHG)"
-          description=""
-          value={5000}
-          linkToHDB="//hdb.gov.sg/cs/infoweb/residential/buying-a-flat/resale/financing/cpf-housing-grants/living-with-near-parents-or-child"
-        />
-      </Grid>
-      <Grid item xs={6}>
-        <GrantCard
-          grantName="Singles Grant"
-          description=""
-          value={5000}
-          linkToHDB="//hdb.gov.sg/residential/buying-a-flat/resale/financing/cpf-housing-grants/single-singapore-citizen-scheme"
-        />
-      </Grid>
-      <Grid item xs={6}>
-        <GrantCard
-          grantName="Half Housing Grant"
-          description=""
-          value={5000}
-          linkToHDB="//hdb.gov.sg/residential/buying-a-flat/resale/financing/cpf-housing-grants/firsttimer-and-secondtimer-couple-applicants"
-        />
-      </Grid>
+      {ehgGrant.max > 0 && (
+        <Grid item xs={6}>
+          <GrantCard
+            grantName="Enhanced CPF Housing Grant (EHG)"
+            description=""
+            grantRange={ehgGrant}
+            linkToHDB="//hdb.gov.sg/residential/buying-a-flat/new/schemes-and-grants/cpf-housing-grants-for-hdb-flats/firsttimer-applicants"
+          />
+        </Grid>
+      )}
+      {singleEhgGrant.max > 0 && (
+        <Grid item xs={6}>
+          <GrantCard
+            grantName="Enhanced CPF Housing Grant (EHG Single)"
+            description=""
+            grantRange={singleEhgGrant}
+            linkToHDB="//hdb.gov.sg/residential/buying-a-flat/resale/financing/cpf-housing-grants/single-singapore-citizen-scheme"
+          />
+        </Grid>
+      )}
+      {familyGrant.min && familyGrant.max && (
+        <Grid item xs={6}>
+          <GrantCard
+            grantName="Family Grant"
+            description=""
+            grantRange={familyGrant as any}
+            linkToHDB="//hdb.gov.sg/residential/buying-a-flat/new/schemes-and-grants/cpf-housing-grants-for-hdb-flats/firsttimer-applicants"
+          />
+        </Grid>
+      )}
+      {halfHousingGrant.max && halfHousingGrant.min && (
+        <Grid item xs={6}>
+          <GrantCard
+            grantName="Half Housing Grant"
+            description=""
+            grantRange={halfHousingGrant as any}
+            linkToHDB="//hdb.gov.sg/residential/buying-a-flat/resale/financing/cpf-housing-grants/firsttimer-and-secondtimer-couple-applicants"
+          />
+        </Grid>
+      )}
+      {proximityGrant.max && proximityGrant.min && (
+        <Grid item xs={6}>
+          <GrantCard
+            grantName="Proximity Housing Grant (PHG)"
+            description=""
+            grantRange={proximityGrant as any}
+            linkToHDB="//hdb.gov.sg/cs/infoweb/residential/buying-a-flat/resale/financing/cpf-housing-grants/living-with-near-parents-or-child"
+          />
+        </Grid>
+      )}
     </Grid>
   );
 };
