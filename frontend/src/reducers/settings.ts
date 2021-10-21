@@ -6,6 +6,7 @@ export interface SettingsState {
   darkMode: boolean | null;
   drawerOpen: boolean;
   heatmap: {
+    showOverlay: boolean;
     showHeatmap: boolean;
     showPrices: boolean;
     priceRange: {
@@ -20,6 +21,7 @@ const initialState: SettingsState = {
   darkMode: null,
   drawerOpen: true,
   heatmap: {
+    showOverlay: true,
     showHeatmap: true,
     showPrices: true,
     priceRange: {
@@ -39,6 +41,9 @@ const slice = createSlice({
     },
     setDrawerOpen: (state, action: PayloadAction<boolean>) => {
       state.drawerOpen = action.payload;
+    },
+    setShowHeatmapOverlay: (state, action: PayloadAction<boolean>) => {
+      state.heatmap.showOverlay = action.payload;
     },
     setShowHeatmap: (state, action: PayloadAction<boolean>) => {
       state.heatmap.showHeatmap = action.payload;
@@ -61,6 +66,7 @@ const slice = createSlice({
 export const {
   setDarkMode,
   setDrawerOpen,
+  setShowHeatmapOverlay,
   setShowHeatmap,
   setShowHeatmapPrices,
   setHeatmapPriceRangeLower,
@@ -70,6 +76,8 @@ export const {
 
 export const selectDarkMode = (state: RootState) => state.settings.darkMode;
 export const selectDrawerOpen = (state: RootState) => state.settings.drawerOpen;
+export const selectShowHeatmapOverlay = (state: RootState) =>
+  state.settings.heatmap.showOverlay;
 export const selectShowHeatmap = (state: RootState) =>
   state.settings.heatmap.showHeatmap;
 export const selectShowHeatmapPrices = (state: RootState) =>

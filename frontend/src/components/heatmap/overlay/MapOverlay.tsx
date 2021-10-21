@@ -6,14 +6,22 @@ import {
   Button,
   Card,
   CardContent,
+  Collapse,
+  Divider,
   Grid,
+  IconButton,
   OutlinedInput,
+  Paper,
   Slider,
   Stack,
   TextField,
   Typography,
 } from '@mui/material';
-import { Settings as SettingsIcon } from '@mui/icons-material';
+import {
+  KeyboardArrowDown as KeyboardArrowDownIcon,
+  KeyboardArrowUp as KeyboardArrowUpIcon,
+  Settings as SettingsIcon,
+} from '@mui/icons-material';
 import { StandaloneSearchBox } from '@react-google-maps/api';
 import { skipToken } from '@reduxjs/toolkit/query/react';
 import { matchSorter } from 'match-sorter';
@@ -29,8 +37,10 @@ import {
   selectHeatmapPriceRangeLower,
   selectHeatmapPriceRangeUpper,
   selectShowHeatmap,
+  selectShowHeatmapOverlay,
   setHeatmapPriceRangeLower,
   setHeatmapPriceRangeUpper,
+  setShowHeatmapOverlay,
 } from '../../../reducers/settings';
 import {
   useGetIslandHeatmapQuery,
@@ -76,6 +86,7 @@ const MapOverlay = ({
   setSearchMarkers,
 }: Props) => {
   const dispatch = useAppDispatch();
+  const showHeatmapOverlay = useAppSelector(selectShowHeatmapOverlay);
   const showHeatmap = useAppSelector(selectShowHeatmap);
   const town = useAppSelector(selectTown);
   const year = useAppSelector(selectYear);
@@ -220,160 +231,182 @@ const MapOverlay = ({
 
   return (
     <>
-      <Grid
-        container
-        spacing={2}
-        sx={{ position: 'absolute', top: 0, p: 2, pointerEvents: 'none' }}
+      <Button
+        variant="contained"
+        onClick={() => dispatch(setShowHeatmapOverlay(true))}
+        sx={{
+          p: 1,
+          minWidth: 'auto',
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          m: 1,
+          pointerEvents: 'auto',
+        }}
       >
-        <Grid item xs={12} md="auto">
-          <StandaloneSearchBox
-            onPlacesChanged={() => {
-              ReactGA.event({
-                category: EventCategory.Heatmap,
-                action: HeatmapEventAction.SearchAddr,
-              });
-              setMapViewport();
-            }}
-            onLoad={setSearchBox}
-          >
-            <TextField
-              placeholder="Search..."
+        <KeyboardArrowDownIcon />
+      </Button>
+      <Collapse
+        in={showHeatmapOverlay}
+        sx={{ position: 'absolute', top: 0, width: '100%' }}
+      >
+        <Grid
+          component={Paper}
+          container
+          spacing={2}
+          sx={{ p: 1 }}
+          alignItems="center"
+        >
+          <Grid item xs={12} md="auto">
+            <StandaloneSearchBox
+              onPlacesChanged={() => {
+                ReactGA.event({
+                  category: EventCategory.Heatmap,
+                  action: HeatmapEventAction.SearchAddr,
+                });
+                setMapViewport();
+              }}
+              onLoad={setSearchBox}
+            >
+              <TextField
+                placeholder="Search..."
+                size="small"
+                sx={{
+                  width: {
+                    xs: '100%',
+                    md: 400,
+                  },
+                  '.MuiInputBase-root': {
+                    backgroundColor: (theme) =>
+                      theme.palette.background.default,
+                  },
+                }}
+              />
+            </StandaloneSearchBox>
+          </Grid>
+          <Grid item xs={12} md="auto">
+            <Autocomplete
+              size="small"
+              options={['Islandwide'].concat(
+                Object.values(Town).sort(
+                  (a, b) =>
+                    townRegions[a].localeCompare(townRegions[b]) ||
+                    a.localeCompare(b)
+                )
+              )}
+              groupBy={(option) => townRegions[option as Town] ?? ''}
+              filterOptions={(options, { inputValue }) =>
+                matchSorter(options, inputValue, {
+                  sorter: townSorter(
+                    (option) => townRegions[option as Town] ?? ''
+                  ),
+                })
+              }
+              renderInput={(params) => <TextField label="Town" {...params} />}
+              value={town}
+              onChange={handleTownChange}
+              blurOnSelect
+              disableClearable
               sx={{
                 width: {
                   xs: '100%',
-                  md: 400,
+                  md: 200,
                 },
-                pointerEvents: 'auto',
                 '.MuiInputBase-root': {
                   backgroundColor: (theme) => theme.palette.background.default,
                 },
               }}
             />
-          </StandaloneSearchBox>
-        </Grid>
-        <Grid item xs={12} md="auto">
-          <Autocomplete
-            options={['Islandwide'].concat(
-              Object.values(Town).sort(
-                (a, b) =>
-                  townRegions[a].localeCompare(townRegions[b]) ||
-                  a.localeCompare(b)
-              )
-            )}
-            groupBy={(option) => townRegions[option as Town] ?? ''}
-            filterOptions={(options, { inputValue }) =>
-              matchSorter(options, inputValue, {
-                sorter: townSorter(
-                  (option) => townRegions[option as Town] ?? ''
-                ),
-              })
-            }
-            renderInput={(params) => <TextField label="Town" {...params} />}
-            value={town}
-            onChange={handleTownChange}
-            blurOnSelect
-            disableClearable
-            sx={{
-              width: {
-                xs: '100%',
-                md: 200,
-              },
-              pointerEvents: 'auto',
-              '.MuiInputBase-root': {
-                backgroundColor: (theme) => theme.palette.background.default,
-              },
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} md="auto">
-          <Card
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            md="auto"
             sx={{
               width: {
                 xs: '100%',
                 md: 400,
               },
-              pointerEvents: 'auto',
               overflow: 'visible',
             }}
           >
-            <CardContent
-              sx={{
-                p: (theme) =>
-                  `0 ${theme.spacing(2)} ${theme.spacing(1)} !important`,
-              }}
-            >
-              <Stack direction="row" spacing={2} alignItems="center">
-                <Typography gutterBottom>Year</Typography>
-                <Box
-                  sx={{
-                    p: (theme) => `${theme.spacing(2)} ${theme.spacing(2)} 0`,
-                    flexGrow: 1,
-                  }}
-                >
-                  <Slider
-                    track={false}
-                    min={1990}
-                    max={currentYear}
-                    marks={yearMarks}
-                    value={year}
-                    onChange={(_, value) => dispatch(setYear(value as number))}
-                    onChangeCommitted={() => {
-                      ReactGA.event({
-                        category: EventCategory.Heatmap,
-                        action: HeatmapEventAction.AdjustYear,
-                      });
-                    }}
-                    valueLabelDisplay="auto"
-                  />
-                </Box>
-                <OutlinedInput
-                  value={year}
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Divider orientation="vertical" flexItem />
+              <Typography gutterBottom>Year</Typography>
+              <Box
+                sx={{
+                  p: (theme) => `${theme.spacing(2)} ${theme.spacing(2)} 0`,
+                  flexGrow: 1,
+                }}
+              >
+                <Slider
+                  track={false}
                   size="small"
-                  onChange={(event) =>
-                    dispatch(setYear(parseInt(event.target.value, 10)))
-                  }
-                  onBlur={handleYearBlur}
-                  inputProps={{
-                    min: 1990,
-                    max: currentYear,
-                    type: 'number',
+                  min={1990}
+                  max={currentYear}
+                  marks={yearMarks}
+                  value={year}
+                  onChange={(_, value) => dispatch(setYear(value as number))}
+                  onChangeCommitted={() => {
+                    ReactGA.event({
+                      category: EventCategory.Heatmap,
+                      action: HeatmapEventAction.AdjustYear,
+                    });
                   }}
                   sx={{
-                    '.MuiInputBase-input': {
-                      maxWidth: '70px',
+                    p: 0,
+                    '.MuiSlider-markLabel': {
+                      top: 10,
                     },
                   }}
                 />
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid
-          item
-          xs
-          sx={{
-            display: 'flex',
-            alignItems: 'start',
-            flexDirection: 'row-reverse',
-          }}
-        >
-          <Button
-            variant="contained"
-            onClick={() => setShowSettings(true)}
+              </Box>
+              <OutlinedInput
+                value={year}
+                size="small"
+                onChange={(event) =>
+                  dispatch(setYear(parseInt(event.target.value, 10)))
+                }
+                onBlur={handleYearBlur}
+                inputProps={{
+                  min: 1990,
+                  max: currentYear,
+                  type: 'number',
+                }}
+                sx={{
+                  '.MuiInputBase-input': {
+                    maxWidth: '70px',
+                  },
+                }}
+              />
+            </Stack>
+          </Grid>
+          <Grid
+            item
+            xs
             sx={{
-              p: '12px',
-              minWidth: 'auto',
-              pointerEvents: 'auto',
+              display: 'flex',
+              alignItems: 'start',
+              flexDirection: 'row-reverse',
             }}
           >
-            <SettingsIcon />
-          </Button>
-          <Settings
-            open={showSettings}
-            onClose={() => setShowSettings(false)}
-          />
+            <Stack direction="row">
+              <IconButton onClick={() => setShowSettings(true)}>
+                <SettingsIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => dispatch(setShowHeatmapOverlay(false))}
+              >
+                <KeyboardArrowUpIcon />
+              </IconButton>
+            </Stack>
+            <Settings
+              open={showSettings}
+              onClose={() => setShowSettings(false)}
+            />
+          </Grid>
         </Grid>
-      </Grid>
+      </Collapse>
       {showHeatmap && (
         <Grid
           container
