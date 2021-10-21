@@ -16,7 +16,7 @@ import {
   SubmitHandler,
   useForm,
 } from 'react-hook-form';
-import { FlatType } from '../../types/groups';
+import { FlatType, GroupColor } from '../../types/groups';
 import { Town } from '../../types/towns';
 import FormAutocompleteInput from '../forms/FormAutocompleteInput';
 import FormSliderInput from '../forms/FormSliderInput';
@@ -26,6 +26,9 @@ import FormSwitchInput, {
 import FormTextInput from '../forms/FormTextInput';
 import { townRegions } from '../../app/constants';
 import { CloseRounded as CloseRoundedIcon } from '@mui/icons-material';
+import FormColorInput from '../forms/FormColorInput';
+import { useAppSelector } from '../../app/hooks';
+import { selectNextColor } from '../../reducers/colors';
 
 export interface Range<T> {
   lower: T;
@@ -35,6 +38,7 @@ export interface Range<T> {
 export interface UpdateGroupFormValues {
   name: string;
   type: 'resale' | 'bto';
+  color: GroupColor;
   towns?: Town;
   flatTypes?: FlatType;
   storeyRange?: Range<number>;
@@ -56,6 +60,7 @@ interface Props {
 const defaultFormValues: UpdateGroupFormValues = {
   name: '',
   type: 'resale',
+  color: GroupColor.Color1,
   isStoreyRangeEnabled: false,
   isFloorAreaRangeEnabled: false,
   isLeasePeriodRangeEnabled: false,
@@ -64,6 +69,7 @@ const defaultFormValues: UpdateGroupFormValues = {
 
 const UpdateGroupForm = (props: Props) => {
   const { onSubmit, handleClose, currentData } = props;
+  const nextColor = useAppSelector(selectNextColor);
   const {
     formState: { isSubmitting, errors },
     watch,
@@ -72,7 +78,7 @@ const UpdateGroupForm = (props: Props) => {
     setValue,
     control,
   } = useForm<UpdateGroupFormValues>({
-    defaultValues: currentData ?? defaultFormValues,
+    defaultValues: currentData ?? { ...defaultFormValues, color: nextColor },
   });
 
   const watchType = watch('type');
@@ -100,14 +106,14 @@ const UpdateGroupForm = (props: Props) => {
             </Typography>
           </Box>
         </Grid>
-        <Grid item xs={12} lg={6}>
+        <Grid item xs={12} lg="auto">
           <Stack
             direction="row"
             spacing={1}
             alignItems="center"
             sx={{ height: '100%' }}
           >
-            <Typography>Group Type: </Typography>
+            <Typography>Property Type:</Typography>
             <Controller
               name="type"
               control={control}
@@ -130,13 +136,27 @@ const UpdateGroupForm = (props: Props) => {
             />
           </Stack>
         </Grid>
-        <Grid item xs={12} lg={6}>
+        <Grid item xs={12} lg>
           <FormTextInput
             name="name"
             control={control as Control<FieldValues>}
             label="Group Name (optional)"
             placeholder={currentData ? currentData.name : 'Enter a group name'}
           />
+        </Grid>
+        <Grid item xs={12} lg="auto">
+          <Stack
+            direction="row"
+            spacing={0.5}
+            alignItems="center"
+            sx={{ height: '100%' }}
+          >
+            <Typography>Colour:</Typography>
+            <FormColorInput
+              name="color"
+              control={control as Control<FieldValues>}
+            />
+          </Stack>
         </Grid>
         <Grid item xs={12}>
           <Divider />

@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../app/store';
 import { GroupColor } from '../types/groups';
+import { getGroupColor } from '../utils/groups';
 
 export interface ColorsState {
   colorCount: Record<GroupColor, number>;
@@ -31,20 +32,15 @@ const slice = createSlice({
         state.colorCount[action.payload] -= 1;
       }
     },
-    setColorCount: (
-      state,
-      action: PayloadAction<Record<GroupColor, number>>
-    ) => {
-      state.colorCount = action.payload;
-    },
   },
 });
 
-export const { incrementColorCount, decrementColorCount, setColorCount } =
-  slice.actions;
+export const { incrementColorCount, decrementColorCount } = slice.actions;
 
 export const selectColorCount = (
   state: RootState
 ): Record<GroupColor, number> => state.colors.colorCount;
+export const selectNextColor = (state: RootState): GroupColor =>
+  getGroupColor(state.colors.colorCount);
 
 export default slice.reducer;

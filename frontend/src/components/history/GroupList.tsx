@@ -5,18 +5,8 @@ import { useDispatch } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 import { useAppSelector } from '../../app/hooks';
 import { createGroup, resetGroups, selectGroups } from '../../reducers/history';
-import {
-  incrementColorCount,
-  selectColorCount,
-  setColorCount,
-} from '../../reducers/colors';
-import {
-  BTOGroup,
-  Group,
-  GroupColor,
-  GroupFilters,
-  ResaleGroup,
-} from '../../types/groups';
+import { incrementColorCount, selectColorCount } from '../../reducers/colors';
+import { BTOGroup, Group, GroupFilters, ResaleGroup } from '../../types/groups';
 import {
   getGroupColor,
   mapCreateFormValuesToGroupFilters,
@@ -53,39 +43,37 @@ const GroupList = (props: Props) => {
       mapCreateFormValuesToGroupFilters(data);
     if (groupFilters.length === 1) {
       const groupId = uuidv4();
-      const color = getGroupColor(colorCount);
       const group: Group = {
         type: data.type,
         id: groupId,
         name: data.name === '' ? 'New Group' : data.name,
-        color,
+        color: data.color,
         filters: groupFilters[0],
       };
 
       dispatch(createGroup(group));
-      dispatch(incrementColorCount(color));
+      dispatch(incrementColorCount(data.color));
       onChangeSelectedGroup(groupId)(true);
     } else {
-      const colorCountCopy: Record<GroupColor, number> = { ...colorCount };
       const firstGroupId = uuidv4();
-      for (let i = 0; i < groupFilters.length; i += 1) {
-        const groupId = uuidv4();
-        const color = getGroupColor(colorCountCopy);
-        const group: Group = {
+      const createdGroups: Group[] = groupFilters.map((filters, index) => {
+        return {
           type: data.type,
-          id: i === 0 ? firstGroupId : groupId,
+          id: index === 0 ? firstGroupId : uuidv4(),
           name:
-            data.name === '' ? `New Group ${i + 1}` : `${data.name} ${i + 1}`,
-          color,
-          filters: groupFilters[i],
+            data.name === ''
+              ? `New Group ${index + 1}`
+              : `${data.name} ${index + 1}`,
+          color: data.color,
+          filters,
         };
+      });
+      createdGroups.forEach((group) => {
         dispatch(createGroup(group));
-        colorCountCopy[color] += 1;
-      }
-      dispatch(setColorCount(colorCountCopy));
+        dispatch(incrementColorCount(data.color));
+      });
       onChangeSelectedGroup(firstGroupId)(true);
     }
-
     setDisplayedModal(DisplayedModal.Hidden);
   };
 

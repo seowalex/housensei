@@ -165,16 +165,18 @@ const HistoryChart = (props: Props) => {
                         stroke={colorTheme[color]}
                         strokeWidth={selectedGroup === groupId ? 3 : 2}
                         dot={{
-                          r: 3.5,
-                          stroke: selectedBTOProjectIds[groupId].includes(id)
-                            ? 'black'
-                            : colorTheme[color],
+                          r: selectedBTOProjectIds[groupId].includes(id)
+                            ? 4.5
+                            : 3.5,
+                          stroke: colorTheme[color],
                           fill: selectedBTOProjectIds[groupId].includes(id)
                             ? colorTheme[color]
                             : 'white',
                         }}
                         activeDot={{
-                          r: 4.5,
+                          r: selectedBTOProjectIds[groupId].includes(id)
+                            ? 5.5
+                            : 4.5,
                           stroke: selectedBTOProjectIds[groupId].includes(id)
                             ? 'black'
                             : 'white',

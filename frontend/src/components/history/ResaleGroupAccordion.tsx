@@ -26,7 +26,10 @@ import { useDispatch } from 'react-redux';
 
 import { useGetBTOGraphQuery, useGetResaleGraphQuery } from '../../api/history';
 import { removeGroup, updateGroup } from '../../reducers/history';
-import { decrementColorCount } from '../../reducers/colors';
+import {
+  decrementColorCount,
+  incrementColorCount,
+} from '../../reducers/colors';
 import { Group, ResaleGroup } from '../../types/groups';
 import {
   mapUpdateFormValuesToGroupFilters,
@@ -95,6 +98,7 @@ const ResaleGroupAccordion = (props: Props) => {
       ...group,
       type: data.type,
       name: data.name === '' ? group.name : data.name,
+      color: data.color,
       filters: mapUpdateFormValuesToGroupFilters(data),
     };
 
@@ -104,6 +108,8 @@ const ResaleGroupAccordion = (props: Props) => {
         group: updatedGroup,
       })
     );
+    dispatch(decrementColorCount(group.color));
+    dispatch(incrementColorCount(data.color));
     setDisplayedModal(DisplayedModal.Hidden);
     setShowBTOAlert(true);
   };
