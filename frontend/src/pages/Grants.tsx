@@ -139,7 +139,7 @@ const Grants = () => {
           }
         ),
       age: yup.mixed().when('maritalStatus', {
-        is: 'Single',
+        is: 'single',
         then: notEmptyStrCheck('Must indicate age'),
       }),
       workingAtLeastAYear: notEmptyStrCheck(
@@ -184,18 +184,11 @@ const Grants = () => {
     reset();
   };
 
-  const onStepClick = (idx: number) => {
-    if (
-      idx !== 0 &&
-      validationSchema
-        .slice(0, idx)
-        .some((validation) => !validation.isValidSync(methods.getValues()))
-    ) {
-      return;
-    }
-
-    setActiveStep(idx);
-  };
+  const isValidStep = (idx: number) =>
+    idx === 0 ||
+    validationSchema
+      .slice(0, idx)
+      .every((validation) => validation.isValidSync(methods.getValues()));
 
   return (
     <Container sx={{ p: 3 }}>
@@ -223,13 +216,25 @@ const Grants = () => {
               {steps.map((label, idx) => {
                 const stepProps = {};
                 const labelProps = {};
+                const isValidClick = isValidStep(idx);
                 return (
                   <Step
                     onClick={() => {
-                      // check if pass validation of all steps before
-                      onStepClick(idx);
+                      if (isValidClick) {
+                        setActiveStep(idx);
+                      }
                     }}
                     key={label}
+                    sx={
+                      isValidClick
+                        ? {
+                            '&:hover': {
+                              backgroundColor: '#D3D3D3',
+                              cursor: 'pointer',
+                            },
+                          }
+                        : null
+                    }
                     {...stepProps}
                   >
                     <StepLabel {...labelProps}>{label}</StepLabel>
