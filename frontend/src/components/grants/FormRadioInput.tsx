@@ -16,7 +16,7 @@ interface Props {
   required?: boolean;
 }
 
-const FormSelectInput = (props: Props) => {
+const FormRadioInput = (props: Props) => {
   const { name, options, form, label, required } = props;
   const error = form.formState.errors[name]?.message;
 
@@ -26,7 +26,9 @@ const FormSelectInput = (props: Props) => {
       control={form.control}
       render={({ field: { onChange, value } }) => (
         <FormControl component="fieldset" error={!!error} required={!!required}>
-          <FormLabel component="legend">{label}</FormLabel>
+          <FormLabel component="legend">
+            {label + (required ? '' : ' (Optional)')}
+          </FormLabel>
           <RadioGroup row value={value} onChange={onChange}>
             {options.map((option) => (
               <FormControlLabel
@@ -44,4 +46,4 @@ const FormSelectInput = (props: Props) => {
   );
 };
 
-export default FormSelectInput;
+export default FormRadioInput;

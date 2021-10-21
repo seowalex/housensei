@@ -27,6 +27,12 @@ const GrantsResult = (props: Props) => {
     return arr.join('/');
   };
 
+  Object.keys(values).forEach((field) => {
+    if (values[field] === 'NA') {
+      values[field] = '';
+    }
+  });
+
   const fieldValues = {
     ...values,
     singleNationality: values.ownNationality,

@@ -22,6 +22,7 @@ const HousingQuestions = (props: StepProps) => {
   const leaseOptions = [
     { label: 'Yes', value: true },
     { label: 'No', value: false },
+    { label: 'Unsure', value: 'NA' },
   ];
 
   // Helper
@@ -36,6 +37,7 @@ const HousingQuestions = (props: StepProps) => {
   const livingWithExtendedFamilyOptions = [
     { label: 'Yes', value: true },
     { label: 'No', value: false },
+    { label: 'Unsure', value: 'NA' },
   ];
 
   return (

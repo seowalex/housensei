@@ -168,7 +168,7 @@ const Grants = () => {
     resolver: yupResolver(currentValidationSchema),
     mode: 'onChange',
   });
-  const { trigger } = methods;
+  const { reset, trigger } = methods;
 
   const handleNext = async () => {
     const isStepValid = await trigger();
@@ -177,6 +177,11 @@ const Grants = () => {
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleReset = () => {
+    setActiveStep(0);
+    reset();
   };
 
   const onStepClick = (idx: number) => {
@@ -201,11 +206,17 @@ const Grants = () => {
             <br />
             <Typography>
               Check your eligibility for the Enhanced CPF Housing Grant (EHG/EHG
-              Single), Family Grant, Proximity Housing Grant (PHG), Singles
-              Grant, Half Housing Grant here.
+              Single), Family Grant, Proximity Housing Grant (PHG) and Half
+              Housing Grant here.
             </Typography>
             <br />
-            <Typography>Questions that required (*)</Typography>
+            <Typography>
+              All information in this site is provided &apos;as is&apos;, with
+              no guarantee of completeness, accuracy or timeliness of the
+              results obtained from the use of this information.
+            </Typography>
+            <br />
+            <Typography>Questions that are required (*)</Typography>
           </Grid>
           <Grid item>
             <Stepper activeStep={activeStep}>
@@ -254,18 +265,27 @@ const Grants = () => {
                       Back
                     </Button>
                   </Grid>
-                  {activeStep < steps.length - 1 && (
-                    <Grid item>
+
+                  <Grid item>
+                    {activeStep < steps.length - 1 ? (
                       <Button
                         variant="contained"
-                        color="primary"
                         onClick={handleNext}
                         size="large"
                       >
                         {activeStep < steps.length - 2 ? 'Continue' : 'Finish'}
                       </Button>
-                    </Grid>
-                  )}
+                    ) : (
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleReset}
+                        size="large"
+                      >
+                        Reset
+                      </Button>
+                    )}
+                  </Grid>
                 </Grid>
               </form>
             </FormProvider>

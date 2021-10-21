@@ -19,6 +19,7 @@ const ProximityQuestions = (props: StepProps) => {
       value: 'live together',
     },
     { label: 'No', value: 'no' },
+    { label: 'Unsure', value: 'NA' },
   ];
 
   return (

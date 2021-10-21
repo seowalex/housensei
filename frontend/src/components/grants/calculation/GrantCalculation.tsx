@@ -7,7 +7,6 @@ import proximityGrantTree from '../../../utils/grant_json/proximityGrant.json';
 import singleEhgTree from '../../../utils/grant_json/singleEHG.json';
 import singleEhgIncome from '../../../utils/grant_json/singleEHGIncome.json';
 import { recurseBooleanTree, getEHGGrantValue, recurseTree } from './helper';
-// import singleGrantTree from '../../../utils/grant_json/singleGrant.json';
 
 export type GrantRange = {
   min: number;

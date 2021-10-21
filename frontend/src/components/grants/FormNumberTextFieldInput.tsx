@@ -23,7 +23,9 @@ const FormNumberTextFieldInput = (props: Props) => {
       control={form.control}
       render={({ field: { onChange, value } }) => (
         <FormControl component="fieldset" error={!!error} required={!!required}>
-          <FormLabel component="legend">{label}</FormLabel>
+          <FormLabel component="legend">
+            {label + (required ? '' : ' (Optional)')}
+          </FormLabel>
           <TextField
             type="number"
             size="small"
