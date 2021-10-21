@@ -12,40 +12,48 @@ import {
   UseFormReturn,
 } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import UserQuestions from '../components/grants/UserQuestions';
-import GrantsCalculation from '../components/grants/GrantsCalculation';
-import HousingQuestions from '../components/grants/HousingQuestions';
-import ProximityQuestions from '../components/grants/ProximityQuestions';
+import UserQuestions from '../components/grants/steps/UserQuestions';
+import GrantsResult from '../components/grants/steps/GrantsResult';
+import HousingQuestions from '../components/grants/steps/HousingQuestions';
+import ProximityQuestions from '../components/grants/steps/ProximityQuestions';
 
 export type GrantsFormValues = {
   // user questions
-  maritalStatus: string;
-  singleNationality: string;
-  coupleNationality: string;
-  singleFirstTimer: boolean | '';
-  coupleFirstTimer: boolean | '';
+  maritalStatus: 'single' | 'couple' | '';
+  ownNationality: 'SC' | 'PR' | 'F' | '';
+  partnerNationality: 'SC' | 'PR' | 'F' | '';
+  ownFirstTimer: boolean | '';
+  partnerFirstTimer: boolean | '';
   age: boolean | '';
   workingAtLeastAYear: boolean | '';
   monthlyIncome: number | '';
 
   // housing questions
-  housingType: string;
+  housingType: 'BTO' | 'Resale' | 'EC' | '';
   lease: boolean | '';
-  flatSize: string;
+  flatSize:
+    | '1 Room'
+    | '2 Room'
+    | '3 Room'
+    | '4 Room'
+    | '5 Room'
+    | '3Gen'
+    | 'Studio'
+    | '';
   livingWithExtendedFamily: boolean | '';
 
   // proximity questions
   receivedProximityBefore: boolean | '';
-  proximityStatus: string;
+  proximityStatus: 'within 4km' | 'live together' | 'no' | '';
 };
 
 const defaultValues: GrantsFormValues = {
   // user questions
   maritalStatus: '',
-  singleNationality: '',
-  coupleNationality: '',
-  singleFirstTimer: '',
-  coupleFirstTimer: '',
+  ownNationality: '',
+  partnerNationality: '',
+  ownFirstTimer: '',
+  partnerFirstTimer: '',
   age: '',
   workingAtLeastAYear: '',
   monthlyIncome: '',
@@ -70,7 +78,7 @@ function getStepContent(step: number, form: UseFormReturn<FieldValues>) {
     case 2:
       return <ProximityQuestions form={form} />;
     case 3:
-      return <GrantsCalculation formValues={form.getValues} />;
+      return <GrantsResult formValues={form.getValues} />;
     default:
       return 'Unknown step';
   }
@@ -93,64 +101,62 @@ const Grants = () => {
   const validationSchema = [
     yup.object({
       maritalStatus: yup.string().required('Must indicate marital status'),
-      singleNationality: yup.string().required('Must indicate nationality'),
-      coupleNationality: yup.mixed().when('maritalStatus', {
-        is: 'Couple',
+      ownNationality: yup.string().required('Must indicate nationality'),
+      partnerNationality: yup.mixed().when('maritalStatus', {
+        is: 'couple',
         then: yup.string().required("Must indicate partner's nationality"),
       }),
-      singleFirstTimer: notEmptyStrCheck('Must indicate if first time buyer'),
-      coupleFirstTimer: yup.mixed().when('maritalStatus', {
-        is: 'Couple',
-        then: notEmptyStrCheck(
-          'Must indicate whether partner is first time buyer'
-        ),
-      }),
-      age: yup.mixed().when('maritalStatus', {
-        is: 'Single',
-        then: notEmptyStrCheck('Must indicate age'),
-      }),
-      workingAtLeastAYear: notEmptyStrCheck(
-        'Must indicate if working for at least a year'
-      ),
-      monthlyIncome: notEmptyStrCheck('Must indicate monthly income'),
-    }),
-    yup.object({
-      housingType: yup.string().required('Must indicate housing type'),
-      lease: yup.mixed().when('housingType', {
-        is: 'Resale',
-        then: notEmptyStrCheck('Must indicate resale lease'),
-      }),
-      flatSize: yup.mixed().when('housingType', {
-        is: 'Resale',
-        then: notEmptyStrCheck('Must indicate resale flat size'),
-      }),
-      livingWithExtendedFamily: yup
+      ownFirstTimer: yup
         .mixed()
         .test(
-          'livingWithExtendedFamily',
-          'Must indicate if living with extended family',
+          'ownNationality',
+          'Must indicate if first time buyer',
           function (item) {
             if (
               // eslint-disable-next-line react/no-this-in-sfc
-              this.parent.maritalStatus !== 'Couple' ||
-              // eslint-disable-next-line react/no-this-in-sfc
-              this.parent.housingType !== 'Resale'
+              this.parent.ownNationality === 'F'
             ) {
               return true;
             }
             return item !== '';
           }
         ),
+      partnerFirstTimer: yup
+        .mixed()
+        .test(
+          'partnerNationality and couple',
+          'Must indicate whether partner is first time buyer',
+          function (item) {
+            if (
+              // eslint-disable-next-line react/no-this-in-sfc
+              this.parent.partnerNationality === 'F' ||
+              // eslint-disable-next-line react/no-this-in-sfc
+              this.parent.maritalStatus !== 'couple'
+            ) {
+              return true;
+            }
+            return item !== '';
+          }
+        ),
+      age: yup.mixed().when('maritalStatus', {
+        is: 'single',
+        then: notEmptyStrCheck('Must indicate age'),
+      }),
+      workingAtLeastAYear: notEmptyStrCheck(
+        'Must indicate if working for at least a year'
+      ),
+    }),
+    yup.object({
+      housingType: yup.string().required('Must indicate housing type'),
+      flatSize: yup.mixed().when('housingType', {
+        is: 'Resale',
+        then: notEmptyStrCheck('Must indicate resale flat size'),
+      }),
     }),
     yup.object({
       receivedProximityBefore: notEmptyStrCheck(
         'Must indicate if received proximity grant before'
       ),
-      proximityStatus: yup
-        .string()
-        .required(
-          'Must indicate intended living proximity with parents or children'
-        ),
     }),
   ];
 
@@ -162,7 +168,7 @@ const Grants = () => {
     resolver: yupResolver(currentValidationSchema),
     mode: 'onChange',
   });
-  const { trigger } = methods;
+  const { reset, trigger } = methods;
 
   const handleNext = async () => {
     const isStepValid = await trigger();
@@ -173,17 +179,37 @@ const Grants = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
+  const handleReset = () => {
+    setActiveStep(0);
+    reset();
+  };
+
+  const isValidStep = (idx: number) =>
+    idx === 0 ||
+    validationSchema
+      .slice(0, idx)
+      .every((validation) => validation.isValidSync(methods.getValues()));
+
   return (
     <Container sx={{ p: 3 }}>
       <Paper sx={{ p: '1rem' }}>
         <Grid container direction="column" spacing={10} padding={5}>
           <Grid item>
-            <Typography variant="h2">Grant Calculator</Typography>
-            <br />
-            <Typography>
+            <Typography variant="h2" gutterBottom>
+              Grant Calculator
+            </Typography>
+            <Typography gutterBottom>
               Check your eligibility for the Enhanced CPF Housing Grant (EHG/EHG
-              Single), Family Grant, Proximity Housing Grant (PHG), Singles
-              Grant, Half Housing Grant here.
+              Single), Family Grant, Proximity Housing Grant (PHG) and Half
+              Housing Grant here.
+            </Typography>
+            <Typography gutterBottom>
+              All information in this site is provided &apos;as is&apos;, with
+              no guarantee of completeness, accuracy or timeliness of the
+              results obtained from the use of this information.
+            </Typography>
+            <Typography gutterBottom>
+              Questions that are required (*)
             </Typography>
           </Grid>
           <Grid item>
@@ -191,25 +217,25 @@ const Grants = () => {
               {steps.map((label, idx) => {
                 const stepProps = {};
                 const labelProps = {};
+                const isValidClick = isValidStep(idx);
                 return (
                   <Step
                     onClick={() => {
-                      // check if pass validation of all steps before
-                      if (
-                        idx !== 0 &&
-                        validationSchema
-                          .slice(0, idx)
-                          .some(
-                            (validation) =>
-                              !validation.isValidSync(methods.getValues())
-                          )
-                      ) {
-                        return;
+                      if (isValidClick) {
+                        setActiveStep(idx);
                       }
-
-                      setActiveStep(idx);
                     }}
                     key={label}
+                    sx={
+                      isValidClick
+                        ? {
+                            '&:hover': {
+                              backgroundColor: '#D3D3D3',
+                              cursor: 'pointer',
+                            },
+                          }
+                        : null
+                    }
                     {...stepProps}
                   >
                     <StepLabel {...labelProps}>{label}</StepLabel>
@@ -234,23 +260,38 @@ const Grants = () => {
                   alignItems="center"
                   justifyContent="center"
                   padding={5}
+                  spacing={3}
                 >
                   <Grid item>
-                    <Button disabled={activeStep === 0} onClick={handleBack}>
+                    <Button
+                      disabled={activeStep === 0}
+                      onClick={handleBack}
+                      size="large"
+                    >
                       Back
                     </Button>
                   </Grid>
-                  {activeStep < steps.length - 1 && (
-                    <Grid item>
+
+                  <Grid item>
+                    {activeStep < steps.length - 1 ? (
                       <Button
                         variant="contained"
-                        color="primary"
                         onClick={handleNext}
+                        size="large"
                       >
                         {activeStep < steps.length - 2 ? 'Continue' : 'Finish'}
                       </Button>
-                    </Grid>
-                  )}
+                    ) : (
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={handleReset}
+                        size="large"
+                      >
+                        Reset
+                      </Button>
+                    )}
+                  </Grid>
                 </Grid>
               </form>
             </FormProvider>

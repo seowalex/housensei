@@ -1,12 +1,12 @@
 import { Grid } from '@mui/material';
-import { FlatType } from '../../types/groups';
-import FormRadioInput from './FormRadioInput';
+import { FlatType } from '../../../types/groups';
+import FormRadioInput from '../FormRadioInput';
 import StepProps from './StepProps';
 
 const HousingQuestions = (props: StepProps) => {
   const { form } = props;
   const watchMartialStatus = form.watch('maritalStatus');
-  const isCouple = watchMartialStatus === 'Couple';
+  const isCouple = watchMartialStatus === 'couple';
   const watchHousingType = form.watch('housingType');
   const isResale = watchHousingType === 'Resale';
 
@@ -22,13 +22,14 @@ const HousingQuestions = (props: StepProps) => {
   const leaseOptions = [
     { label: 'Yes', value: true },
     { label: 'No', value: false },
+    { label: 'Unsure', value: 'NA' },
   ];
 
   // Helper
   function ToArray(enumme: Record<string, string>) {
     return Object.keys(enumme).map((key) => ({
       label: enumme[key],
-      value: key,
+      value: enumme[key],
     }));
   }
   const flatSizeOptions = ToArray(FlatType);
@@ -36,6 +37,7 @@ const HousingQuestions = (props: StepProps) => {
   const livingWithExtendedFamilyOptions = [
     { label: 'Yes', value: true },
     { label: 'No', value: false },
+    { label: 'Unsure', value: 'NA' },
   ];
 
   return (
@@ -46,6 +48,7 @@ const HousingQuestions = (props: StepProps) => {
           name="housingType"
           form={form}
           options={housingTypeOptions}
+          required
         />
       </Grid>
 
@@ -66,6 +69,7 @@ const HousingQuestions = (props: StepProps) => {
               name="flatSize"
               form={form}
               options={flatSizeOptions}
+              required
             />
           </Grid>
         </>

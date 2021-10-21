@@ -1,0 +1,70 @@
+[
+    {
+        "income": 0,
+        "amount": 40000
+    },
+    {
+        "income": 750,
+        "amount": 37500
+    },
+    {
+        "income": 1000,
+        "amount": 35000
+    },
+    {
+        "income": 1250,
+        "amount": 32500
+    },
+    {
+        "income": 1500,
+        "amount": 30000
+    },
+    {
+        "income": 1750,
+        "amount": 27500
+    },
+    {
+        "income": 2000,
+        "amount": 25000
+    },
+    {
+        "income": 2250,
+        "amount": 22500
+    },
+    {
+        "income": 2500,
+        "amount": 20000
+    },
+    {
+        "income": 2750,
+        "amount": 17500
+    },
+    {
+        "income": 3000,
+        "amount": 15000
+    },
+    {
+        "income": 3250,
+        "amount": 12500
+    },
+    {
+        "income": 3500,
+        "amount": 10000
+    },
+    {
+        "income": 3750,
+        "amount": 7500
+    },
+    {
+        "income": 4000,
+        "amount": 5000
+    },
+    {
+        "income": 4250,
+        "amount": 2500
+    },
+    {
+        "income": 4500,
+        "amount": 0
+    }
+]

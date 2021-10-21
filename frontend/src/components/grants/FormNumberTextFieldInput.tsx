@@ -1,23 +1,20 @@
 import {
   FormControl,
-  FormControlLabel,
   FormHelperText,
   FormLabel,
-  Radio,
-  RadioGroup,
+  TextField,
 } from '@mui/material';
 import { Controller, FieldValues, UseFormReturn } from 'react-hook-form';
 
 interface Props {
   name: string;
-  options: Array<{ label: string; value: any }>;
   form: UseFormReturn<FieldValues>;
   label?: string;
   required?: boolean;
 }
 
-const FormRadioInput = (props: Props) => {
-  const { name, options, form, label, required } = props;
+const FormNumberTextFieldInput = (props: Props) => {
+  const { name, form, label, required } = props;
   const error = form.formState.errors[name]?.message;
 
   return (
@@ -29,16 +26,14 @@ const FormRadioInput = (props: Props) => {
           <FormLabel component="legend">
             {label + (required ? '' : ' (Optional)')}
           </FormLabel>
-          <RadioGroup row value={value} onChange={onChange}>
-            {options.map((option) => (
-              <FormControlLabel
-                key={option.value}
-                value={option.value}
-                control={<Radio />}
-                label={option.label}
-              />
-            ))}
-          </RadioGroup>
+          <TextField
+            type="number"
+            size="small"
+            variant="outlined"
+            value={value}
+            onChange={onChange}
+            sx={{ width: '100%' }}
+          />
           <FormHelperText style={{ height: '5px' }}>{error}</FormHelperText>
         </FormControl>
       )}
@@ -46,4 +41,4 @@ const FormRadioInput = (props: Props) => {
   );
 };
 
-export default FormRadioInput;
+export default FormNumberTextFieldInput;

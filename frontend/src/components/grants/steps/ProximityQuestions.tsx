@@ -1,11 +1,11 @@
 import { Grid } from '@mui/material';
-import FormRadioInput from './FormRadioInput';
+import FormRadioInput from '../FormRadioInput';
 import StepProps from './StepProps';
 
 const ProximityQuestions = (props: StepProps) => {
   const { form } = props;
   const watchMartialStatus = form.watch('maritalStatus');
-  const isCouple = watchMartialStatus === 'Couple';
+  const isCouple = watchMartialStatus === 'couple';
 
   const receivedProximityBeforeOptions = [
     { label: 'Yes', value: true },
@@ -13,12 +13,13 @@ const ProximityQuestions = (props: StepProps) => {
   ];
 
   const proximityStatusOptions = [
-    { label: 'Yes, within 4km', value: 'Within 4km' },
+    { label: 'Yes, within 4km', value: 'within 4km' },
     {
       label: 'Yes, we intend to live together',
-      value: 'Live together',
+      value: 'live together',
     },
-    { label: 'No', value: 'No' },
+    { label: 'No', value: 'no' },
+    { label: 'Unsure', value: 'NA' },
   ];
 
   return (
@@ -31,13 +32,14 @@ const ProximityQuestions = (props: StepProps) => {
           name="receivedProximityBefore"
           form={form}
           options={receivedProximityBeforeOptions}
+          required
         />
       </Grid>
       <Grid item>
         <FormRadioInput
-          label={`Will you be living with or near your ${
-            isCouple ? "or your partner's " : ''
-          }extended family (parents/children)?`}
+          label={`Will you be living with or near your parents${
+            isCouple ? ', parents-in-law' : ''
+          } and/or children?`}
           name="proximityStatus"
           form={form}
           options={proximityStatusOptions}

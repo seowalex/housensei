@@ -1,11 +1,22 @@
 import { Grid } from '@mui/material';
-import FormRadioInput from './FormRadioInput';
+import FormRadioInput from '../FormRadioInput';
+import FormNumberTextFieldInput from '../FormNumberTextFieldInput';
 import StepProps from './StepProps';
 
 const UserQuestions = (props: StepProps) => {
   const { form } = props;
   const watchMartialStatus = form.watch('maritalStatus');
-  const isCouple = watchMartialStatus === 'Couple';
+  const isCouple = watchMartialStatus === 'couple';
+
+  const watchOwnNationality = form.watch('ownNationality');
+  const isOwnForeigner = watchOwnNationality === 'F';
+  const watchPartnerNationality = form.watch('partnerNationality');
+  const isPartnerForeigner = watchPartnerNationality === 'F';
+
+  const maritalStatusOptions = [
+    { label: 'Single', value: 'single' },
+    { label: 'Couple', value: 'couple' },
+  ];
 
   const nationalityOptions = [
     { label: 'Singaporean', value: 'SC' },
@@ -28,19 +39,6 @@ const UserQuestions = (props: StepProps) => {
     { label: 'No', value: false },
   ];
 
-  // const income = [1500, 2000, ..., 9000, 10k, 11k, 12k, 14k, 21k]
-  let possibleIncomes = [...Array(16).keys()].map((num) => num * 500 + 1500); // gives [1.5k, 2k 2.5k ... 9k]
-  possibleIncomes = possibleIncomes.concat([10000, 11000, 12000, 14000, 21000]);
-
-  const monthlyIncomeOptions = possibleIncomes.map((income, idx) => ({
-    label: `$${income} to $${possibleIncomes[idx + 1]}`,
-    value: income,
-  }));
-
-  monthlyIncomeOptions.unshift({ label: 'Not more than $1500', value: 0 });
-  monthlyIncomeOptions[monthlyIncomeOptions.length - 1].label =
-    'More than $21000';
-
   return (
     <Grid container item direction="column" spacing={3}>
       <Grid item>
@@ -48,10 +46,8 @@ const UserQuestions = (props: StepProps) => {
           label="Are you purchasing as a single or a couple?"
           name="maritalStatus"
           form={form}
-          options={[
-            { label: 'Single', value: 'Single' },
-            { label: 'Couple', value: 'Couple' },
-          ]}
+          options={maritalStatusOptions}
+          required
         />
       </Grid>
 
@@ -59,9 +55,10 @@ const UserQuestions = (props: StepProps) => {
         <Grid item>
           <FormRadioInput
             label="What is your nationality?"
-            name="singleNationality"
+            name="ownNationality"
             form={form}
             options={nationalityOptions}
+            required
           />
         </Grid>
 
@@ -69,31 +66,36 @@ const UserQuestions = (props: StepProps) => {
           <Grid item>
             <FormRadioInput
               label="What is your partner's nationality?"
-              name="coupleNationality"
+              name="partnerNationality"
               form={form}
               options={nationalityOptions}
+              required
             />
           </Grid>
         )}
       </Grid>
 
       <Grid container item direction="row" spacing={5}>
-        <Grid item>
-          <FormRadioInput
-            label="Are you a first time buyer?"
-            name="singleFirstTimer"
-            form={form}
-            options={firstTimerOptions}
-          />
-        </Grid>
+        {!isOwnForeigner && (
+          <Grid item>
+            <FormRadioInput
+              label="Are you a first time buyer?"
+              name="ownFirstTimer"
+              form={form}
+              options={firstTimerOptions}
+              required
+            />
+          </Grid>
+        )}
 
-        {isCouple && (
+        {isCouple && !isPartnerForeigner && (
           <Grid item>
             <FormRadioInput
               label="Is your partner a first time buyer?"
-              name="coupleFirstTimer"
+              name="partnerFirstTimer"
               form={form}
               options={firstTimerOptions}
+              required
             />
           </Grid>
         )}
@@ -106,6 +108,7 @@ const UserQuestions = (props: StepProps) => {
             name="age"
             form={form}
             options={ageOptions}
+            required
           />
         </Grid>
       )}
@@ -116,15 +119,15 @@ const UserQuestions = (props: StepProps) => {
           name="workingAtLeastAYear"
           form={form}
           options={workingAtLeastAYearOptions}
+          required
         />
       </Grid>
 
       <Grid item>
-        <FormRadioInput
-          label="What is your monthly income?"
+        <FormNumberTextFieldInput
+          label="What is your monthly household income?"
           name="monthlyIncome"
           form={form}
-          options={monthlyIncomeOptions}
         />
       </Grid>
     </Grid>
