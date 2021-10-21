@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import ReactGA from 'react-ga';
 import {
   Dialog,
@@ -12,6 +12,7 @@ import {
   TableRow,
   TableSortLabel,
   Tooltip,
+  useTheme,
 } from '@mui/material';
 import { Marker } from '@react-google-maps/api';
 import {
@@ -24,7 +25,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { FlatTransaction } from '../../../api/heatmap';
-import { createGroup, selectGroups } from '../../../reducers/history';
+import { createGroup } from '../../../reducers/history';
 
 import { currencyFormatter } from '../../../app/utils';
 import {
@@ -77,15 +78,30 @@ const getComparator = <Key extends keyof FlatTransaction>(
     : (a, b) => -descendingComparator(a, b, orderBy);
 
 const FlatMarker = ({ town, address, coordinates, transactions }: Props) => {
+  const { google } = window;
+  const theme = useTheme();
   const dispatch = useAppDispatch();
   const { enqueueSnackbar } = useSnackbar();
-  const groups = useAppSelector(selectGroups);
   const colorCount = useAppSelector(selectColorCount);
 
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<OrderBy>('transactionMonth');
   const [marker, setMarker] = useState<google.maps.Marker>();
   const [showTransactions, setShowTransactions] = useState(false);
+
+  const baseMarkerOptions: google.maps.MarkerOptions = useMemo(
+    () => ({
+      clickable: false,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 3,
+        fillColor: theme.palette.text.primary,
+        fillOpacity: 0.8,
+        strokeOpacity: 0,
+      },
+    }),
+    [theme, google]
+  );
 
   const handleMouseOver = () => {
     marker?.setOptions({
@@ -140,6 +156,7 @@ const FlatMarker = ({ town, address, coordinates, transactions }: Props) => {
 
   return (
     <>
+      <Marker position={coordinates} options={baseMarkerOptions} />
       <Marker
         position={coordinates}
         title={address}
@@ -166,9 +183,9 @@ const FlatMarker = ({ town, address, coordinates, transactions }: Props) => {
             }}
             sx={{
               position: 'absolute',
-              top: (theme) => theme.spacing(1),
-              right: (theme) => theme.spacing(1),
-              color: (theme) => theme.palette.grey[500],
+              top: theme.spacing(1),
+              right: theme.spacing(1),
+              color: theme.palette.grey[500],
             }}
           >
             <CloseIcon />
