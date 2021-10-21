@@ -29,7 +29,6 @@ export const get99CoLink = (filters: GroupFilters): string => {
   const town = filters.towns[0];
   const flatType = filters.flatTypes[0];
   const queryParams: Record<string, unknown> = {
-    autocom: 'true',
     listing_type: 'sale',
     main_category: 'hdb',
     name: `${town} (HDB Town)`,
