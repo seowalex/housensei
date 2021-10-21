@@ -25,7 +25,7 @@ const LinkBehavior = forwardRef<
 const App = () => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const darkMode = useAppSelector(selectDarkMode) ?? prefersDarkMode;
-  const GA_TRACKING_ID = 'UA-210554819-1';
+  const GA_TRACKING_ID = 'UA-210777320-1';
 
   useEffect(() => {
     ReactGA.initialize(GA_TRACKING_ID, {
