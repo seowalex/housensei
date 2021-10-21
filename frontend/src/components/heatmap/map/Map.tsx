@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import ReactGA from 'react-ga';
 import { Box, CircularProgress, useMediaQuery, useTheme } from '@mui/material';
 import {
   GoogleMap,
@@ -34,6 +35,7 @@ import { Town } from '../../../types/towns';
 import MapOverlay from '../overlay/MapOverlay';
 import TownPolygon from './TownPolygon';
 import FlatMarker from './FlatMarker';
+import { EventCategory, HeatmapEventAction } from '../../../app/analytics';
 
 const Map = () => {
   const { google } = window;
@@ -162,9 +164,21 @@ const Map = () => {
 
     if (google && zoom) {
       if (zoom < 15) {
+        if (town !== 'Islandwide') {
+          ReactGA.event({
+            category: EventCategory.Heatmap,
+            action: HeatmapEventAction.ZoomIsland,
+          });
+        }
         dispatch(setTown('Islandwide'));
         setSearchMarkers([]);
       } else {
+        if (town === 'Islandwide') {
+          ReactGA.event({
+            category: EventCategory.Heatmap,
+            action: HeatmapEventAction.ZoomTown,
+          });
+        }
         for (const [townName, paths] of Object.entries(townBoundaries)) {
           const polygon = new google.maps.Polygon({ paths });
           if (

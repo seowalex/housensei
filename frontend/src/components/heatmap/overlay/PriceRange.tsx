@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import ReactGA from 'react-ga';
 import {
   IconButton,
   InputAdornment,
@@ -12,6 +13,7 @@ import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import { useAppDispatch } from '../../../app/hooks';
 
 import { currencyFormatter } from '../../../app/utils';
+import { EventCategory, HeatmapEventAction } from '../../../app/analytics';
 
 interface Props {
   priceRange: number;
@@ -101,7 +103,16 @@ const PriceRange = ({ priceRange, setHeatmapPriceRange, min, max }: Props) => {
       <Typography variant="subtitle2">
         {currencyFormatter.format(priceRange)}
       </Typography>
-      <IconButton size="small" onClick={() => setPriceRangeOpen(true)}>
+      <IconButton
+        size="small"
+        onClick={() => {
+          ReactGA.event({
+            category: EventCategory.Heatmap,
+            action: HeatmapEventAction.EditPrice,
+          });
+          setPriceRangeOpen(true);
+        }}
+      >
         <EditIcon fontSize="inherit" />
       </IconButton>
     </Stack>

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import ReactGA from 'react-ga';
 import {
   Card,
   CardContent,
@@ -20,6 +21,7 @@ import {
 } from '../../../app/constants';
 import type { Town } from '../../../types/towns';
 import { currencyFormatter } from '../../../app/utils';
+import { EventCategory, HeatmapEventAction } from '../../../app/analytics';
 
 interface Props {
   town: string;
@@ -93,6 +95,10 @@ const TownPolygon = ({ town, resalePrice, showHeatmapPrices, map }: Props) => {
     dispatch(setTown(town as Town));
     map?.setCenter(townCoordinates[town as Town] ?? singaporeCoordinates);
     map?.setZoom(15);
+    ReactGA.event({
+      category: EventCategory.Heatmap,
+      action: HeatmapEventAction.MapClick,
+    });
   };
 
   return (
