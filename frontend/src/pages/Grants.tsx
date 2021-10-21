@@ -195,21 +195,22 @@ const Grants = () => {
       <Paper sx={{ p: '1rem' }}>
         <Grid container direction="column" spacing={10} padding={5}>
           <Grid item>
-            <Typography variant="h2">Grant Calculator</Typography>
-            <br />
-            <Typography>
+            <Typography variant="h2" gutterBottom>
+              Grant Calculator
+            </Typography>
+            <Typography gutterBottom>
               Check your eligibility for the Enhanced CPF Housing Grant (EHG/EHG
               Single), Family Grant, Proximity Housing Grant (PHG) and Half
               Housing Grant here.
             </Typography>
-            <br />
-            <Typography>
+            <Typography gutterBottom>
               All information in this site is provided &apos;as is&apos;, with
               no guarantee of completeness, accuracy or timeliness of the
               results obtained from the use of this information.
             </Typography>
-            <br />
-            <Typography>Questions that are required (*)</Typography>
+            <Typography gutterBottom>
+              Questions that are required (*)
+            </Typography>
           </Grid>
           <Grid item>
             <Stepper activeStep={activeStep}>

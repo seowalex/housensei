@@ -6,7 +6,12 @@ import halfHousingGrantTree from '../../../utils/grant_json/halfHousingGrant.jso
 import proximityGrantTree from '../../../utils/grant_json/proximityGrant.json';
 import singleEhgTree from '../../../utils/grant_json/singleEHG.json';
 import singleEhgIncome from '../../../utils/grant_json/singleEHGIncome.json';
-import { recurseBooleanTree, getEHGGrantValue, recurseTree } from './helper';
+import singleGrantTree from '../../../utils/grant_json/singleGrant.json';
+import {
+  recurseBooleanTree,
+  getEHGGrantValue,
+  recurseTree,
+} from './GrantTreeRecursion';
 
 export type GrantRange = {
   min: number;
@@ -77,4 +82,13 @@ export const getSingleEHGGrant = (fieldValues: Record<string, any>) => {
     return { min: 0, max: grantValue };
   }
   return { min: grantValue, max: grantValue };
+};
+
+export const getSingleGrant = (fieldValues: Record<string, any>) => {
+  const grantValues = {
+    min: null,
+    max: null,
+  };
+  recurseTree(fieldValues, singleGrantTree, grantValues);
+  return grantValues;
 };

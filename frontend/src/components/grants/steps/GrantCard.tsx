@@ -8,7 +8,7 @@ interface Props {
   grantName: string;
   description: string;
   grantRange: { min: number; max: number };
-  linkToHDB: string;
+  linkToHDB?: string;
 }
 
 const GrantCard = (props: Props) => {
@@ -26,12 +26,18 @@ const GrantCard = (props: Props) => {
         <Typography gutterBottom variant="h5" component="div">
           {grantName} - {grantRangeDisplay}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {`Sth here${description}`}
+        <Typography gutterBottom variant="body2" color="text.secondary">
+          {description}
         </Typography>
-        <Link href={linkToHDB} target="_blank" rel="noopener">
-          HDB Website
-        </Link>
+        {linkToHDB && (
+          <Link
+            href={`//${linkToHDB.slice(12)}`}
+            target="_blank"
+            rel="noopener"
+          >
+            HDB Website
+          </Link>
+        )}
       </CardContent>
       <CardActions />
     </Card>
