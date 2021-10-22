@@ -1,3 +1,5 @@
+/* eslint-disable react/no-this-in-sfc */
+/* eslint-disable func-names */
 import { useState } from 'react';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -112,10 +114,7 @@ const Grants = () => {
           'ownNationality',
           'Must indicate if first time buyer',
           function (item) {
-            if (
-              // eslint-disable-next-line react/no-this-in-sfc
-              this.parent.ownNationality === 'F'
-            ) {
+            if (this.parent.ownNationality === 'F') {
               return true;
             }
             return item !== '';
@@ -128,9 +127,7 @@ const Grants = () => {
           'Must indicate whether partner is first time buyer',
           function (item) {
             if (
-              // eslint-disable-next-line react/no-this-in-sfc
               this.parent.partnerNationality === 'F' ||
-              // eslint-disable-next-line react/no-this-in-sfc
               this.parent.maritalStatus !== 'couple'
             ) {
               return true;
@@ -145,6 +142,14 @@ const Grants = () => {
       workingAtLeastAYear: notEmptyStrCheck(
         'Must indicate if working for at least a year'
       ),
+      monthlyIncome: yup
+        .mixed()
+        .test('monthlyIncome', 'Cannot be a negative number', (item) => {
+          if (item === '') {
+            return true;
+          }
+          return Number(item) > 0;
+        }),
     }),
     yup.object({
       housingType: yup.string().required('Must indicate housing type'),
@@ -230,7 +235,6 @@ const Grants = () => {
                       isValidClick
                         ? {
                             '&:hover': {
-                              backgroundColor: '#D3D3D3',
                               cursor: 'pointer',
                             },
                           }
@@ -284,7 +288,6 @@ const Grants = () => {
                     ) : (
                       <Button
                         variant="contained"
-                        color="secondary"
                         onClick={handleReset}
                         size="large"
                       >

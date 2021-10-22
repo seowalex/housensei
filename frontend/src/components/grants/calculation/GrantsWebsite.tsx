@@ -1,4 +1,4 @@
-export const getEHGGrantWebsite = (fieldValues: Record<string, any>) => {
+export const getEHGGrantWebsite = (fieldValues: Record<string, string>) => {
   switch (fieldValues.housingType) {
     case 'Resale':
       return 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/resale/financing/cpf-housing-grants/firsttimer-applicants';
@@ -9,7 +9,7 @@ export const getEHGGrantWebsite = (fieldValues: Record<string, any>) => {
   }
 };
 
-export const getFamilyGrantWebsite = (fieldValues: Record<string, any>) => {
+export const getFamilyGrantWebsite = (fieldValues: Record<string, string>) => {
   switch (fieldValues.housingType) {
     case 'Resale':
       return 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/resale/financing/cpf-housing-grants/firsttimer-applicants';
@@ -21,7 +21,7 @@ export const getFamilyGrantWebsite = (fieldValues: Record<string, any>) => {
 };
 
 export const getHalfHousingGrantWebsite = (
-  fieldValues: Record<string, any>
+  fieldValues: Record<string, string>
 ) => {
   switch (fieldValues.housingType) {
     case 'Resale':
@@ -33,10 +33,12 @@ export const getHalfHousingGrantWebsite = (
   }
 };
 
-export const getProximityGrantWebsite = (_fieldValues: Record<string, any>) =>
+export const getProximityGrantWebsite = () =>
   'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/resale/financing/cpf-housing-grants/living-with-near-parents-or-child';
 
-export const getSingleEHGGrantWebsite = (fieldValues: Record<string, any>) => {
+export const getSingleEHGGrantWebsite = (
+  fieldValues: Record<string, string>
+) => {
   const { housingType, coupleFirstTimer, coupleNationality, maritalStatus } =
     fieldValues;
 
@@ -64,7 +66,7 @@ export const getSingleEHGGrantWebsite = (fieldValues: Record<string, any>) => {
   return '';
 };
 
-export const getSingleGrantWebsite = (fieldValues: Record<string, any>) => {
+export const getSingleGrantWebsite = (fieldValues: Record<string, string>) => {
   if (fieldValues.maritalStatus === 'single') {
     return 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/resale/financing/cpf-housing-grants/single-singapore-citizen-scheme';
   }

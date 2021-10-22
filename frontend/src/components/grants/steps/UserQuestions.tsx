@@ -115,7 +115,9 @@ const UserQuestions = (props: StepProps) => {
 
       <Grid item>
         <FormRadioInput
-          label="Have you been workng for at least a year?"
+          label={`Have you ${
+            isCouple ? 'or your partner ' : ''
+          }been working for at least a year?`}
           name="workingAtLeastAYear"
           form={form}
           options={workingAtLeastAYearOptions}

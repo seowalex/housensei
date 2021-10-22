@@ -18,7 +18,12 @@ export type GrantRange = {
   max: number;
 };
 
-export const getEHGGrant = (fieldValues: Record<string, any>) => {
+export type NullableGrantRange = {
+  min: number | null;
+  max: number | null;
+};
+
+export const getEHGGrant = (fieldValues: Record<string, string>) => {
   const certainty = {
     true: 0,
     false: 0,
@@ -36,7 +41,9 @@ export const getEHGGrant = (fieldValues: Record<string, any>) => {
   return { min: grantValue, max: grantValue };
 };
 
-export const getFamilyGrant = (fieldValues: Record<string, any>) => {
+export const getFamilyGrant = (
+  fieldValues: Record<string, string>
+): NullableGrantRange => {
   const grantValues = {
     min: null,
     max: null,
@@ -45,7 +52,9 @@ export const getFamilyGrant = (fieldValues: Record<string, any>) => {
   return grantValues;
 };
 
-export const getHalfHousingGrant = (fieldValues: Record<string, any>) => {
+export const getHalfHousingGrant = (
+  fieldValues: Record<string, string>
+): NullableGrantRange => {
   const grantValues = {
     min: null,
     max: null,
@@ -54,7 +63,9 @@ export const getHalfHousingGrant = (fieldValues: Record<string, any>) => {
   return grantValues;
 };
 
-export const getProximityGrant = (fieldValues: Record<string, any>) => {
+export const getProximityGrant = (
+  fieldValues: Record<string, string>
+): NullableGrantRange => {
   const grantValues = {
     min: null,
     max: null,
@@ -63,7 +74,7 @@ export const getProximityGrant = (fieldValues: Record<string, any>) => {
   return grantValues;
 };
 
-export const getSingleEHGGrant = (fieldValues: Record<string, any>) => {
+export const getSingleEHGGrant = (fieldValues: Record<string, string>) => {
   const certainty = {
     true: 0,
     false: 0,
@@ -84,7 +95,9 @@ export const getSingleEHGGrant = (fieldValues: Record<string, any>) => {
   return { min: grantValue, max: grantValue };
 };
 
-export const getSingleGrant = (fieldValues: Record<string, any>) => {
+export const getSingleGrant = (
+  fieldValues: Record<string, string>
+): NullableGrantRange => {
   const grantValues = {
     min: null,
     max: null,
