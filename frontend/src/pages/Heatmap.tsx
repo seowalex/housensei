@@ -14,6 +14,7 @@ const Heatmap = () => {
 
   return isLoaded ? (
     <Container
+      data-tour="heatmap-map"
       sx={{
         position: 'relative',
         height: (theme) => ({

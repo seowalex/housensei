@@ -303,10 +303,17 @@ const MapOverlay = ({
                 })
               }
               renderInput={(params) => <TextField label="Town" {...params} />}
+              renderOption={(props, option) => (
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                <li data-tour={`heatmap-town-${option}`} {...props}>
+                  {option}
+                </li>
+              )}
               value={town}
               onChange={handleTownChange}
               blurOnSelect
               disableClearable
+              data-tour="heatmap-town-dropdown"
               sx={{
                 width: {
                   xs: '100%',
@@ -421,6 +428,7 @@ const MapOverlay = ({
                 },
                 pointerEvents: 'auto',
               }}
+              data-tour="heatmap-price"
             >
               <CardContent
                 sx={{ position: 'relative', p: '0 12px 12px !important' }}
