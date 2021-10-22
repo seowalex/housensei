@@ -10,9 +10,9 @@ import { Controller, FieldValues, UseFormReturn } from 'react-hook-form';
 
 interface Props {
   name: string;
-  options: Array<{ label: string; value: any }>;
+  options: Array<{ label: string; value: string | boolean | number }>;
   form: UseFormReturn<FieldValues>;
-  label?: string;
+  label?: string | JSX.Element;
   required?: boolean;
 }
 
@@ -26,13 +26,11 @@ const FormRadioInput = (props: Props) => {
       control={form.control}
       render={({ field: { onChange, value } }) => (
         <FormControl component="fieldset" error={!!error} required={!!required}>
-          <FormLabel component="legend">
-            {label + (required ? '' : ' (Optional)')}
-          </FormLabel>
+          <FormLabel component="legend">{label}</FormLabel>
           <RadioGroup row value={value} onChange={onChange}>
             {options.map((option) => (
               <FormControlLabel
-                key={option.value}
+                key={option.value as string}
                 value={option.value}
                 control={<Radio />}
                 label={option.label}

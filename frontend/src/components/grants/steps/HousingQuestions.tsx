@@ -78,7 +78,9 @@ const HousingQuestions = (props: StepProps) => {
       {isResale && isCouple && (
         <Grid item>
           <FormRadioInput
-            label="Are you intending to live with you or your partner's extended family?"
+            label={`Are you intending to live with your ${
+              isCouple ? "or your partner's " : ''
+            }extended family?`}
             name="livingWithExtendedFamily"
             form={form}
             options={livingWithExtendedFamilyOptions}

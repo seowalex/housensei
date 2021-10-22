@@ -24,15 +24,17 @@ const FormNumberTextFieldInput = (props: Props) => {
       render={({ field: { onChange, value } }) => (
         <FormControl component="fieldset" error={!!error} required={!!required}>
           <FormLabel component="legend">
-            {label + (required ? '' : ' (Optional)')}
+            {label +
+              (required ? '' : ' If you are unsure, please leave blank.')}
           </FormLabel>
           <TextField
             type="number"
             size="small"
             variant="outlined"
             value={value}
+            inputProps={{ min: 0 }}
             onChange={onChange}
-            sx={{ width: '100%' }}
+            sx={{ width: '40%' }}
           />
           <FormHelperText style={{ height: '5px' }}>{error}</FormHelperText>
         </FormControl>

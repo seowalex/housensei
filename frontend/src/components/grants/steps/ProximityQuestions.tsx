@@ -1,4 +1,5 @@
-import { Grid } from '@mui/material';
+import { Grid, Link } from '@mui/material';
+import { getProximityGrantWebsite } from '../calculation/GrantsWebsite';
 import FormRadioInput from '../FormRadioInput';
 import StepProps from './StepProps';
 
@@ -13,11 +14,11 @@ const ProximityQuestions = (props: StepProps) => {
   ];
 
   const proximityStatusOptions = [
-    { label: 'Yes, within 4km', value: 'within 4km' },
     {
       label: 'Yes, we intend to live together',
       value: 'live together',
     },
+    { label: 'Yes, within 4km', value: 'within 4km' },
     { label: 'No', value: 'no' },
     { label: 'Unsure', value: 'NA' },
   ];
@@ -26,9 +27,20 @@ const ProximityQuestions = (props: StepProps) => {
     <Grid container item direction="column" spacing={3}>
       <Grid item>
         <FormRadioInput
-          label={`Have you ${
-            isCouple ? 'or your partner ' : ''
-          }received a proximity grant before?`}
+          label={
+            <span>
+              Have you {isCouple ? 'or your partner ' : ''} received a
+              <Link
+                href={`//${getProximityGrantWebsite().slice(12)}`}
+                target="_blank"
+                rel="noopener"
+                sx={{ paddingLeft: 1 }}
+              >
+                proximity grant
+              </Link>{' '}
+              before?
+            </span>
+          }
           name="receivedProximityBefore"
           form={form}
           options={receivedProximityBeforeOptions}
