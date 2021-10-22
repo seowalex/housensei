@@ -1,6 +1,7 @@
 import { forwardRef, useMemo, useEffect } from 'react';
 import { Link, LinkProps } from 'react-router-dom';
 import ReactGA from 'react-ga';
+import initHelpHero from 'helphero';
 import {
   CssBaseline,
   StyledEngineProvider,
@@ -63,6 +64,8 @@ const App = () => {
       }),
     [darkMode]
   );
+  const hlp = initHelpHero('rA2u4QRbIU');
+  hlp.anonymous();
 
   return (
     <StyledEngineProvider injectFirst>
