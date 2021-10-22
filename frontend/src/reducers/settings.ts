@@ -18,7 +18,7 @@ export interface SettingsState {
 }
 
 const initialState: SettingsState = {
-  darkMode: null,
+  darkMode: false,
   drawerOpen: true,
   heatmap: {
     showOverlay: true,

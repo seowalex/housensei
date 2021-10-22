@@ -149,14 +149,14 @@ const Routes = () => {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Housensei
           </Typography>
-          <Tooltip title="Toggle dark mode" placement="bottom-start">
+          {/* <Tooltip title="Toggle dark mode" placement="bottom-start">
             <IconButton
               size={isDesktop ? 'large' : 'medium'}
               onClick={() => dispatch(setDarkMode(!darkMode))}
             >
               {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
             </IconButton>
-          </Tooltip>
+          </Tooltip> */}
         </Toolbar>
       </AppBar>
 
