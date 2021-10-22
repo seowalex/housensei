@@ -77,19 +77,21 @@ const FormAutocompleteInput = (props: Props) => {
             )}
             renderOption={(optionProps, option, { selected }) => (
               // eslint-disable-next-line react/jsx-props-no-spreading
-              <li {...optionProps}>
+              <li
+                {...optionProps}
+                data-tour={
+                  option === 'Bishan'
+                    ? 'history-select-town-option'
+                    : option === '4 Room'
+                    ? 'history-select-flat-type-option'
+                    : undefined
+                }
+              >
                 <Stack
                   direction="row"
                   justifyContent="space-between"
                   alignItems="center"
                   sx={{ width: '100%' }}
-                  data-tour={
-                    option === 'Bishan'
-                      ? 'history-select-town-option'
-                      : option === '4 Room'
-                      ? 'history-select-flat-type-option'
-                      : undefined
-                  }
                 >
                   {option}
                   {selected && <CheckRoundedIcon fontSize="small" />}

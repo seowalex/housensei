@@ -23,6 +23,7 @@
     "@vitejs/plugin-react": "^1.0.5",
     "date-fns": "^2.25.0",
     "file-saver": "^2.0.5",
+    "helphero": "^3.5.3",
     "match-sorter": "^6.3.1",
     "notistack": "^2.0.2",
     "react": "^17.0.2",

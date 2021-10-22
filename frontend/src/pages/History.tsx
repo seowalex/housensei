@@ -41,7 +41,7 @@ const History = () => {
       <Stack>
         <Paper sx={{ p: '1rem' }}>
           <Grid container spacing={2}>
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12} md={8} data-tour="history-chart">
               <HistoryChart
                 chartMode={chartMode}
                 selectedGroup={selectedGroup}
