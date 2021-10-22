@@ -164,7 +164,11 @@ const ResaleGroupAccordion = (props: Props) => {
                 </Divider>
               </Grid>
               <Grid item>
-                <Stack direction="row" spacing={1}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  data-tour="history-search-listings"
+                >
                   <Button
                     variant="outlined"
                     href={get99CoLink(group.filters)}
@@ -216,6 +220,7 @@ const ResaleGroupAccordion = (props: Props) => {
                 <Alert
                   severity="success"
                   onClose={() => setShowBTOAlert(false)}
+                  data-tour="history-add-bto"
                 >
                   <AlertTitle>{`${
                     btoQueryResponse?.data.length ?? ''

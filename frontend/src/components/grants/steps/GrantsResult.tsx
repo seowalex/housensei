@@ -56,8 +56,6 @@ const GrantsResult = (props: Props) => {
     ),
   };
 
-  console.log(fieldValues);
-
   const ehgGrant = getEHGGrant(fieldValues);
   const familyGrant = getFamilyGrant(fieldValues);
   const halfHousingGrant = getHalfHousingGrant(fieldValues);

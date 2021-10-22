@@ -18,7 +18,6 @@ const isWithinIncomeRange = (income: string | number, incomeRange: string) => {
     if (condition.substring(0, 1) === '>') {
       return parsedIncome > value;
     }
-    console.log('not a valid range!');
     return false;
   });
 };

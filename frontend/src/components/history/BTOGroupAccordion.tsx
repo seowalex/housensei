@@ -261,6 +261,7 @@ const BTOGroupAccordion = (props: Props) => {
                           ? 'Mark a project on the chart'
                           : ''
                       }
+                      data-tour="history-mark-bto"
                     />
                   )}
                   filterOptions={(options, { inputValue }) =>

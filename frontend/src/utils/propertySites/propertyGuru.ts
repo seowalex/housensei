@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import { BackendFlatType, GroupFilters } from '../../types/groups';
 import { Town } from '../../types/towns';
 import { constructQueryString } from '../api';
@@ -23,9 +24,9 @@ export const getPropertyGuruLink = (filters: GroupFilters): string => {
   const town = filters.towns[0];
   const flatType = filters.flatTypes[0];
   const queryParams: Record<string, unknown> = {
-    ['beds[]']: FLAT_TYPE_TO_ROOMS[flatType],
+    'beds[]': FLAT_TYPE_TO_ROOMS[flatType],
     freetext: town,
-    ['hdb_estate[]']: getHDBEstate(town),
+    'hdb_estate[]': getHDBEstate(town),
     listing_type: 'sale',
     market: 'residential',
   };

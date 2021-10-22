@@ -9,6 +9,7 @@ import { createGroup, resetGroups, selectGroups } from '../../reducers/history';
 import { incrementColorCount, selectColorCount } from '../../reducers/colors';
 import { BTOGroup, Group, GroupFilters, ResaleGroup } from '../../types/groups';
 import {
+  convertFlatTypeToFrontend,
   getGroupColor,
   mapCreateFormValuesToGroupFilters,
 } from '../../utils/groups';
@@ -48,7 +49,12 @@ const GroupList = (props: Props) => {
       const group: Group = {
         type: data.type,
         id: groupId,
-        name: data.name === '' ? 'New Group' : data.name,
+        name:
+          data.name === ''
+            ? `${groupFilters[0].towns[0]} (${convertFlatTypeToFrontend(
+                groupFilters[0].flatTypes[0]
+              )})`
+            : data.name,
         color: data.color,
         filters: groupFilters[0],
       };
@@ -58,18 +64,18 @@ const GroupList = (props: Props) => {
       onChangeSelectedGroup(groupId)(true);
     } else {
       const firstGroupId = uuidv4();
-      const createdGroups: Group[] = groupFilters.map((filters, index) => {
-        return {
-          type: data.type,
-          id: index === 0 ? firstGroupId : uuidv4(),
-          name:
-            data.name === ''
-              ? `New Group ${index + 1}`
-              : `${data.name} ${index + 1}`,
-          color: data.color,
-          filters,
-        };
-      });
+      const createdGroups: Group[] = groupFilters.map((filters, index) => ({
+        type: data.type,
+        id: index === 0 ? firstGroupId : uuidv4(),
+        name:
+          data.name === ''
+            ? `${filters.towns[0]} (${convertFlatTypeToFrontend(
+                filters.flatTypes[0]
+              )}) ${index + 1}`
+            : `${data.name} ${index + 1}`,
+        color: data.color,
+        filters,
+      }));
       createdGroups.forEach((group) => {
         dispatch(createGroup(group));
         dispatch(incrementColorCount(data.color));
@@ -139,6 +145,7 @@ const GroupList = (props: Props) => {
             size="large"
             onClick={() => setDisplayedModal(DisplayedModal.Create)}
             sx={{ width: '100%' }}
+            data-tour="history-new-group"
           >
             New Group
           </Button>

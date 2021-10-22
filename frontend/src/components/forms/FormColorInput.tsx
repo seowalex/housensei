@@ -43,38 +43,36 @@ const FormColorInput = (props: Props) => {
     <Controller
       name={name}
       control={control}
-      render={({ field: { onChange, value } }) => {
-        return (
-          <Stack>
-            <Stack direction="row">
-              {firstRowColors.map((c) => {
-                const color: GroupColor = c;
-                return (
-                  <FormColorButton
-                    color={color}
-                    value={value}
-                    onChange={onChange}
-                    iconColor={colorTheme[color]}
-                  />
-                );
-              })}
-            </Stack>
-            <Stack direction="row">
-              {secondRowColors.map((c) => {
-                const color: GroupColor = c;
-                return (
-                  <FormColorButton
-                    color={color}
-                    value={value}
-                    onChange={onChange}
-                    iconColor={colorTheme[color]}
-                  />
-                );
-              })}
-            </Stack>
+      render={({ field: { onChange, value } }) => (
+        <Stack>
+          <Stack direction="row">
+            {firstRowColors.map((c) => {
+              const color: GroupColor = c;
+              return (
+                <FormColorButton
+                  color={color}
+                  value={value}
+                  onChange={onChange}
+                  iconColor={colorTheme[color]}
+                />
+              );
+            })}
           </Stack>
-        );
-      }}
+          <Stack direction="row">
+            {secondRowColors.map((c) => {
+              const color: GroupColor = c;
+              return (
+                <FormColorButton
+                  color={color}
+                  value={value}
+                  onChange={onChange}
+                  iconColor={colorTheme[color]}
+                />
+              );
+            })}
+          </Stack>
+        </Stack>
+      )}
     />
   );
 };

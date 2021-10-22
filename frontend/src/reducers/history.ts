@@ -63,7 +63,7 @@ const slice = createSlice({
       state.monthlyChartData = monthlyData;
       state.yearlyChartData = yearlyData;
     },
-    resetGroups: (state) => initialState,
+    resetGroups: () => initialState,
     updateSelectedBTOProjects: (
       state,
       action: PayloadAction<{ id: string; projectIds: string[] }>

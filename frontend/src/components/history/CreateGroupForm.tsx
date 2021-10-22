@@ -16,7 +16,7 @@ import {
   SubmitHandler,
   useForm,
 } from 'react-hook-form';
-import { Circle, CloseRounded as CloseRoundedIcon } from '@mui/icons-material';
+import { CloseRounded as CloseRoundedIcon } from '@mui/icons-material';
 import { FlatType, GroupColor } from '../../types/groups';
 import { Town } from '../../types/towns';
 import FormAutocompleteInput from '../forms/FormAutocompleteInput';
@@ -117,6 +117,7 @@ const CreateGroupForm = (props: Props) => {
             spacing={1}
             alignItems="center"
             sx={{ height: '100%' }}
+            data-tour="history-select-property-type"
           >
             <Typography>Property Type:</Typography>
             <Controller
@@ -314,7 +315,11 @@ const CreateGroupForm = (props: Props) => {
             </Button>
           </Grid>
           <Grid item>
-            <Button variant="contained" type="submit">
+            <Button
+              variant="contained"
+              type="submit"
+              data-tour="history-add-group"
+            >
               {isSubmitting ? <CircularProgress /> : submitText}
             </Button>
           </Grid>

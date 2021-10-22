@@ -1,7 +1,7 @@
 import { MatchSorterOptions } from 'match-sorter';
 
-import { CreateGroupFormValues } from '../components/history/CreateGroupForm';
-import { UpdateGroupFormValues } from '../components/history/UpdateGroupForm';
+import type { CreateGroupFormValues } from '../components/history/CreateGroupForm';
+import type { UpdateGroupFormValues } from '../components/history/UpdateGroupForm';
 import {
   BackendFlatType,
   FlatType,

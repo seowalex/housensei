@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import { BackendFlatType, GroupFilters } from '../../types/groups';
 import { Town } from '../../types/towns';
 import { constructQueryString } from '../api';

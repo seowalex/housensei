@@ -1,3 +1,4 @@
+import { CloseRounded as CloseRoundedIcon } from '@mui/icons-material';
 import {
   Button,
   ButtonGroup,
@@ -25,7 +26,6 @@ import FormSwitchInput, {
 } from '../forms/FormSwitchInput';
 import FormTextInput from '../forms/FormTextInput';
 import { townRegions } from '../../app/constants';
-import { CloseRounded as CloseRoundedIcon } from '@mui/icons-material';
 import FormColorInput from '../forms/FormColorInput';
 import { useAppSelector } from '../../app/hooks';
 import { selectNextColor } from '../../reducers/colors';

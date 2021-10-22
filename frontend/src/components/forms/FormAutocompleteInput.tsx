@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { CheckRounded as CheckRoundedIcon } from '@mui/icons-material';
 import {
   Autocomplete,
@@ -65,6 +66,13 @@ const FormAutocompleteInput = (props: Props) => {
                     e.preventDefault();
                   }
                 }}
+                data-tour={
+                  name === 'towns'
+                    ? 'history-select-town'
+                    : name === 'flatTypes'
+                    ? 'history-select-flat-type'
+                    : undefined
+                }
               />
             )}
             renderOption={(optionProps, option, { selected }) => (
@@ -75,6 +83,13 @@ const FormAutocompleteInput = (props: Props) => {
                   justifyContent="space-between"
                   alignItems="center"
                   sx={{ width: '100%' }}
+                  data-tour={
+                    option === 'Bishan'
+                      ? 'history-select-town-option'
+                      : option === '4 Room'
+                      ? 'history-select-flat-type-option'
+                      : undefined
+                  }
                 >
                   {option}
                   {selected && <CheckRoundedIcon fontSize="small" />}
