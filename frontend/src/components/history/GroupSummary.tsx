@@ -1,12 +1,16 @@
 import {
-  BedRounded as BedRoundedIcon,
+  BlurOn as BlurOnIcon,
   Circle as CircleIcon,
-  CircleOutlined as CircleOutlinedIcon,
-  RoomRounded as RoomRoundedIcon,
+  VisibilityRounded as VisibilityRoundedIcon,
+  VisibilityOffRounded as VisibilityOffRoundedIcon,
 } from '@mui/icons-material';
-import { Chip, Stack } from '@mui/material';
+import { Chip, Stack, Tooltip } from '@mui/material';
+import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../../app/hooks';
-import { selectIsGroupDisplayed } from '../../reducers/history';
+import {
+  selectIsGroupDisplayed,
+  updateDisplayedGroups,
+} from '../../reducers/history';
 import { selectColorTheme } from '../../reducers/settings';
 import { Group } from '../../types/groups';
 import { convertFlatTypeToFrontend } from '../../utils/groups';
@@ -16,30 +20,45 @@ interface Props {
 }
 
 const GroupSummary = (props: Props) => {
+  const dispatch = useDispatch();
   const { group } = props;
   const { type, color, filters, id } = group;
   const isGroupDisplayed = useAppSelector(selectIsGroupDisplayed(id));
   const colorTheme = useAppSelector(selectColorTheme);
 
+  const handleToggleDisplayGroup = () => {
+    dispatch(updateDisplayedGroups({ id, show: !isGroupDisplayed }));
+  };
+
   return (
-    <Stack direction="row" spacing={0.5} alignItems="center">
+    <Stack direction="row" spacing={1} alignItems="center">
       {colorTheme && (
         <Chip
           icon={
             isGroupDisplayed ? (
               <CircleIcon sx={{ fill: colorTheme[color] }} />
             ) : (
-              <CircleOutlinedIcon sx={{ fill: colorTheme[color] }} />
+              <BlurOnIcon sx={{ fill: colorTheme[color] }} />
             )
           }
           label={type === 'resale' ? 'Resale' : 'BTO'}
           variant="outlined"
+          onDelete={handleToggleDisplayGroup}
+          deleteIcon={
+            <Tooltip title={isGroupDisplayed ? 'Visible' : 'Hidden'} arrow>
+              {isGroupDisplayed ? (
+                <VisibilityRoundedIcon fontSize="small" />
+              ) : (
+                <VisibilityOffRoundedIcon fontSize="small" />
+              )}
+            </Tooltip>
+          }
         />
       )}
-      <Chip icon={<RoomRoundedIcon />} label={filters.towns[0]} size="small" />
       <Chip
-        icon={<BedRoundedIcon />}
-        label={convertFlatTypeToFrontend(filters.flatTypes[0])}
+        label={`${filters.towns[0]} | ${convertFlatTypeToFrontend(
+          filters.flatTypes[0]
+        )}`}
         size="small"
       />
     </Stack>

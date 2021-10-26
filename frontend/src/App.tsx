@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { SnackbarProvider } from 'notistack';
 
+import { Timeline as TimelineIcon } from '@mui/icons-material';
 import { useAppSelector } from './app/hooks';
 import { selectDarkMode } from './reducers/settings';
 
@@ -71,7 +72,10 @@ const App = () => {
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <SnackbarProvider maxSnack={1}>
+        <SnackbarProvider
+          maxSnack={1}
+          iconVariant={{ success: <TimelineIcon fontSize="small" /> }}
+        >
           <Routes />
         </SnackbarProvider>
       </ThemeProvider>
