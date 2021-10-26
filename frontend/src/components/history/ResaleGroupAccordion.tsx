@@ -226,7 +226,7 @@ const ResaleGroupAccordion = (props: Props) => {
                     btoQueryResponse?.data.length ?? ''
                   } BTO projects found!`}</AlertTitle>
                   We found {btoQueryResponse?.data.length ?? ''} BTO projects
-                  with the same filters as this group.
+                  with the same filters as this line.
                   <Button
                     variant="text"
                     onClick={() => {

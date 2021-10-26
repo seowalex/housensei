@@ -92,8 +92,8 @@ const CreateGroupForm = (props: Props) => {
 
   const submitText =
     watchTowns.length * watchFlatTypes.length > 1
-      ? `Add ${watchTowns.length * watchFlatTypes.length} Groups`
-      : 'Add Group';
+      ? `Add ${watchTowns.length * watchFlatTypes.length} Lines`
+      : 'Add Line';
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -107,11 +107,11 @@ const CreateGroupForm = (props: Props) => {
         <Grid item xs={12}>
           <Box sx={{ p: '0.5rem 0rem' }}>
             <Typography variant="h4" sx={{ textAlign: 'center' }}>
-              Create Groups
+              Create Lines
             </Typography>
           </Box>
         </Grid>
-        <Grid item xs={12} lg="auto">
+        <Grid item xs={12} lg={6}>
           <Stack
             direction="row"
             spacing={1}
@@ -142,27 +142,12 @@ const CreateGroupForm = (props: Props) => {
             />
           </Stack>
         </Grid>
-        <Grid item xs={12} lg>
+        <Grid item xs={12} lg={6}>
           <FormTextInput
             name="name"
             control={control as Control<FieldValues>}
-            label="Group Name (optional)"
-            placeholder="New Group"
+            label="Line Name (optional)"
           />
-        </Grid>
-        <Grid item xs={12} lg="auto">
-          <Stack
-            direction="row"
-            spacing={0.5}
-            alignItems="center"
-            sx={{ height: '100%' }}
-          >
-            <Typography>Colour:</Typography>
-            <FormColorInput
-              name="color"
-              control={control as Control<FieldValues>}
-            />
-          </Stack>
         </Grid>
         <Grid item xs={12}>
           <Divider />

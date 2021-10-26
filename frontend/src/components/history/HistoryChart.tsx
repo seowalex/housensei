@@ -120,7 +120,7 @@ const HistoryChart = (props: Props) => {
         <LineChart
           data={chartData}
           height={300}
-          margin={{ top: 20, left: 20, bottom: 10, right: 10 }}
+          margin={{ top: 20, left: 20, bottom: 10, right: 0 }}
           ref={ref}
         >
           <CartesianGrid />

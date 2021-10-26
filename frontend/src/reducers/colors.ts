@@ -32,10 +32,17 @@ const slice = createSlice({
         state.colorCount[action.payload] -= 1;
       }
     },
+    setColorCount: (
+      state,
+      action: PayloadAction<Record<GroupColor, number>>
+    ) => {
+      state.colorCount = action.payload;
+    },
   },
 });
 
-export const { incrementColorCount, decrementColorCount } = slice.actions;
+export const { incrementColorCount, decrementColorCount, setColorCount } =
+  slice.actions;
 
 export const selectColorCount = (
   state: RootState
