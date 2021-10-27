@@ -17,6 +17,11 @@ import {
   getSingleEHGGrantWebsite,
   getSingleGrantWebsite,
 } from '../calculation/GrantsWebsite';
+import {
+  displayRange,
+  getTotalGrant,
+  parseFormValues,
+} from '../calculation/ParseGrantsForm';
 import GrantCard from './GrantCard';
 
 interface Props {
@@ -27,35 +32,7 @@ const GrantsResult = (props: Props) => {
   const { formValues } = props;
 
   const values = formValues();
-
-  const sortAndJoinByDefinedOrder = (
-    definedOrder: Array<string>,
-    arr: Array<string>
-  ) => {
-    arr.sort((a, b) => definedOrder.indexOf(a) - definedOrder.indexOf(b));
-
-    return arr.join('/');
-  };
-
-  Object.keys(values).forEach((field) => {
-    if (values[field] === 'NA') {
-      values[field] = '';
-    }
-  });
-
-  const fieldValues = {
-    ...values,
-    singleNationality: values.ownNationality,
-    coupleNationality: sortAndJoinByDefinedOrder(
-      ['SC', 'PR', 'F', ''],
-      [values.ownNationality, values.partnerNationality]
-    ),
-    singleFirstTimer: values.ownFirstTimer,
-    coupleFirstTimer: sortAndJoinByDefinedOrder(
-      ['true', 'false', ''],
-      [values.ownFirstTimer, values.partnerFirstTimer]
-    ),
-  };
+  const fieldValues = parseFormValues(values);
 
   const ehgGrant = getEHGGrant(fieldValues);
   const familyGrant = getFamilyGrant(fieldValues);
@@ -63,21 +40,14 @@ const GrantsResult = (props: Props) => {
   const proximityGrant = getProximityGrant(fieldValues);
   const singleEhgGrant = getSingleEHGGrant(fieldValues);
   const singleGrant = getSingleGrant(fieldValues);
-
-  const allGrants = [
+  const totalGrantRange = getTotalGrant([
     ehgGrant,
     familyGrant,
     halfHousingGrant,
     proximityGrant,
     singleEhgGrant,
     singleGrant,
-  ].filter((grant) => grant.min !== null && grant.max !== null);
-  const minTotalGrant = allGrants
-    .map((grant) => grant.min)
-    .reduce((a, b) => Number(a) + Number(b), 0);
-  const maxTotalGrant = allGrants
-    .map((grant) => grant.max)
-    .reduce((a, b) => Number(a) + Number(b), 0);
+  ]);
 
   const ehgGrantWebsite = getEHGGrantWebsite(fieldValues);
   const familyGrantWebsite = getFamilyGrantWebsite(fieldValues);
@@ -95,10 +65,7 @@ const GrantsResult = (props: Props) => {
     <Grid container spacing={5}>
       <Grid item xs={12}>
         <Typography variant="h4">
-          Estimated Total Grant: $
-          {minTotalGrant === maxTotalGrant
-            ? minTotalGrant
-            : `${minTotalGrant} - $${maxTotalGrant}`}
+          Estimated Total Grant: ${displayRange(totalGrantRange)}
         </Typography>
       </Grid>
       {shouldDisplayGrant(ehgGrant) && (

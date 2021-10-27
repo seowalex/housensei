@@ -3,6 +3,7 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { Link } from '@mui/material';
+import { displayRange } from '../calculation/ParseGrantsForm';
 
 interface Props {
   grantName: string;
@@ -14,12 +15,6 @@ interface Props {
 const GrantCard = (props: Props) => {
   const { grantName, description, grantRange, linkToHDB } = props;
 
-  const grantRangeDisplay = `$${
-    grantRange.min === grantRange.max
-      ? grantRange.min
-      : `${grantRange.min} - $${grantRange.max}`
-  }`;
-
   return (
     <Card
       sx={{
@@ -30,7 +25,7 @@ const GrantCard = (props: Props) => {
     >
       <CardContent>
         <Typography gutterBottom variant="h5">
-          {grantName} : {grantRangeDisplay}
+          {grantName} : {displayRange(grantRange)}
         </Typography>
         <Typography gutterBottom variant="body2" color="text.secondary">
           {description}

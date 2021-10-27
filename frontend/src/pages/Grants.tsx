@@ -18,6 +18,7 @@ import UserQuestions from '../components/grants/steps/UserQuestions';
 import GrantsResult from '../components/grants/steps/GrantsResult';
 import HousingQuestions from '../components/grants/steps/HousingQuestions';
 import ProximityQuestions from '../components/grants/steps/ProximityQuestions';
+import MiniGrantsResult from '../components/grants/steps/MiniGrantsResult';
 
 export type GrantsFormValues = {
   // user questions
@@ -199,7 +200,7 @@ const Grants = () => {
     <Container sx={{ p: 3 }}>
       <Paper sx={{ p: '1rem' }}>
         <Grid container direction="column" spacing={10} padding={5}>
-          <Grid item>
+          <Grid item xs={12}>
             <Typography variant="h2" gutterBottom>
               Grant Calculator
             </Typography>
@@ -217,7 +218,7 @@ const Grants = () => {
               Questions that are required (*)
             </Typography>
           </Grid>
-          <Grid item>
+          <Grid item xs={12}>
             <Stepper activeStep={activeStep}>
               {steps.map((label, idx) => {
                 const stepProps = {};
@@ -249,54 +250,64 @@ const Grants = () => {
             </Stepper>
           </Grid>
           {/* button group */}
-          <Grid container item direction="column">
+          <Grid container item>
             <FormProvider {...methods}>
-              <form>
-                <Grid container item>
-                  {getStepContent(
-                    activeStep,
-                    methods as UseFormReturn<FieldValues>
-                  )}
-                </Grid>
-                <Grid
-                  container
-                  item
-                  alignItems="center"
-                  justifyContent="center"
-                  padding={5}
-                  spacing={3}
-                >
-                  <Grid item>
-                    <Button
-                      disabled={activeStep === 0}
-                      onClick={handleBack}
-                      size="large"
+              <Grid container item>
+                <form>
+                  <Grid container item>
+                    <Grid item xs={8}>
+                      {getStepContent(
+                        activeStep,
+                        methods as UseFormReturn<FieldValues>
+                      )}
+                    </Grid>
+                    <Grid item xs={4}>
+                      <MiniGrantsResult formValues={methods.getValues} />
+                    </Grid>
+                    <Grid
+                      container
+                      item
+                      alignItems="center"
+                      justifyContent="center"
+                      padding={5}
+                      spacing={3}
+                      xs={12}
                     >
-                      Back
-                    </Button>
-                  </Grid>
+                      <Grid item>
+                        <Button
+                          disabled={activeStep === 0}
+                          onClick={handleBack}
+                          size="large"
+                        >
+                          Back
+                        </Button>
+                      </Grid>
 
-                  <Grid item>
-                    {activeStep < steps.length - 1 ? (
-                      <Button
-                        variant="contained"
-                        onClick={handleNext}
-                        size="large"
-                      >
-                        {activeStep < steps.length - 2 ? 'Continue' : 'Finish'}
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="contained"
-                        onClick={handleReset}
-                        size="large"
-                      >
-                        Reset
-                      </Button>
-                    )}
+                      <Grid item>
+                        {activeStep < steps.length - 1 ? (
+                          <Button
+                            variant="contained"
+                            onClick={handleNext}
+                            size="large"
+                          >
+                            {activeStep < steps.length - 2
+                              ? 'Continue'
+                              : 'Finish'}
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="contained"
+                            onClick={handleReset}
+                            size="large"
+                          >
+                            Reset
+                          </Button>
+                        )}
+                      </Grid>
+                    </Grid>
                   </Grid>
-                </Grid>
-              </form>
+                </form>
+              </Grid>
             </FormProvider>
           </Grid>
         </Grid>
