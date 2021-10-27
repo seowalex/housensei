@@ -45,6 +45,7 @@ export const recurseTree = (
     const fieldValue = fieldValues[attribute]; // grab from form
     const chosenSubTree = subTrees[fieldValue];
     if (!fieldValue) {
+      // empty string
       // user indicated unsure -> recurse down all subtrees
       Object.values(subTrees).forEach((subTree) => {
         recurseTree(fieldValues, subTree, grantValues);
@@ -57,7 +58,7 @@ export const recurseTree = (
         }
       });
     } else if (!chosenSubTree) {
-      // no option in subtree -> min value is 0
+      // no option in subtree matches form value -> min value is 0
       grantValues.min = 0;
       grantValues.max = grantValues.max ?? 0;
     } else {

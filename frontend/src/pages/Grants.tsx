@@ -196,6 +196,10 @@ const Grants = () => {
       .slice(0, idx)
       .every((validation) => validation.isValidSync(methods.getValues()));
 
+  const isFirstStep = activeStep === 0;
+  const isLastStep = activeStep === steps.length - 2;
+  const otherSteps = activeStep < steps.length - 2;
+
   return (
     <Container sx={{ p: 3 }}>
       <Paper sx={{ p: '1rem' }}>
@@ -255,15 +259,19 @@ const Grants = () => {
               <Grid container item>
                 <form>
                   <Grid container item>
-                    <Grid item xs={8}>
+                    <Grid item xs={otherSteps || isLastStep ? 8 : 12}>
                       {getStepContent(
                         activeStep,
                         methods as UseFormReturn<FieldValues>
                       )}
                     </Grid>
-                    <Grid item xs={4}>
-                      <MiniGrantsResult formValues={methods.getValues} />
-                    </Grid>
+                    {(otherSteps || isLastStep) && (
+                      <Grid item xs={4}>
+                        <MiniGrantsResult
+                          form={methods as UseFormReturn<FieldValues>}
+                        />
+                      </Grid>
+                    )}
                     <Grid
                       container
                       item
@@ -275,7 +283,7 @@ const Grants = () => {
                     >
                       <Grid item>
                         <Button
-                          disabled={activeStep === 0}
+                          disabled={isFirstStep}
                           onClick={handleBack}
                           size="large"
                         >
@@ -284,15 +292,13 @@ const Grants = () => {
                       </Grid>
 
                       <Grid item>
-                        {activeStep < steps.length - 1 ? (
+                        {otherSteps || isLastStep ? (
                           <Button
                             variant="contained"
                             onClick={handleNext}
                             size="large"
                           >
-                            {activeStep < steps.length - 2
-                              ? 'Continue'
-                              : 'Finish'}
+                            {!isLastStep ? 'Continue' : 'Finish'}
                           </Button>
                         ) : (
                           <Button

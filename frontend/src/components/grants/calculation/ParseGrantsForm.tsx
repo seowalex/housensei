@@ -1,15 +1,29 @@
 import { NullableGrantRange } from './GrantCalculation';
 
-// eslint-disable-next-line import/prefer-default-export
 export const parseFormValues = (values: Record<string, string>) => {
   const formValues = values;
   const sortAndJoinByDefinedOrder = (
     definedOrder: Array<string>,
     arr: Array<string>
   ) => {
-    arr.sort((a, b) => definedOrder.indexOf(a) - definedOrder.indexOf(b));
+    switch (values.maritalStatus) {
+      case 'couple': {
+        if (arr.some((value) => value === '')) {
+          return '';
+        }
+        arr.sort((a, b) => definedOrder.indexOf(a) - definedOrder.indexOf(b));
 
-    return arr.join('/');
+        return arr.join('/');
+      }
+      case 'single': {
+        return 'NA';
+      }
+      case '': {
+        return '';
+      }
+      default:
+        return '';
+    }
   };
 
   Object.keys(formValues).forEach((field) => {
@@ -46,7 +60,7 @@ export const getTotalGrant = (allGrants: Array<NullableGrantRange>) => {
   return { min, max };
 };
 
-export const displayRange = (grantRange: NullableGrantRange) =>
+export const displayGrantRange = (grantRange: NullableGrantRange) =>
   `$${
     grantRange.min === grantRange.max
       ? grantRange.min
