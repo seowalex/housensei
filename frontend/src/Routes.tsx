@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Link } from 'react-router-dom';
 import {
   AppBar,
@@ -26,6 +26,7 @@ import {
   Menu as MenuIcon,
   Timeline as TimelineIcon,
 } from '@mui/icons-material';
+import { useSnackbar } from 'notistack';
 
 import { useAppDispatch, useAppSelector } from './app/hooks';
 import {
@@ -70,12 +71,24 @@ const MiniDrawer = styled(Drawer)(({ theme, open }) => ({
 }));
 
 const Routes = () => {
+  const { enqueueSnackbar } = useSnackbar();
   const dispatch = useAppDispatch();
-  const isDesktop = useMediaQuery('(min-width: 600px)');
+  const isDesktop = useMediaQuery(
+    (theme: Theme) => theme.breakpoints.up('sm'),
+    { noSsr: true }
+  );
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const darkMode = useAppSelector(selectDarkMode) ?? prefersDarkMode;
   const drawerOpen = useAppSelector(selectDrawerOpen);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isDesktop) {
+      enqueueSnackbar('Housensei is best viewed on a desktop browser.', {
+        variant: 'error',
+      });
+    }
+  }, [isDesktop, enqueueSnackbar]);
 
   const handleDrawerOpen = () => {
     if (isDesktop) {

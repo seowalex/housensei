@@ -361,7 +361,7 @@ const MapOverlay = ({
                     });
                   }}
                   sx={{
-                    p: 0,
+                    p: '0px !important',
                     '.MuiSlider-markLabel': {
                       top: 10,
                     },

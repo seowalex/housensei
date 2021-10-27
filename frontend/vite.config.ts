@@ -9,10 +9,6 @@ export default defineConfig({
       algorithm: 'brotliCompress',
       ext: '.br',
     }),
-    viteCompression({
-      algorithm: 'gzip',
-      ext: '.gz',
-    }),
   ],
   css: {
     modules: {
