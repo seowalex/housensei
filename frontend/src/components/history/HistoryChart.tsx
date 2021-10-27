@@ -80,42 +80,6 @@ const HistoryChart = (props: Props) => {
 
   return (
     <>
-      {groups.length > 0 && (
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          sx={{ width: '100%' }}
-        >
-          <Button startIcon={<DownloadRoundedIcon />} onClick={handleDownload}>
-            {isLoadingPng ? (
-              <Stack direction="row" spacing={1}>
-                <CircularProgress size="1.5rem" />
-                <Typography variant="inherit">Downloading...</Typography>
-              </Stack>
-            ) : (
-              'Download Chart'
-            )}
-          </Button>
-          <ButtonGroup>
-            <Button
-              variant={
-                chartMode === ChartMode.Monthly ? 'contained' : 'outlined'
-              }
-              onClick={() => setChartMode(ChartMode.Monthly)}
-            >
-              Monthly
-            </Button>
-            <Button
-              variant={
-                chartMode === ChartMode.Yearly ? 'contained' : 'outlined'
-              }
-              onClick={() => setChartMode(ChartMode.Yearly)}
-            >
-              Yearly
-            </Button>
-          </ButtonGroup>
-        </Stack>
-      )}
       <ResponsiveContainer width="100%" height={650}>
         <LineChart
           data={chartData}
@@ -232,6 +196,42 @@ const HistoryChart = (props: Props) => {
               ))}
         </LineChart>
       </ResponsiveContainer>
+      {groups.length > 0 && (
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          sx={{ width: '100%' }}
+        >
+          <Button startIcon={<DownloadRoundedIcon />} onClick={handleDownload}>
+            {isLoadingPng ? (
+              <Stack direction="row" spacing={1}>
+                <CircularProgress size="1.5rem" />
+                <Typography variant="inherit">Downloading...</Typography>
+              </Stack>
+            ) : (
+              'Download Chart'
+            )}
+          </Button>
+          <ButtonGroup>
+            <Button
+              variant={
+                chartMode === ChartMode.Monthly ? 'contained' : 'outlined'
+              }
+              onClick={() => setChartMode(ChartMode.Monthly)}
+            >
+              Monthly
+            </Button>
+            <Button
+              variant={
+                chartMode === ChartMode.Yearly ? 'contained' : 'outlined'
+              }
+              onClick={() => setChartMode(ChartMode.Yearly)}
+            >
+              Yearly
+            </Button>
+          </ButtonGroup>
+        </Stack>
+      )}
     </>
   );
 };

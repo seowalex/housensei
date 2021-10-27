@@ -3,8 +3,11 @@ import {
   Circle as CircleIcon,
   VisibilityRounded as VisibilityRoundedIcon,
   VisibilityOffRounded as VisibilityOffRoundedIcon,
+  CircleTwoTone,
+  RoomRounded,
+  BedRounded,
 } from '@mui/icons-material';
-import { Chip, Stack, Tooltip } from '@mui/material';
+import { Chip, Divider, Stack, Tooltip, Typography } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../../app/hooks';
 import {
@@ -13,6 +16,7 @@ import {
 } from '../../reducers/history';
 import { selectColorTheme } from '../../reducers/settings';
 import { Group } from '../../types/groups';
+import { Town } from '../../types/towns';
 import { convertFlatTypeToFrontend } from '../../utils/groups';
 
 interface Props {
@@ -31,14 +35,14 @@ const GroupSummary = (props: Props) => {
   };
 
   return (
-    <Stack direction="row" spacing={1} alignItems="center">
+    <Stack direction="row" spacing={0.2} alignItems="center">
       {colorTheme && (
         <Chip
           icon={
             isGroupDisplayed ? (
               <CircleIcon sx={{ fill: colorTheme[color] }} />
             ) : (
-              <BlurOnIcon sx={{ fill: colorTheme[color] }} />
+              <CircleTwoTone sx={{ fill: colorTheme[color] }} />
             )
           }
           label={type === 'resale' ? 'Resale' : 'BTO'}
@@ -56,9 +60,14 @@ const GroupSummary = (props: Props) => {
         />
       )}
       <Chip
-        label={`${filters.towns[0]} | ${convertFlatTypeToFrontend(
-          filters.flatTypes[0]
-        )}`}
+        label={filters.towns[0] === Town.KAL ? 'Kallang' : filters.towns[0]}
+        icon={<RoomRounded fontSize="small" />}
+        size="small"
+      />
+
+      <Chip
+        label={convertFlatTypeToFrontend(filters.flatTypes[0])}
+        icon={<BedRounded fontSize="small" />}
         size="small"
       />
     </Stack>
