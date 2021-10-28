@@ -206,10 +206,10 @@ const GroupList = (props: Props) => {
         <ModalPaper>
           <Stack spacing={2}>
             <Typography variant="h5" textAlign="center">
-              Delete All Groups?
+              Delete All Lines?
             </Typography>
             <Typography sx={{ p: '0rem 1rem' }}>
-              Are you sure you want to delete all groups?
+              Are you sure you want to delete all lines?
             </Typography>
             <Stack direction="row" spacing={2}>
               <Button
