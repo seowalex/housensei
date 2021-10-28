@@ -272,7 +272,7 @@ const MapOverlay = ({
           sx={{ p: 1 }}
           alignItems="center"
         >
-          <Grid item xs={12} md="auto">
+          <Grid item xs={12} sm="auto">
             <StandaloneSearchBox
               onPlacesChanged={() => {
                 ReactGA.event({
@@ -289,7 +289,8 @@ const MapOverlay = ({
                 sx={{
                   width: {
                     xs: '100%',
-                    md: 400,
+                    sm: 300,
+                    xl: 400,
                   },
                   '.MuiInputBase-root': {
                     backgroundColor: (theme) =>
@@ -299,7 +300,7 @@ const MapOverlay = ({
               />
             </StandaloneSearchBox>
           </Grid>
-          <Grid item xs={12} md="auto">
+          <Grid item xs={12} sm="auto">
             <Autocomplete
               size="small"
               options={['Islandwide'].concat(
@@ -332,7 +333,7 @@ const MapOverlay = ({
               sx={{
                 width: {
                   xs: '100%',
-                  md: 200,
+                  sm: 200,
                 },
                 '.MuiInputBase-root': {
                   backgroundColor: (theme) => theme.palette.background.default,
@@ -340,13 +341,13 @@ const MapOverlay = ({
               }}
             />
           </Grid>
-          <Grid item xs={12} md="auto">
+          <Grid item xs={12} sm="auto">
             <FormControl
               size="small"
               sx={{
                 width: {
                   xs: '100%',
-                  md: 200,
+                  sm: 200,
                 },
               }}
             >
@@ -394,11 +395,11 @@ const MapOverlay = ({
           <Grid
             item
             xs={12}
-            md="auto"
+            sm="auto"
             sx={{
               width: {
                 xs: '100%',
-                md: 400,
+                sm: 400,
               },
               overflow: 'visible',
             }}
