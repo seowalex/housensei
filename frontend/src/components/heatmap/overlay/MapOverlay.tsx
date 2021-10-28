@@ -8,16 +8,22 @@ import {
   CardContent,
   Collapse,
   Divider,
+  FormControl,
   Grid,
   IconButton,
+  InputLabel,
+  ListItemText,
+  MenuItem,
   OutlinedInput,
   Paper,
+  Select,
   Slider,
   Stack,
   TextField,
   Typography,
 } from '@mui/material';
 import {
+  CheckRounded as CheckRoundedIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
   KeyboardArrowUp as KeyboardArrowUpIcon,
   Settings as SettingsIcon,
@@ -28,8 +34,10 @@ import { matchSorter } from 'match-sorter';
 
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import {
+  selectFlatTypes,
   selectTown,
   selectYear,
+  setFlatTypes,
   setTown,
   setYear,
 } from '../../../reducers/heatmap';
@@ -48,6 +56,7 @@ import {
 } from '../../../api/heatmap';
 
 import { useDebounce } from '../../../app/utils';
+import { convertFlatTypeToFrontend } from '../../../utils/groups';
 import { townSorter } from '../../../utils/towns';
 import {
   singaporeCoordinates,
@@ -59,6 +68,7 @@ import { Town } from '../../../types/towns';
 import Settings from './Settings';
 import PriceRange from './PriceRange';
 import { EventCategory, HeatmapEventAction } from '../../../app/analytics';
+import { BackendFlatType } from '../../../types/groups';
 
 interface Props {
   map?: google.maps.Map;
@@ -89,19 +99,24 @@ const MapOverlay = ({
   const showHeatmapOverlay = useAppSelector(selectShowHeatmapOverlay);
   const showHeatmap = useAppSelector(selectShowHeatmap);
   const town = useAppSelector(selectTown);
+  const flatTypes = useAppSelector(selectFlatTypes);
   const year = useAppSelector(selectYear);
 
   const [showSettings, setShowSettings] = useState(false);
 
+  const debouncedFlatTypes = useDebounce(flatTypes, 500);
   const debouncedYear = useDebounce(year, 500);
 
   const { data: islandHeatmap } = useGetIslandHeatmapQuery(
-    town === 'Islandwide' ? debouncedYear : skipToken
+    town === 'Islandwide'
+      ? { flatTypes: debouncedFlatTypes, year: debouncedYear }
+      : skipToken
   );
   const { data: townHeatmap } = useGetTownHeatmapQuery(
     town === 'Islandwide'
       ? skipToken
       : {
+          flatTypes: debouncedFlatTypes,
           year: debouncedYear,
           town,
         }
@@ -257,7 +272,7 @@ const MapOverlay = ({
           sx={{ p: 1 }}
           alignItems="center"
         >
-          <Grid item xs={12} md="auto">
+          <Grid item xs={12} sm="auto">
             <StandaloneSearchBox
               onPlacesChanged={() => {
                 ReactGA.event({
@@ -274,7 +289,8 @@ const MapOverlay = ({
                 sx={{
                   width: {
                     xs: '100%',
-                    md: 400,
+                    sm: 300,
+                    xl: 400,
                   },
                   '.MuiInputBase-root': {
                     backgroundColor: (theme) =>
@@ -284,7 +300,7 @@ const MapOverlay = ({
               />
             </StandaloneSearchBox>
           </Grid>
-          <Grid item xs={12} md="auto">
+          <Grid item xs={12} sm="auto">
             <Autocomplete
               size="small"
               options={['Islandwide'].concat(
@@ -317,7 +333,7 @@ const MapOverlay = ({
               sx={{
                 width: {
                   xs: '100%',
-                  md: 200,
+                  sm: 200,
                 },
                 '.MuiInputBase-root': {
                   backgroundColor: (theme) => theme.palette.background.default,
@@ -325,14 +341,62 @@ const MapOverlay = ({
               }}
             />
           </Grid>
+          <Grid item xs={12} sm="auto">
+            <FormControl
+              size="small"
+              sx={{
+                width: {
+                  xs: '100%',
+                  sm: 200,
+                },
+              }}
+            >
+              <InputLabel shrink>Flat Types</InputLabel>
+              <Select
+                multiple
+                displayEmpty
+                value={flatTypes}
+                onChange={(event) =>
+                  dispatch(
+                    setFlatTypes(event.target.value as BackendFlatType[])
+                  )
+                }
+                input={<OutlinedInput label="Flat Types" notched />}
+                renderValue={(selected) => {
+                  if (
+                    selected.length === 0 ||
+                    selected.length === Object.values(BackendFlatType).length
+                  ) {
+                    return 'All';
+                  }
+
+                  return [...selected]
+                    .sort()
+                    .map(convertFlatTypeToFrontend)
+                    .join(', ');
+                }}
+              >
+                {Object.values(BackendFlatType).map((flatType) => (
+                  <MenuItem key={flatType} value={flatType}>
+                    <ListItemText>
+                      {convertFlatTypeToFrontend(flatType)}
+                    </ListItemText>
+                    {flatTypes.indexOf(flatType) > -1 && (
+                      <CheckRoundedIcon fontSize="small" />
+                    )}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
           <Grid
             item
             xs={12}
-            md="auto"
+            sm="auto"
             sx={{
               width: {
                 xs: '100%',
-                md: 400,
+                sm: 400,
               },
               overflow: 'visible',
             }}
@@ -361,7 +425,7 @@ const MapOverlay = ({
                     });
                   }}
                   sx={{
-                    p: 0,
+                    p: '0px !important',
                     '.MuiSlider-markLabel': {
                       top: 10,
                     },

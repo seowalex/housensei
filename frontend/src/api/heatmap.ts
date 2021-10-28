@@ -2,14 +2,20 @@ import api from './base';
 import type { Town } from '../types/towns';
 import type { BackendFlatType } from '../types/groups';
 
+interface IslandHeatmapRequest {
+  flatTypes: BackendFlatType[];
+  year: number;
+}
+
 interface IslandHeatmapResponse {
   town: string;
   resalePrice: number;
 }
 
 interface TownHeatmapRequest {
-  year: number;
   town: Town;
+  flatTypes: BackendFlatType[];
+  year: number;
 }
 
 interface TownHeatmapResponse {
@@ -27,9 +33,14 @@ export interface FlatTransaction {
 
 const extendedApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    getIslandHeatmap: builder.query<[IslandHeatmapResponse], number>({
-      query: (year) => ({
-        url: 'resale/heatmap/island',
+    getIslandHeatmap: builder.query<
+      [IslandHeatmapResponse],
+      IslandHeatmapRequest
+    >({
+      query: ({ flatTypes, year }) => ({
+        url: `resale/heatmap/island?${flatTypes
+          .map((flatType) => `flatTypes=${flatType}`)
+          .join('&')}`,
         params: {
           years: year,
         },
@@ -38,8 +49,10 @@ const extendedApi = api.injectEndpoints({
         response.data,
     }),
     getTownHeatmap: builder.query<[TownHeatmapResponse], TownHeatmapRequest>({
-      query: ({ year, town }) => ({
-        url: 'resale/heatmap/town',
+      query: ({ town, flatTypes, year }) => ({
+        url: `resale/heatmap/town?${flatTypes
+          .map((flatType) => `flatTypes=${flatType}`)
+          .join('&')}`,
         params: {
           years: year,
           town,

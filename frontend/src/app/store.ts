@@ -6,11 +6,13 @@ import {
 } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import {
+  PersistedState,
+  createMigrate,
+  persistReducer,
+  persistStore,
   FLUSH,
   PAUSE,
   PERSIST,
-  persistReducer,
-  persistStore,
   PURGE,
   REGISTER,
   REHYDRATE,
@@ -23,10 +25,16 @@ import heatmap from '../reducers/heatmap';
 import history from '../reducers/history';
 import settings from '../reducers/settings';
 
+const migrations = {
+  0: () => ({} as PersistedState),
+};
+
 const persistConfig = {
   key: 'root',
+  version: 0,
   storage,
   whitelist: ['settings'],
+  migrate: createMigrate(migrations),
 };
 
 const rootReducer = combineReducers({
