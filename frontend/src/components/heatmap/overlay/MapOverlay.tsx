@@ -290,7 +290,6 @@ const MapOverlay = ({
                   width: {
                     xs: '100%',
                     sm: 300,
-                    xl: 400,
                   },
                   '.MuiInputBase-root': {
                     backgroundColor: (theme) =>
