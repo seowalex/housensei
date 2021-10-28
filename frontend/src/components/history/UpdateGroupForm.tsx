@@ -102,7 +102,7 @@ const UpdateGroupForm = (props: Props) => {
         <Grid item xs={12}>
           <Box sx={{ p: '0.5rem 0rem' }}>
             <Typography variant="h4" sx={{ textAlign: 'center' }}>
-              Edit Group
+              Edit Line
             </Typography>
           </Box>
         </Grid>
@@ -136,14 +136,6 @@ const UpdateGroupForm = (props: Props) => {
             />
           </Stack>
         </Grid>
-        <Grid item xs={12} lg>
-          <FormTextInput
-            name="name"
-            control={control as Control<FieldValues>}
-            label="Group Name (optional)"
-            placeholder={currentData ? currentData.name : 'Enter a group name'}
-          />
-        </Grid>
         <Grid item xs={12} lg="auto">
           <Stack
             direction="row"
@@ -157,6 +149,14 @@ const UpdateGroupForm = (props: Props) => {
               control={control as Control<FieldValues>}
             />
           </Stack>
+        </Grid>
+        <Grid item xs={12} lg>
+          <FormTextInput
+            name="name"
+            control={control as Control<FieldValues>}
+            label="Line Name (optional)"
+            placeholder={currentData ? currentData.name : ''}
+          />
         </Grid>
         <Grid item xs={12}>
           <Divider />
@@ -311,7 +311,7 @@ const UpdateGroupForm = (props: Props) => {
 
           <Grid item>
             <Button variant="contained" type="submit">
-              {isSubmitting ? <CircularProgress /> : 'Edit Group'}
+              {isSubmitting ? <CircularProgress /> : 'Edit Line'}
             </Button>
           </Grid>
         </Grid>

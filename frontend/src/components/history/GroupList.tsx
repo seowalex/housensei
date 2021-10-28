@@ -6,8 +6,18 @@ import { useDispatch } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
 import { useAppSelector } from '../../app/hooks';
 import { createGroup, resetGroups, selectGroups } from '../../reducers/history';
-import { incrementColorCount, selectColorCount } from '../../reducers/colors';
-import { BTOGroup, Group, GroupFilters, ResaleGroup } from '../../types/groups';
+import {
+  incrementColorCount,
+  selectColorCount,
+  setColorCount,
+} from '../../reducers/colors';
+import {
+  BTOGroup,
+  Group,
+  GroupColor,
+  GroupFilters,
+  ResaleGroup,
+} from '../../types/groups';
 import {
   convertFlatTypeToFrontend,
   getGroupColor,
@@ -63,23 +73,28 @@ const GroupList = (props: Props) => {
       dispatch(incrementColorCount(data.color));
       onChangeSelectedGroup(groupId)(true);
     } else {
+      const colorCountCopy: Record<GroupColor, number> = { ...colorCount };
       const firstGroupId = uuidv4();
-      const createdGroups: Group[] = groupFilters.map((filters, index) => ({
-        type: data.type,
-        id: index === 0 ? firstGroupId : uuidv4(),
-        name:
-          data.name === ''
-            ? `${filters.towns[0]} (${convertFlatTypeToFrontend(
-                filters.flatTypes[0]
-              )}) ${index + 1}`
-            : `${data.name} ${index + 1}`,
-        color: data.color,
-        filters,
-      }));
-      createdGroups.forEach((group) => {
+      for (let i = 0; i < groupFilters.length; i += 1) {
+        const filters = groupFilters[i];
+        const groupId = uuidv4();
+        const color = getGroupColor(colorCountCopy);
+        const group: Group = {
+          type: data.type,
+          id: i === 0 ? firstGroupId : groupId,
+          name:
+            data.name === ''
+              ? `${filters.towns[0]} (${convertFlatTypeToFrontend(
+                  filters.flatTypes[0]
+                )})`
+              : `${data.name} ${i + 1}`,
+          color,
+          filters: groupFilters[i],
+        };
         dispatch(createGroup(group));
-        dispatch(incrementColorCount(data.color));
-      });
+        colorCountCopy[color] += 1;
+      }
+      dispatch(setColorCount(colorCountCopy));
       onChangeSelectedGroup(firstGroupId)(true);
     }
     setDisplayedModal(DisplayedModal.Hidden);
@@ -147,7 +162,7 @@ const GroupList = (props: Props) => {
             sx={{ width: '100%' }}
             data-tour="history-new-group"
           >
-            New Group
+            New Line
           </Button>
         </Grid>
         {groups.length > 0 && (
@@ -159,7 +174,7 @@ const GroupList = (props: Props) => {
               sx={{ width: '100%' }}
               color="error"
             >
-              Delete Groups
+              Delete Lines
             </Button>
           </Grid>
         )}
