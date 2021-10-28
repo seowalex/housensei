@@ -104,15 +104,19 @@ const MapOverlay = ({
 
   const [showSettings, setShowSettings] = useState(false);
 
+  const debouncedFlatTypes = useDebounce(flatTypes, 500);
   const debouncedYear = useDebounce(year, 500);
 
   const { data: islandHeatmap } = useGetIslandHeatmapQuery(
-    town === 'Islandwide' ? debouncedYear : skipToken
+    town === 'Islandwide'
+      ? { flatTypes: debouncedFlatTypes, year: debouncedYear }
+      : skipToken
   );
   const { data: townHeatmap } = useGetTownHeatmapQuery(
     town === 'Islandwide'
       ? skipToken
       : {
+          flatTypes: debouncedFlatTypes,
           year: debouncedYear,
           town,
         }

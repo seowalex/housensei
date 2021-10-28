@@ -11,7 +11,12 @@ import {
 import { skipToken } from '@reduxjs/toolkit/query/react';
 
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { selectTown, selectYear, setTown } from '../../../reducers/heatmap';
+import {
+  selectFlatTypes,
+  selectTown,
+  selectYear,
+  setTown,
+} from '../../../reducers/heatmap';
 import {
   selectDarkMode,
   selectHeatmapPriceRangeLower,
@@ -49,21 +54,28 @@ const Map = () => {
   const heatmapPriceRangeLower = useAppSelector(selectHeatmapPriceRangeLower);
   const heatmapPriceRangeUpper = useAppSelector(selectHeatmapPriceRangeUpper);
   const town = useAppSelector(selectTown);
+  const flatTypes = useAppSelector(selectFlatTypes);
   const year = useAppSelector(selectYear);
 
   const [map, setMap] = useState<google.maps.Map>();
   const [searchBox, setSearchBox] = useState<google.maps.places.SearchBox>();
   const [searchMarkers, setSearchMarkers] = useState<google.maps.LatLng[]>([]);
 
+  const debouncedFlatTypes = useDebounce(flatTypes, 500);
   const debouncedYear = useDebounce(year, 500);
 
   const { data: islandHeatmap, isFetching: isIslandFetching } =
-    useGetIslandHeatmapQuery(town === 'Islandwide' ? debouncedYear : skipToken);
+    useGetIslandHeatmapQuery(
+      town === 'Islandwide'
+        ? { flatTypes: debouncedFlatTypes, year: debouncedYear }
+        : skipToken
+    );
   const { data: townHeatmap, isFetching: isTownFetching } =
     useGetTownHeatmapQuery(
       town === 'Islandwide'
         ? skipToken
         : {
+            flatTypes: debouncedFlatTypes,
             year: debouncedYear,
             town,
           }
