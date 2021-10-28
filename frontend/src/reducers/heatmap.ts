@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import type { RootState } from '../app/store';
-import { BackendFlatType } from '../types/groups';
+import type { BackendFlatType } from '../types/groups';
 import type { Town } from '../types/towns';
 
 export interface HeatmapState {
@@ -11,7 +11,7 @@ export interface HeatmapState {
 
 const initialState: HeatmapState = {
   town: 'Islandwide',
-  flatTypes: Object.values(BackendFlatType),
+  flatTypes: [],
   year: new Date().getFullYear(),
 };
 

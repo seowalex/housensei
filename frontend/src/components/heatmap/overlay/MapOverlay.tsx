@@ -363,11 +363,8 @@ const MapOverlay = ({
                 }
                 input={<OutlinedInput label="Flat Types" notched />}
                 renderValue={(selected) => {
-                  if (selected.length === 0) {
-                    return 'None';
-                  }
-
                   if (
+                    selected.length === 0 ||
                     selected.length === Object.values(BackendFlatType).length
                   ) {
                     return 'All';
