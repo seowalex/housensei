@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import ReactGA from 'react-ga';
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -12,6 +13,7 @@ import {
   TableRow,
   TableSortLabel,
   Tooltip,
+  Typography,
   useTheme,
 } from '@mui/material';
 import { Marker } from '@react-google-maps/api';
@@ -23,6 +25,7 @@ import { useSnackbar } from 'notistack';
 import { format, parse } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 
+import { useHistory } from 'react-router';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
 import { FlatTransaction } from '../../../api/heatmap';
 import { createGroup } from '../../../reducers/history';
@@ -81,6 +84,7 @@ const FlatMarker = ({ town, address, coordinates, transactions }: Props) => {
   const { google } = window;
   const theme = useTheme();
   const dispatch = useAppDispatch();
+  const history = useHistory();
   const { enqueueSnackbar } = useSnackbar();
   const colorCount = useAppSelector(selectColorCount);
 
@@ -135,15 +139,26 @@ const FlatMarker = ({ town, address, coordinates, transactions }: Props) => {
     });
 
     enqueueSnackbar(
-      <span>
+      <Typography variant="body2" sx={{ marginLeft: '0.5rem' }}>
         Added{' '}
         <strong>
           {town} ({convertFlatTypeToFrontend(transaction.flatType)})
         </strong>{' '}
         resale flats to Price History.
-      </span>,
+      </Typography>,
       {
         variant: 'success',
+        autoHideDuration: 5000,
+        action: () => (
+          <Button
+            color="inherit"
+            onClick={() => {
+              history.push('/history');
+            }}
+          >
+            Go to Price History
+          </Button>
+        ),
       }
     );
   };

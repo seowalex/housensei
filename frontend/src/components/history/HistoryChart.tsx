@@ -10,9 +10,16 @@ import {
   YAxis,
 } from 'recharts';
 import { saveAs } from 'file-saver';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useCurrentPng } from 'recharts-to-png';
-import { Button, CircularProgress, Stack, Typography } from '@mui/material';
+import { DownloadRounded as DownloadRoundedIcon } from '@mui/icons-material';
+import {
+  Button,
+  ButtonGroup,
+  CircularProgress,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { ChartMode } from '../../types/history';
 import { formatDate } from '../../utils/dates';
 import {
@@ -34,12 +41,11 @@ import { Group } from '../../types/groups';
 import { selectColorTheme } from '../../reducers/settings';
 
 interface Props {
-  chartMode: ChartMode;
   selectedGroup: string | undefined;
 }
 
 const HistoryChart = (props: Props) => {
-  const { chartMode, selectedGroup } = props;
+  const { selectedGroup } = props;
   const groups = useAppSelector(selectGroups);
 
   const monthlyChartData = useAppSelector(selectMonthlyChartData);
@@ -51,6 +57,8 @@ const HistoryChart = (props: Props) => {
   const displayedGroupIds = useAppSelector(selectDisplayedGroupIds);
 
   const colorTheme = useAppSelector(selectColorTheme);
+
+  const [chartMode, setChartMode] = useState<ChartMode>(ChartMode.Monthly);
 
   const [getPng, { ref, isLoading: isLoadingPng }] = useCurrentPng();
 
@@ -76,7 +84,7 @@ const HistoryChart = (props: Props) => {
         <LineChart
           data={chartData}
           height={300}
-          margin={{ top: 20, left: 20, bottom: 10, right: 10 }}
+          margin={{ top: 20, left: 20, bottom: 10, right: 0 }}
           ref={ref}
         >
           <CartesianGrid />
@@ -189,16 +197,40 @@ const HistoryChart = (props: Props) => {
         </LineChart>
       </ResponsiveContainer>
       {groups.length > 0 && (
-        <Button onClick={handleDownload}>
-          {isLoadingPng ? (
-            <Stack direction="row" spacing={1}>
-              <CircularProgress size="1.5rem" />
-              <Typography variant="inherit">Downloading...</Typography>
-            </Stack>
-          ) : (
-            'Download Chart'
-          )}
-        </Button>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          sx={{ width: '100%' }}
+        >
+          <Button startIcon={<DownloadRoundedIcon />} onClick={handleDownload}>
+            {isLoadingPng ? (
+              <Stack direction="row" spacing={1}>
+                <CircularProgress size="1.5rem" />
+                <Typography variant="inherit">Downloading...</Typography>
+              </Stack>
+            ) : (
+              'Download Chart'
+            )}
+          </Button>
+          <ButtonGroup>
+            <Button
+              variant={
+                chartMode === ChartMode.Monthly ? 'contained' : 'outlined'
+              }
+              onClick={() => setChartMode(ChartMode.Monthly)}
+            >
+              Monthly
+            </Button>
+            <Button
+              variant={
+                chartMode === ChartMode.Yearly ? 'contained' : 'outlined'
+              }
+              onClick={() => setChartMode(ChartMode.Yearly)}
+            >
+              Yearly
+            </Button>
+          </ButtonGroup>
+        </Stack>
       )}
     </>
   );

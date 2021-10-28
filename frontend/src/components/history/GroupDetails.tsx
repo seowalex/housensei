@@ -3,8 +3,6 @@ import {
   DeleteRounded as DeleteRoundedIcon,
   EditRounded as EditRoundedIcon,
   MoreVertRounded as MoreVertRoundedIcon,
-  VisibilityOffRounded as VisibilityOffRoundedIcon,
-  VisibilityRounded as VisibilityRoundedIcon,
 } from '@mui/icons-material';
 import {
   IconButton,
@@ -14,16 +12,9 @@ import {
   MenuList,
   Popover,
   Stack,
-  Tooltip,
   Typography,
 } from '@mui/material';
 import { MouseEvent, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useAppSelector } from '../../app/hooks';
-import {
-  selectIsGroupDisplayed,
-  updateDisplayedGroups,
-} from '../../reducers/history';
 import { Group } from '../../types/groups';
 import GroupAdditionalFilters from './GroupAdditionalFilters';
 
@@ -35,7 +26,6 @@ interface Props {
 }
 
 const GroupDetails = (props: Props) => {
-  const dispatch = useDispatch();
   const {
     group,
     onDisplayUpdateModal,
@@ -43,12 +33,8 @@ const GroupDetails = (props: Props) => {
     onDuplicateGroup,
   } = props;
   const { name, id } = group;
-  const isGroupDisplayed = useAppSelector(selectIsGroupDisplayed(id));
 
   const [anchor, setAnchor] = useState<HTMLElement | undefined>(undefined);
-  const handleToggleDisplayGroup = () => {
-    dispatch(updateDisplayedGroups({ id, show: !isGroupDisplayed }));
-  };
   const handleOpenMenu = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchor(event.currentTarget);
   };
@@ -68,24 +54,9 @@ const GroupDetails = (props: Props) => {
         >
           {name}
         </Typography>
-        <Stack direction="row" justifyContent="flex-end">
-          <Tooltip
-            title={isGroupDisplayed ? 'Displayed' : 'Hidden'}
-            placement="right"
-            arrow
-          >
-            <IconButton onClick={handleToggleDisplayGroup}>
-              {isGroupDisplayed ? (
-                <VisibilityRoundedIcon fontSize="small" />
-              ) : (
-                <VisibilityOffRoundedIcon fontSize="small" />
-              )}
-            </IconButton>
-          </Tooltip>
-          <IconButton onClick={handleOpenMenu}>
-            <MoreVertRoundedIcon fontSize="small" />
-          </IconButton>
-        </Stack>
+        <IconButton onClick={handleOpenMenu}>
+          <MoreVertRoundedIcon fontSize="small" />
+        </IconButton>
       </Stack>
       <GroupAdditionalFilters group={group} />
       <Popover

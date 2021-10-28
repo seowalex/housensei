@@ -1,27 +1,16 @@
-import {
-  Button,
-  ButtonGroup,
-  Container,
-  Grid,
-  LinearProgress,
-  Paper,
-  Stack,
-} from '@mui/material';
+import { Container, Grid, LinearProgress, Paper, Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { ChartMode } from '../types/history';
 import GroupList from '../components/history/GroupList';
 import HistoryChart from '../components/history/HistoryChart';
 import { useAppSelector } from '../app/hooks';
 import { selectGroups, selectIsLoadingChartData } from '../reducers/history';
 
 const History = () => {
-  const groups = useAppSelector(selectGroups);
   const isLoadingChart = useAppSelector(selectIsLoadingChartData);
 
   const [selectedGroup, setSelectedGroup] = useState<string | undefined>(
     undefined
   );
-  const [chartMode, setChartMode] = useState<ChartMode>(ChartMode.Monthly);
   const [showLoadingBar, setShowLoadingBar] = useState<boolean>(false);
 
   useEffect(() => {
@@ -39,55 +28,20 @@ const History = () => {
   return (
     <Container sx={{ p: 3 }}>
       <Stack>
+        {showLoadingBar && <LinearProgress />}
         <Paper sx={{ p: '1rem' }}>
           <Grid container spacing={2}>
             <Grid item xs={12} md={8} data-tour="history-chart">
-              <HistoryChart
-                chartMode={chartMode}
-                selectedGroup={selectedGroup}
-              />
+              <HistoryChart selectedGroup={selectedGroup} />
             </Grid>
             <Grid item xs={12} md={4}>
-              <Stack
-                alignItems="center"
-                justifyContent="space-between"
-                sx={{ height: '100%' }}
-                spacing={2}
-              >
-                <GroupList
-                  selectedGroup={selectedGroup}
-                  onChangeSelectedGroup={handleChangeSelectedGroup}
-                />
-                {groups.filter((group) => group.type === 'resale').length >
-                  0 && (
-                  <ButtonGroup>
-                    <Button
-                      variant={
-                        chartMode === ChartMode.Monthly
-                          ? 'contained'
-                          : 'outlined'
-                      }
-                      onClick={() => setChartMode(ChartMode.Monthly)}
-                    >
-                      Monthly
-                    </Button>
-                    <Button
-                      variant={
-                        chartMode === ChartMode.Yearly
-                          ? 'contained'
-                          : 'outlined'
-                      }
-                      onClick={() => setChartMode(ChartMode.Yearly)}
-                    >
-                      Yearly
-                    </Button>
-                  </ButtonGroup>
-                )}
-              </Stack>
+              <GroupList
+                selectedGroup={selectedGroup}
+                onChangeSelectedGroup={handleChangeSelectedGroup}
+              />
             </Grid>
           </Grid>
         </Paper>
-        {showLoadingBar && <LinearProgress />}
       </Stack>
     </Container>
   );
