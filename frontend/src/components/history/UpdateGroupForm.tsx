@@ -106,7 +106,7 @@ const UpdateGroupForm = (props: Props) => {
             </Typography>
           </Box>
         </Grid>
-        <Grid item xs={12} lg="auto">
+        <Grid item xs={12} sm={6} lg="auto" xl="auto">
           <Stack
             direction="row"
             spacing={1}
@@ -136,7 +136,7 @@ const UpdateGroupForm = (props: Props) => {
             />
           </Stack>
         </Grid>
-        <Grid item xs={12} lg="auto">
+        <Grid item xs={12} sm={6} lg="auto" xl>
           <Stack
             direction="row"
             spacing={0.5}
@@ -150,7 +150,7 @@ const UpdateGroupForm = (props: Props) => {
             />
           </Stack>
         </Grid>
-        <Grid item xs={12} lg>
+        <Grid item xs={12} sm={12} lg xl={6}>
           <FormTextInput
             name="name"
             control={control as Control<FieldValues>}
