@@ -1,93 +1,99 @@
 {
-    "attribute": "maritalStatus",
-    "options": {
-      "single": {
-        "attribute": "singleNationality",
-        "options": {
-          "SC": {
-            "attribute": "singleFirstTimer",
-            "options": {
-              "true": {
-                "attribute": "age",
-                "options": {
-                  "true": {
-                    "attribute": "housingType",
-                    "options": {
-                      "BTO": 0,
-                      "Resale": {
-                        "attribute": "lease",
-                        "options": {
-                          "true": {
-                            "attribute": "monthlyIncome",
-                            "options": {
-                              "<= 7000": {
-                                "attribute": "flatSize",
-                                "options": {
-                                  "2 Room": 25000,
-                                  "3 Room": 25000,
-                                  "4 Room": 25000,
-                                  "5 Room": 20000
-                                }
-                              },
-                              "> 7000": 0
-                            }
-                          },
-                          "false": 0
-                        }
-                      },
-                      "EC": 0
-                    }
-                  },
-                  "false": 0
-                }
-              },
-              "false": 0
-            }
-          },
-          "PR": 0,
-          "F": 0
-        }
-      },
-      "couple": {
-        "attribute": "coupleNationality",
-        "options": {
-          "SC/SC": 0,
-          "SC/PR": 0,
-          "SC/F": {
-            "attribute": "singleFirstTimer",
-            "options": {
-              "true": {
-                "attribute": "housingType",
-                "options": {
-                  "BTO": 0,
-                  "Resale": {
-                    "attribute": "lease",
-                    "options": {
-                      "true": {
-                        "attribute": "monthlyIncome",
-                        "options": {
-                          "<= 14000": {
-                            "attribute": "flatSize",
-                            "options": {
-                              "2 Room": 25000,
-                              "3 Room": 25000,
-                              "4 Room": 25000,
-                              "5 Room": 20000
-                            }
-                          },
-                          "> 14000": 0
-                        }
-                      },
-                      "false": 0
-                    }
-                  },
-                  "EC": 0
-                }
-              },
-              "false": 0
-            }
+  "attribute": "maritalStatus",
+  "options": {
+    "single": {
+      "attribute": "singleNationality",
+      "options": {
+        "SC": {
+          "attribute": "singleFirstTimer",
+          "options": {
+            "true": {
+              "attribute": "age",
+              "options": {
+                "true": {
+                  "attribute": "housingType",
+                  "options": {
+                    "BTO": 0,
+                    "Resale": {
+                      "attribute": "lease",
+                      "options": {
+                        "true": {
+                          "attribute": "monthlyIncome",
+                          "options": {
+                            "<= 7000": {
+                              "attribute": "flatSize",
+                              "options": {
+                                "1 Room": 0,
+                                "2 Room": 25000,
+                                "3 Room": 25000,
+                                "4 Room": 25000,
+                                "5 Room": 20000,
+                                "3Gen": 0,
+                                "Studio": 0
+                              }
+                            },
+                            "> 7000": 0
+                          }
+                        },
+                        "false": 0
+                      }
+                    },
+                    "EC": 0
+                  }
+                },
+                "false": 0
+              }
+            },
+            "false": 0
+          }
+        },
+        "PR": 0,
+        "F": 0
+      }
+    },
+    "couple": {
+      "attribute": "coupleNationality",
+      "options": {
+        "SC/SC": 0,
+        "SC/PR": 0,
+        "SC/F": {
+          "attribute": "singleFirstTimer",
+          "options": {
+            "true": {
+              "attribute": "housingType",
+              "options": {
+                "BTO": 0,
+                "Resale": {
+                  "attribute": "lease",
+                  "options": {
+                    "true": {
+                      "attribute": "monthlyIncome",
+                      "options": {
+                        "<= 14000": {
+                          "attribute": "flatSize",
+                          "options": {
+                            "1 Room": 0,
+                            "2 Room": 25000,
+                            "3 Room": 25000,
+                            "4 Room": 25000,
+                            "5 Room": 20000,
+                            "3Gen": 0,
+                            "Studio": 0
+                          }
+                        },
+                        "> 14000": 0
+                      }
+                    },
+                    "false": 0
+                  }
+                },
+                "EC": 0
+              }
+            },
+            "false": 0
           }
         }
       }
     }
+  }
 }

@@ -38,7 +38,11 @@ export const parseFormValues = (values: Record<string, string>) => {
       ['SC', 'PR', 'F', ''],
       [formValues.ownNationality, formValues.partnerNationality]
     ),
-    singleFirstTimer: formValues.ownFirstTimer,
+    singleFirstTimer:
+      formValues.maritalStatus === 'couple' &&
+      formValues.partnerNationality === 'SC'
+        ? formValues.partnerFirstTimer
+        : formValues.ownFirstTimer,
     coupleFirstTimer: sortAndJoinByDefinedOrder(
       ['true', 'false', ''],
       [formValues.ownFirstTimer, formValues.partnerFirstTimer]
