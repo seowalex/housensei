@@ -20,7 +20,6 @@ import {
 } from '../calculation/GrantCalculation';
 import {
   displayGrantRange,
-  getTotalGrant,
   parseFormValues,
 } from '../calculation/ParseGrantsForm';
 
@@ -39,17 +38,6 @@ const MiniGrantsResult = (props: Props) => {
   const proximityGrant = getProximityGrant(fieldValues);
   const singleEhgGrant = getSingleEHGGrant(fieldValues);
   const singleGrant = getSingleGrant(fieldValues);
-
-  const totalGrantRange = getTotalGrant([
-    ehgGrant,
-    familyGrant,
-    halfHousingGrant,
-    proximityGrant,
-    singleEhgGrant,
-    singleGrant,
-  ]);
-
-  // TODO grant amount is not stackable
 
   const rows = [
     {
@@ -105,15 +93,11 @@ const MiniGrantsResult = (props: Props) => {
               <TableCell component="th" scope="row">
                 {row.grantName}
               </TableCell>
-              <TableCell>{displayGrantRange(row.grantRange)}</TableCell>
+              <TableCell sx={{ width: '120px', whiteSpace: 'nowrap' }}>
+                {displayGrantRange(row.grantRange)}
+              </TableCell>
             </TableRow>
           ))}
-          <TableRow>
-            <TableCell sx={{ fontWeight: 'bold' }}>Total Grant</TableCell>
-            <TableCell sx={{ fontWeight: 'bold' }}>
-              {displayGrantRange(totalGrantRange)}
-            </TableCell>
-          </TableRow>
         </TableBody>
       </Table>
       <Typography variant="h6" />
