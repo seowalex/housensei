@@ -52,7 +52,6 @@ const HousingQuestions = (props: StepProps) => {
           name="housingType"
           form={form}
           options={housingTypeOptions}
-          required
         />
       </Grid>
 
@@ -73,7 +72,6 @@ const HousingQuestions = (props: StepProps) => {
               name="flatSize"
               form={form}
               options={flatSizeOptions}
-              required
             />
           </Grid>
         </>

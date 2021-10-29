@@ -17,14 +17,12 @@ const UserQuestions = (props: StepProps) => {
   const maritalStatusOptions = [
     { label: 'Single', value: 'single' },
     { label: 'Couple', value: 'couple' },
-    PNTS_OPTION,
   ];
 
   const nationalityOptions = [
     { label: 'Singaporean', value: 'SC' },
     { label: 'PR', value: 'PR' },
     { label: 'Foreigner', value: 'F' },
-    PNTS_OPTION,
   ];
 
   const firstTimerOptions = [
@@ -113,7 +111,6 @@ const UserQuestions = (props: StepProps) => {
             name="age"
             form={form}
             options={ageOptions}
-            required
           />
         </Grid>
       )}
@@ -126,7 +123,6 @@ const UserQuestions = (props: StepProps) => {
           name="workingAtLeastAYear"
           form={form}
           options={workingAtLeastAYearOptions}
-          required
         />
       </Grid>
 

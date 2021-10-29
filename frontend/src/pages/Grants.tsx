@@ -97,13 +97,14 @@ const Grants = () => {
     'Grant Calculation',
   ];
 
-  // TODO can convert all yup.string().required to notEmptyStrCheck
-
-  const notEmptyStrCheck = (message: string) =>
-    yup.mixed().notOneOf([''], message);
-
   const validationSchema = [
     yup.object({
+      maritalStatus: yup.string().required('Must indicate marital status'),
+      ownNationality: yup.string().required('Must indicate nationality'),
+      partnerNationality: yup.mixed().when('maritalStatus', {
+        is: 'couple',
+        then: yup.string().required("Must indicate partner's nationality"),
+      }),
       ownFirstTimer: yup
         .mixed()
         .test(
@@ -140,12 +141,8 @@ const Grants = () => {
           return Number(item) > 0;
         }),
     }),
-    yup.object({}),
-    yup.object({
-      receivedProximityBefore: notEmptyStrCheck(
-        'Must indicate if received proximity grant before'
-      ),
-    }),
+    yup.object(),
+    yup.object(),
   ];
 
   const currentValidationSchema = validationSchema[activeStep];

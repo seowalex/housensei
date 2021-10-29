@@ -13,10 +13,12 @@ export const getTotalGrant = (allGrants: Array<NullableGrantRange>) => {
 
 export const displayGrantRange = (grantRange: NullableGrantRange) => (
   <span style={{ whiteSpace: 'nowrap' }}>
-    {`$${
+    {`${
       grantRange.min === grantRange.max
-        ? grantRange.min
-        : `${grantRange.min} - $${grantRange.max}`
+        ? `$${grantRange.min}`
+        : `${
+            grantRange.min === 0 ? 'Up to' : `$${grantRange.min} -`
+          } ${`$${grantRange.max}`}`
     }`}
   </span>
 );
