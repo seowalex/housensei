@@ -103,12 +103,6 @@ const Grants = () => {
 
   const validationSchema = [
     yup.object({
-      maritalStatus: yup.string().required('Must indicate marital status'),
-      ownNationality: yup.string().required('Must indicate nationality'),
-      partnerNationality: yup.mixed().when('maritalStatus', {
-        is: 'couple',
-        then: yup.string().required("Must indicate partner's nationality"),
-      }),
       ownFirstTimer: yup
         .mixed()
         .test(
@@ -136,13 +130,6 @@ const Grants = () => {
             return item !== '';
           }
         ),
-      age: yup.mixed().when('maritalStatus', {
-        is: 'single',
-        then: notEmptyStrCheck('Must indicate age'),
-      }),
-      workingAtLeastAYear: notEmptyStrCheck(
-        'Must indicate if working for at least a year'
-      ),
       monthlyIncome: yup
         .mixed()
         .test('monthlyIncome', 'Cannot be a negative number', (item) => {
@@ -152,13 +139,7 @@ const Grants = () => {
           return Number(item) > 0;
         }),
     }),
-    yup.object({
-      housingType: yup.string().required('Must indicate housing type'),
-      flatSize: yup.mixed().when('housingType', {
-        is: 'Resale',
-        then: notEmptyStrCheck('Must indicate resale flat size'),
-      }),
-    }),
+    yup.object({}),
     yup.object({
       receivedProximityBefore: notEmptyStrCheck(
         'Must indicate if received proximity grant before'

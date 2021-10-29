@@ -103,7 +103,7 @@ const GrantsResult = (props: Props) => {
         <Grid item xs={6} sx={{ display: 'flex' }}>
           <GrantCard
             grantName="Half Housing Grant"
-            description={`The Half Housing Grant is worth up to S$${GRANT_MAX.halfHousing}, and it's to help SC/SC applicants whose spouse/spouse-to-be had previously received a housing subsidy. Half-Housing Grant’s amount is half of the Family Grant that you and your spouse/ spouse-to-be would qualify for if both of you were first-timer applicants.`}
+            description={`The Half Housing Grant is worth up to S$${GRANT_MAX.halfHousing}, and it's to help SC/SC applicants whose spouse/spouse-to-be had previously received a housing subsidy. Half-Housing Grant’s amount is half of the Family Grant that you and your spouse/spouse-to-be would qualify for if both of you were first-timer applicants.`}
             grantRange={halfHousingGrant as GrantRange}
             linkToHDB={halfHousingGrantWebsite}
           />

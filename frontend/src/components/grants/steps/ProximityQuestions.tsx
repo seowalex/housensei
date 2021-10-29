@@ -1,6 +1,7 @@
 import { Grid, Link } from '@mui/material';
+import NewTabLink from '../../common/Link';
 import { getProximityGrantWebsite } from '../calculation/GrantsWebsite';
-import FormRadioInput from '../FormRadioInput';
+import FormRadioInput from '../../forms/FormRadioInput';
 import { UNSURE } from './Options';
 import StepProps from './StepProps';
 
@@ -31,14 +32,10 @@ const ProximityQuestions = (props: StepProps) => {
           label={
             <span>
               Have you {isCouple ? 'or your partner ' : ''} received a
-              <Link
-                href={`//${getProximityGrantWebsite().slice(12)}`}
-                target="_blank"
-                rel="noopener"
-                sx={{ paddingLeft: 1 }}
-              >
-                proximity grant
-              </Link>{' '}
+              <NewTabLink
+                link={getProximityGrantWebsite()}
+                label="proximity grant"
+              />{' '}
               before?
             </span>
           }

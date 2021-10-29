@@ -2,14 +2,15 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import { Link } from '@mui/material';
+import { Grid, Link } from '@mui/material';
 import { displayGrantRange } from '../calculation/ParseGrantsForm';
+import NewTabLink from '../../common/Link';
 
 interface Props {
   grantName: string;
   description: string;
   grantRange: { min: number; max: number };
-  linkToHDB?: string;
+  linkToHDB?: string | Record<string, string>;
 }
 
 const GrantCard = (props: Props) => {
@@ -32,15 +33,20 @@ const GrantCard = (props: Props) => {
         </Typography>
       </CardContent>
       <CardActions>
-        {linkToHDB && (
-          <Link
-            href={`//${linkToHDB.slice(12)}`}
-            target="_blank"
-            rel="noopener"
-            sx={{ paddingLeft: 1 }}
-          >
-            HDB Website
-          </Link>
+        {typeof linkToHDB === 'string' && (
+          <NewTabLink link={linkToHDB} label="HDB Website" />
+        )}
+        {typeof linkToHDB === 'object' && (
+          <Grid container direction="column">
+            {Object.keys(linkToHDB).map((condition) => (
+              <Grid item>
+                <NewTabLink
+                  link={linkToHDB[condition]}
+                  label={`HDB Website for ${condition}`}
+                />
+              </Grid>
+            ))}
+          </Grid>
         )}
       </CardActions>
     </Card>

@@ -1,11 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const getEHGGrantWebsite = (fieldValues: Record<string, string>) => {
+  const resale =
+    'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/resale/financing/cpf-housing-grants/firsttimer-applicants';
+  const bto =
+    'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/new/schemes-and-grants/cpf-housing-grants-for-hdb-flats/firsttimer-applicants';
   switch (fieldValues.housingType) {
     case 'Resale':
-      return 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/resale/financing/cpf-housing-grants/firsttimer-applicants';
+      return resale;
     case 'BTO':
-      return 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/new/schemes-and-grants/cpf-housing-grants-for-hdb-flats/firsttimer-applicants';
+      return bto;
     default:
-      return '';
+      return { Resale: resale, BTO: bto };
   }
 };
 
@@ -39,31 +44,75 @@ export const getProximityGrantWebsite = () =>
 export const getSingleEHGGrantWebsite = (
   fieldValues: Record<string, string>
 ) => {
-  const { housingType, coupleFirstTimer, coupleNationality, maritalStatus } =
-    fieldValues;
+  const conditionsAndWebsites = [
+    {
+      link: 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/resale/financing/cpf-housing-grants/firsttimer-and-secondtimer-couple-applicants',
+      label: 'Resale and one partner is a first time buyer',
+      conditions: [
+        ['housingType', 'Resale'],
+        ['coupleFirstTimer', 'true/false'],
+      ],
+    },
+    {
+      link: 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/resale/financing/cpf-housing-grants/noncitizen-spouse-scheme',
+      label: 'Resale and SC/F couple',
+      conditions: [
+        ['housingType', 'Resale'],
+        ['coupleNationality', 'SC/F'],
+      ],
+    },
+    {
+      link: 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/resale/financing/cpf-housing-grants/single-singapore-citizen-scheme',
+      label: 'Resale and single',
+      conditions: [
+        ['housingType', 'Resale'],
+        ['maritalStatus ', 'single'],
+      ],
+    },
+    {
+      link: 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/new/schemes-and-grants/cpf-housing-grants-for-hdb-flats/firsttimer-and-secondtimer-couple-applicants',
+      label: 'BTO and one partner is a first time buyer',
+      conditions: [
+        ['housingType', 'BTO'],
+        ['coupleFirstTimer', 'true/false'],
+      ],
+    },
+    {
+      link: 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/new/schemes-and-grants/cpf-housing-grants-for-hdb-flats/noncitizen-spouse-scheme',
+      label: 'BTO and SC/F couple',
+      conditions: [
+        ['housingType', 'BTO'],
+        ['coupleNationality', 'SC/F'],
+      ],
+    },
+    {
+      link: 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/new/schemes-and-grants/cpf-housing-grants-for-hdb-flats/single-singapore-citizen-scheme',
+      label: 'BTO and single',
+      conditions: [
+        ['housingType', 'BTO'],
+        ['maritalStatus', 'single'],
+      ],
+    },
+  ];
 
-  if (housingType === 'Resale') {
-    if (coupleFirstTimer === 'true/false') {
-      return 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/resale/financing/cpf-housing-grants/firsttimer-and-secondtimer-couple-applicants';
-    }
-    if (coupleNationality === 'SC/F') {
-      return 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/resale/financing/cpf-housing-grants/noncitizen-spouse-scheme';
-    }
-    if (maritalStatus === 'single') {
-      return 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/resale/financing/cpf-housing-grants/single-singapore-citizen-scheme';
-    }
-  } else if (housingType === 'BTO') {
-    if (coupleFirstTimer === 'true/false') {
-      return 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/new/schemes-and-grants/cpf-housing-grants-for-hdb-flats/firsttimer-and-secondtimer-couple-applicants';
-    }
-    if (coupleNationality === 'SC/F') {
-      return 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/new/schemes-and-grants/cpf-housing-grants-for-hdb-flats/noncitizen-spouse-scheme';
-    }
-    if (maritalStatus === 'single') {
-      return 'https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/new/schemes-and-grants/cpf-housing-grants-for-hdb-flats/single-singapore-citizen-scheme';
-    }
+  const matchingLinks = conditionsAndWebsites.filter((condition) =>
+    condition.conditions.every(
+      (miniCondition) =>
+        fieldValues[miniCondition[0]] === '' ||
+        fieldValues[miniCondition[0]] === miniCondition[1]
+    )
+  );
+
+  if (matchingLinks.length === 1) {
+    return matchingLinks[0].link;
   }
-  return '';
+
+  const matchingLinksObject: Record<string, string> = {};
+  matchingLinks.forEach((condition) => {
+    matchingLinksObject[condition.label] = condition.link;
+  });
+
+  return matchingLinksObject;
 };
 
 export const getSingleGrantWebsite = (fieldValues: Record<string, string>) => {

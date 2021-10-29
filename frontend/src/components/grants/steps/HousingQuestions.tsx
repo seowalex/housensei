@@ -1,6 +1,6 @@
 import { Grid } from '@mui/material';
 import { FlatType } from '../../../types/groups';
-import FormRadioInput from '../FormRadioInput';
+import FormRadioInput from '../../forms/FormRadioInput';
 import { UNSURE } from './Options';
 import StepProps from './StepProps';
 

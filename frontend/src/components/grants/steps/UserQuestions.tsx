@@ -1,6 +1,6 @@
 import { Grid } from '@mui/material';
-import FormRadioInput from '../FormRadioInput';
-import FormNumberTextFieldInput from '../FormNumberTextFieldInput';
+import FormRadioInput from '../../forms/FormRadioInput';
+import FormNumberTextFieldInput from '../../forms/FormNumberTextFieldInput';
 import StepProps from './StepProps';
 import { PNTS } from './Options';
 
