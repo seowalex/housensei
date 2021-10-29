@@ -70,7 +70,14 @@ const GrantsResult = (props: Props) => {
         </Typography>
       </Grid>
       {totalGrantRange.max === 0 && (
-        <Grid container item xs={12} justifyContent="center" display="flex">
+        <Grid
+          container
+          item
+          xs={12}
+          justifyContent="center"
+          display="flex"
+          spacing={5}
+        >
           <Grid item xs={12} justifyContent="center" display="flex">
             <SadGhost />
           </Grid>

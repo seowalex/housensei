@@ -2,7 +2,7 @@ import { Grid } from '@mui/material';
 import NewTabLink from '../../common/Link';
 import { getProximityGrantWebsite } from '../calculation/GrantsWebsite';
 import FormRadioInput from '../../forms/FormRadioInput';
-import { PNTS_OPTION, UNSURE_OPTION } from './Options';
+import { UNSURE_OPTION } from './Options';
 import StepProps from './StepProps';
 
 const ProximityQuestions = (props: StepProps) => {
@@ -13,7 +13,7 @@ const ProximityQuestions = (props: StepProps) => {
   const receivedProximityBeforeOptions = [
     { label: 'Yes', value: true },
     { label: 'No', value: false },
-    PNTS_OPTION,
+    UNSURE_OPTION,
   ];
 
   const proximityStatusOptions = [

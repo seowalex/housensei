@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 const getLabelLinks = (
   fieldValues: Record<string, string>,
   conditionsAndWebsites: Array<{
@@ -103,7 +101,7 @@ export const getSingleEHGGrantWebsite = (
       label: 'Resale and single',
       conditions: [
         ['housingType', 'Resale'],
-        ['maritalStatus ', 'single'],
+        ['maritalStatus', 'single'],
       ],
     },
     {

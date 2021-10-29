@@ -27,7 +27,7 @@ const GrantCard = (props: Props) => {
       <CardContent>
         <Typography variant="h5">{grantName}</Typography>
         <Typography gutterBottom variant="h5">
-          {displayGrantRange(grantRange)}
+          Eligible value: {displayGrantRange(grantRange)}
         </Typography>
         <Typography gutterBottom variant="body2" color="text.secondary">
           {description}
