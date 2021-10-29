@@ -1,3 +1,3 @@
-export const NA = 'NA';
-export const PNTS = { label: 'Prefer not to say', value: NA };
-export const UNSURE = { label: 'Unsure', value: NA };
+export const NA_VALUE = 'NA';
+export const PNTS_OPTION = { label: 'Prefer not to say', value: NA_VALUE };
+export const UNSURE_OPTION = { label: 'Unsure', value: NA_VALUE };

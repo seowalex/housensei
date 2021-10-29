@@ -1,5 +1,53 @@
 /* eslint-disable no-param-reassign */
 
+import { NA_VALUE } from '../steps/Options';
+
+export const parseFormValues = (values: Record<string, string>) => {
+  const formValues = values;
+  const sortAndJoinByDefinedOrder = (
+    definedOrder: Array<string>,
+    arr: Array<string>
+  ) => {
+    switch (values.maritalStatus) {
+      case 'couple': {
+        if (arr.some((value) => value === '')) {
+          return '';
+        }
+        arr.sort((a, b) => definedOrder.indexOf(a) - definedOrder.indexOf(b));
+
+        return arr.join('/');
+      }
+      case 'single': {
+        return 'NA';
+      }
+      default:
+        return '';
+    }
+  };
+
+  Object.keys(formValues).forEach((field) => {
+    if (formValues[field] === NA_VALUE) {
+      formValues[field] = '';
+    }
+  });
+
+  const fieldValues = {
+    ...formValues,
+    singleNationality: formValues.ownNationality,
+    coupleNationality: sortAndJoinByDefinedOrder(
+      ['SC', 'PR', 'F', ''],
+      [formValues.ownNationality, formValues.partnerNationality]
+    ),
+    singleFirstTimer: formValues.ownFirstTimer,
+    coupleFirstTimer: sortAndJoinByDefinedOrder(
+      ['true', 'false', ''],
+      [formValues.ownFirstTimer, formValues.partnerFirstTimer]
+    ),
+  };
+
+  return fieldValues;
+};
+
 type Tree =
   | {
       attribute: string;

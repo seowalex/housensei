@@ -7,9 +7,8 @@ import {
   TableHead,
   TableRow,
   Tooltip,
-  Typography,
 } from '@mui/material';
-import { FieldValues, UseFormReturn } from 'react-hook-form';
+import { FieldValues, UseFormWatch } from 'react-hook-form';
 import {
   getEHGGrant,
   getFamilyGrant,
@@ -18,18 +17,16 @@ import {
   getSingleEHGGrant,
   getSingleGrant,
 } from '../calculation/GrantCalculation';
-import {
-  displayGrantRange,
-  parseFormValues,
-} from '../calculation/ParseGrantsForm';
+import { parseFormValues } from '../calculation/GrantTreeRecursion';
+import { displayGrantRange } from '../calculation/GrantsDisplayHelper';
 
 interface Props {
-  form: UseFormReturn<FieldValues>;
+  formWatch: UseFormWatch<FieldValues>;
 }
 
 const MiniGrantsResult = (props: Props) => {
-  const { form } = props;
-  const values = form.watch();
+  const { formWatch } = props;
+  const values = formWatch();
   const fieldValues = parseFormValues(values);
 
   const ehgGrant = getEHGGrant(fieldValues);
@@ -73,7 +70,7 @@ const MiniGrantsResult = (props: Props) => {
           <TableRow>
             <TableCell>Grant</TableCell>
             <Tooltip
-              title="Range of grant value that you're eligible for based on current selection"
+              title="Range of grant values that you're eligible for based on current selection"
               placement="top"
             >
               <TableCell>Eligible Value</TableCell>
@@ -100,7 +97,6 @@ const MiniGrantsResult = (props: Props) => {
           ))}
         </TableBody>
       </Table>
-      <Typography variant="h6" />
     </TableContainer>
   );
 };

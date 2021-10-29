@@ -2,7 +2,7 @@ import { Grid } from '@mui/material';
 import FormRadioInput from '../../forms/FormRadioInput';
 import FormNumberTextFieldInput from '../../forms/FormNumberTextFieldInput';
 import StepProps from './StepProps';
-import { PNTS } from './Options';
+import { PNTS_OPTION } from './Options';
 
 const UserQuestions = (props: StepProps) => {
   const { form } = props;
@@ -17,14 +17,14 @@ const UserQuestions = (props: StepProps) => {
   const maritalStatusOptions = [
     { label: 'Single', value: 'single' },
     { label: 'Couple', value: 'couple' },
-    PNTS,
+    PNTS_OPTION,
   ];
 
   const nationalityOptions = [
     { label: 'Singaporean', value: 'SC' },
     { label: 'PR', value: 'PR' },
     { label: 'Foreigner', value: 'F' },
-    PNTS,
+    PNTS_OPTION,
   ];
 
   const firstTimerOptions = [
@@ -35,13 +35,13 @@ const UserQuestions = (props: StepProps) => {
   const ageOptions = [
     { label: 'Yes', value: true },
     { label: 'No', value: false },
-    PNTS,
+    PNTS_OPTION,
   ];
 
   const workingAtLeastAYearOptions = [
     { label: 'Yes', value: true },
     { label: 'No', value: false },
-    PNTS,
+    PNTS_OPTION,
   ];
 
   return (

@@ -9,7 +9,6 @@ import {
   getSingleGrant,
   GrantRange,
 } from '../calculation/GrantCalculation';
-import { GRANT_MAX } from '../calculation/GrantMaxAmount';
 import {
   getEHGGrantWebsite,
   getFamilyGrantWebsite,
@@ -18,12 +17,13 @@ import {
   getSingleEHGGrantWebsite,
   getSingleGrantWebsite,
 } from '../calculation/GrantsWebsite';
+import { parseFormValues } from '../calculation/GrantTreeRecursion';
 import {
   displayGrantRange,
   getTotalGrant,
-  parseFormValues,
-} from '../calculation/ParseGrantsForm';
+} from '../calculation/GrantsDisplayHelper';
 import GrantCard from './GrantCard';
+import SadGhost from '../../common/SadGhost';
 
 interface Props {
   formValues: UseFormGetValues<FieldValues>;
@@ -64,16 +64,28 @@ const GrantsResult = (props: Props) => {
 
   return (
     <Grid container spacing={5}>
-      <Grid item xs={12}>
+      <Grid item xs={12} justifyContent="center" display="flex">
         <Typography variant="h4">
-          Estimated Total Grant: {displayGrantRange(totalGrantRange)}
+          Estimated Total Grant: <b>{displayGrantRange(totalGrantRange)}</b>
         </Typography>
       </Grid>
+      {totalGrantRange.max === 0 && (
+        <Grid container item xs={12} justifyContent="center" display="flex">
+          <Grid item xs={12} justifyContent="center" display="flex">
+            <SadGhost />
+          </Grid>
+          <Grid item xs={12} justifyContent="center" display="flex">
+            <Typography variant="h5">
+              Sorry, no grants are applicable.
+            </Typography>
+          </Grid>
+        </Grid>
+      )}
       {shouldDisplayGrant(ehgGrant) && (
         <Grid item xs={6} sx={{ display: 'flex' }}>
           <GrantCard
             grantName="Enhanced CPF Housing Grant (EHG)"
-            description={`The EHG is a catch-all HDB grant that is worth up to S$${GRANT_MAX.ehg}, and it's to help all local lower- to middle-class couples afford a home. It’s applicable to all BTO and resale flats and there is no restriction on flat size or estate.`}
+            description={`The EHG is a catch-all HDB grant that is worth up to S$80,000, and it's to help all local lower- to middle-class couples afford a home. It’s applicable to all BTO and resale flats and there is no restriction on flat size or estate.`}
             grantRange={ehgGrant}
             linkToHDB={ehgGrantWebsite}
           />
@@ -83,7 +95,7 @@ const GrantsResult = (props: Props) => {
         <Grid item xs={6} sx={{ display: 'flex' }}>
           <GrantCard
             grantName="Enhanced CPF Housing Grant (EHG Single)"
-            description={`The EHG Single is worth up to S$${GRANT_MAX.ehgSingle}, and it's to help all local lower- to middle-class singles or mixed-nationality couples afford a home.`}
+            description={`The EHG Single is worth up to S$$40,000, and it's to help all local lower- to middle-class singles or mixed-nationality couples afford a home.`}
             grantRange={singleEhgGrant}
             linkToHDB={singleEhgGrantWebsite}
           />
@@ -93,7 +105,7 @@ const GrantsResult = (props: Props) => {
         <Grid item xs={6} sx={{ display: 'flex' }}>
           <GrantCard
             grantName="Family Grant"
-            description={`The Family Grant is worth up to S$${GRANT_MAX.family}, and it's to help first-time HDB applicants purchase a resale or EC.`}
+            description={`The Family Grant is worth up to S$50,000, and it's to help first-time HDB applicants purchase a resale or EC.`}
             grantRange={familyGrant as GrantRange}
             linkToHDB={familyGrantWebsite}
           />
@@ -103,7 +115,7 @@ const GrantsResult = (props: Props) => {
         <Grid item xs={6} sx={{ display: 'flex' }}>
           <GrantCard
             grantName="Half Housing Grant"
-            description={`The Half Housing Grant is worth up to S$${GRANT_MAX.halfHousing}, and it's to help SC/SC applicants whose spouse/spouse-to-be had previously received a housing subsidy. Half-Housing Grant’s amount is half of the Family Grant that you and your spouse/spouse-to-be would qualify for if both of you were first-timer applicants.`}
+            description={`The Half Housing Grant is worth up to S$25,000, and it's to help SC/SC applicants whose spouse/spouse-to-be had previously received a housing subsidy. Half-Housing Grant’s amount is half of the Family Grant that you and your spouse/spouse-to-be would qualify for if both of you were first-timer applicants.`}
             grantRange={halfHousingGrant as GrantRange}
             linkToHDB={halfHousingGrantWebsite}
           />
@@ -113,7 +125,7 @@ const GrantsResult = (props: Props) => {
         <Grid item xs={6} sx={{ display: 'flex' }}>
           <GrantCard
             grantName="Proximity Housing Grant (PHG)"
-            description={`The PHG is worth up to S$${GRANT_MAX.proximity}, and it's for buying resale flats only. It's for those who want to live with or near their parents/children in a resale flat.`}
+            description={`The PHG is worth up to S$30,000, and it's for buying resale flats only. It's for those who want to live with or near their parents/children in a resale flat.`}
             grantRange={proximityGrant as GrantRange}
             linkToHDB={proximityGrantWebsite}
           />
@@ -123,7 +135,7 @@ const GrantsResult = (props: Props) => {
         <Grid item xs={6} sx={{ display: 'flex' }}>
           <GrantCard
             grantName="Singles Grant"
-            description={`The Singles Grant is worth up to S$${GRANT_MAX.singles}, and it's for buying resale flats only.`}
+            description={`The Singles Grant is worth up to S$25,000, and it's for buying resale flats only.`}
             grantRange={singleGrant as GrantRange}
             linkToHDB={singleGrantWebsite}
           />

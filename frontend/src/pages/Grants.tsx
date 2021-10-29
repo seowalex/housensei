@@ -12,6 +12,7 @@ import {
   FormProvider,
   useForm,
   UseFormReturn,
+  UseFormWatch,
 } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import UserQuestions from '../components/grants/steps/UserQuestions';
@@ -249,7 +250,7 @@ const Grants = () => {
                     {(otherSteps || isLastStep) && (
                       <Grid item xs={3}>
                         <MiniGrantsResult
-                          form={methods as UseFormReturn<FieldValues>}
+                          formWatch={methods.watch as UseFormWatch<FieldValues>}
                         />
                       </Grid>
                     )}

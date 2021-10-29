@@ -1,8 +1,8 @@
-import { Grid, Link } from '@mui/material';
+import { Grid } from '@mui/material';
 import NewTabLink from '../../common/Link';
 import { getProximityGrantWebsite } from '../calculation/GrantsWebsite';
 import FormRadioInput from '../../forms/FormRadioInput';
-import { UNSURE } from './Options';
+import { UNSURE_OPTION } from './Options';
 import StepProps from './StepProps';
 
 const ProximityQuestions = (props: StepProps) => {
@@ -22,7 +22,7 @@ const ProximityQuestions = (props: StepProps) => {
     },
     { label: 'Yes, within 4km', value: 'within 4km' },
     { label: 'No', value: 'no' },
-    UNSURE,
+    UNSURE_OPTION,
   ];
 
   return (

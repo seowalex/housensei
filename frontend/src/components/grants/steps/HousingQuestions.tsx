@@ -1,7 +1,7 @@
 import { Grid } from '@mui/material';
 import { FlatType } from '../../../types/groups';
 import FormRadioInput from '../../forms/FormRadioInput';
-import { UNSURE } from './Options';
+import { UNSURE_OPTION } from './Options';
 import StepProps from './StepProps';
 
 const HousingQuestions = (props: StepProps) => {
@@ -20,12 +20,12 @@ const HousingQuestions = (props: StepProps) => {
     housingTypeOptions.push({ label: 'Executive Condominium', value: 'EC' });
   }
 
-  housingTypeOptions.push(UNSURE);
+  housingTypeOptions.push(UNSURE_OPTION);
 
   const leaseOptions = [
     { label: 'Yes', value: true },
     { label: 'No', value: false },
-    UNSURE,
+    UNSURE_OPTION,
   ];
 
   // Helper
@@ -36,12 +36,12 @@ const HousingQuestions = (props: StepProps) => {
     }));
   }
   const flatSizeOptions = ToArray(FlatType);
-  flatSizeOptions.push(UNSURE);
+  flatSizeOptions.push(UNSURE_OPTION);
 
   const livingWithExtendedFamilyOptions = [
     { label: 'Yes', value: true },
     { label: 'No', value: false },
-    UNSURE,
+    UNSURE_OPTION,
   ];
 
   return (

@@ -2,8 +2,8 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import { Grid, Link } from '@mui/material';
-import { displayGrantRange } from '../calculation/ParseGrantsForm';
+import { Grid } from '@mui/material';
+import { displayGrantRange } from '../calculation/GrantsDisplayHelper';
 import NewTabLink from '../../common/Link';
 
 interface Props {
@@ -25,8 +25,9 @@ const GrantCard = (props: Props) => {
       }}
     >
       <CardContent>
+        <Typography variant="h5">{grantName}</Typography>
         <Typography gutterBottom variant="h5">
-          {grantName} : {displayGrantRange(grantRange)}
+          {displayGrantRange(grantRange)}
         </Typography>
         <Typography gutterBottom variant="body2" color="text.secondary">
           {description}
