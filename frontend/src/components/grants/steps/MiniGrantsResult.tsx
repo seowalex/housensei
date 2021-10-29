@@ -51,7 +51,7 @@ const MiniGrantsResult = (props: Props) => {
 
   // TODO grant amount is not stackable
 
-  const rowData = [
+  const rows = [
     {
       grantName: 'EHG Grant',
       grantRange: ehgGrant,
@@ -78,13 +78,6 @@ const MiniGrantsResult = (props: Props) => {
     },
   ];
 
-  const rows = rowData.map((row) => ({
-    ...row,
-    grantRange: displayGrantRange(row.grantRange),
-  }));
-
-  // rows.forEach((row) => (row.grantRange = displayGrantRange(row.grantRange)));
-
   return (
     <TableContainer component={Paper}>
       <Table size="small">
@@ -101,11 +94,18 @@ const MiniGrantsResult = (props: Props) => {
         </TableHead>
         <TableBody>
           {rows.map((row) => (
-            <TableRow key={row.grantName}>
+            <TableRow
+              key={row.grantName}
+              sx={
+                row.grantRange.max === 0
+                  ? { textDecoration: 'line-through' }
+                  : null
+              }
+            >
               <TableCell component="th" scope="row">
                 {row.grantName}
               </TableCell>
-              <TableCell>{row.grantRange}</TableCell>
+              <TableCell>{displayGrantRange(row.grantRange)}</TableCell>
             </TableRow>
           ))}
           <TableRow>
