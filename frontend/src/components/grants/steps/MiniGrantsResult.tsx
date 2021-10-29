@@ -18,7 +18,6 @@ import {
   getSingleEHGGrant,
   getSingleGrant,
 } from '../calculation/GrantCalculation';
-import { GRANT_MAX } from '../calculation/GrantMaxAmount';
 import {
   displayGrantRange,
   getTotalGrant,
@@ -52,38 +51,30 @@ const MiniGrantsResult = (props: Props) => {
 
   // TODO grant amount is not stackable
 
-  // TODO make into table
-
   const rowData = [
     {
       grantName: 'EHG Grant',
       grantRange: ehgGrant,
-      maxValue: GRANT_MAX.ehg,
     },
     {
       grantName: 'EHG Single Grant',
       grantRange: singleEhgGrant,
-      maxValue: GRANT_MAX.ehgSingle,
     },
     {
       grantName: 'Family Grant',
       grantRange: familyGrant,
-      maxValue: GRANT_MAX.family,
     },
     {
       grantName: 'Half Housing Grant',
       grantRange: halfHousingGrant,
-      maxValue: GRANT_MAX.halfHousing,
     },
     {
       grantName: 'Proximity Housing Grant',
       grantRange: proximityGrant,
-      maxValue: GRANT_MAX.proximity,
     },
     {
       grantName: 'Singles Grant',
       grantRange: singleGrant,
-      maxValue: GRANT_MAX.singles,
     },
   ];
 
@@ -106,22 +97,15 @@ const MiniGrantsResult = (props: Props) => {
             >
               <TableCell>Eligible Value</TableCell>
             </Tooltip>
-            <Tooltip
-              title="Maximum value given under the grant"
-              placement="top"
-            >
-              <TableCell>Max</TableCell>
-            </Tooltip>
           </TableRow>
         </TableHead>
         <TableBody>
           {rows.map((row) => (
             <TableRow key={row.grantName}>
-              <TableCell component="th" scope="row" sx={{ width: '150px' }}>
+              <TableCell component="th" scope="row">
                 {row.grantName}
               </TableCell>
               <TableCell>{row.grantRange}</TableCell>
-              <TableCell sx={{ width: '50px' }}>{row.maxValue}</TableCell>
             </TableRow>
           ))}
           <TableRow>

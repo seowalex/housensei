@@ -259,14 +259,14 @@ const Grants = () => {
               <Grid container item>
                 <form>
                   <Grid container item>
-                    <Grid item xs={otherSteps || isLastStep ? 8 : 12}>
+                    <Grid item xs={otherSteps || isLastStep ? 9 : 12}>
                       {getStepContent(
                         activeStep,
                         methods as UseFormReturn<FieldValues>
                       )}
                     </Grid>
                     {(otherSteps || isLastStep) && (
-                      <Grid item xs={4}>
+                      <Grid item xs={3}>
                         <MiniGrantsResult
                           form={methods as UseFormReturn<FieldValues>}
                         />
