@@ -1,26 +1,9 @@
 import { useHistory } from 'react-router-dom';
-import {
-  Box,
-  Button,
-  Container,
-  Stack,
-  Typography,
-  useTheme,
-} from '@mui/material';
-import { Ghost } from 'react-kawaii';
+import { Box, Button, Container, Stack, Typography } from '@mui/material';
+import SadGhost from '../components/common/SadGhost';
 
 const NotFound = () => {
   const history = useHistory();
-  const theme = useTheme();
-
-  const colors = [
-    theme.palette.primary.light,
-    theme.palette.secondary.light,
-    theme.palette.error.light,
-    theme.palette.warning.light,
-    theme.palette.info.light,
-    theme.palette.success.light,
-  ];
 
   return (
     <Container
@@ -34,11 +17,7 @@ const NotFound = () => {
     >
       <Stack justifyContent="center" sx={{ height: '100%' }}>
         <Box sx={{ textAlign: 'center', my: 2 }}>
-          <Ghost
-            size={200}
-            mood="sad"
-            color={colors[Math.floor(Math.random() * colors.length)]}
-          />
+          <SadGhost />
         </Box>
         <Typography variant="h1" align="center">
           404

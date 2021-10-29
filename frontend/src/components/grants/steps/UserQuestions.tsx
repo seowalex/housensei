@@ -1,7 +1,8 @@
 import { Grid } from '@mui/material';
-import FormRadioInput from '../FormRadioInput';
-import FormNumberTextFieldInput from '../FormNumberTextFieldInput';
+import FormRadioInput from '../../forms/FormRadioInput';
+import FormNumberTextFieldInput from '../../forms/FormNumberTextFieldInput';
 import StepProps from './StepProps';
+import { PNTS_OPTION } from './Options';
 
 const UserQuestions = (props: StepProps) => {
   const { form } = props;
@@ -32,11 +33,13 @@ const UserQuestions = (props: StepProps) => {
   const ageOptions = [
     { label: 'Yes', value: true },
     { label: 'No', value: false },
+    PNTS_OPTION,
   ];
 
   const workingAtLeastAYearOptions = [
     { label: 'Yes', value: true },
     { label: 'No', value: false },
+    PNTS_OPTION,
   ];
 
   return (
@@ -108,7 +111,6 @@ const UserQuestions = (props: StepProps) => {
             name="age"
             form={form}
             options={ageOptions}
-            required
           />
         </Grid>
       )}
@@ -121,7 +123,6 @@ const UserQuestions = (props: StepProps) => {
           name="workingAtLeastAYear"
           form={form}
           options={workingAtLeastAYearOptions}
-          required
         />
       </Grid>
 

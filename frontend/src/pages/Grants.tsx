@@ -12,12 +12,14 @@ import {
   FormProvider,
   useForm,
   UseFormReturn,
+  UseFormWatch,
 } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import UserQuestions from '../components/grants/steps/UserQuestions';
 import GrantsResult from '../components/grants/steps/GrantsResult';
 import HousingQuestions from '../components/grants/steps/HousingQuestions';
 import ProximityQuestions from '../components/grants/steps/ProximityQuestions';
+import MiniGrantsResult from '../components/grants/steps/MiniGrantsResult';
 
 export type GrantsFormValues = {
   // user questions
@@ -95,11 +97,6 @@ const Grants = () => {
     'Grant Calculation',
   ];
 
-  // TODO can convert all yup.string().required to notEmptyStrCheck
-
-  const notEmptyStrCheck = (message: string) =>
-    yup.mixed().notOneOf([''], message);
-
   const validationSchema = [
     yup.object({
       maritalStatus: yup.string().required('Must indicate marital status'),
@@ -135,13 +132,6 @@ const Grants = () => {
             return item !== '';
           }
         ),
-      age: yup.mixed().when('maritalStatus', {
-        is: 'single',
-        then: notEmptyStrCheck('Must indicate age'),
-      }),
-      workingAtLeastAYear: notEmptyStrCheck(
-        'Must indicate if working for at least a year'
-      ),
       monthlyIncome: yup
         .mixed()
         .test('monthlyIncome', 'Cannot be a negative number', (item) => {
@@ -151,18 +141,8 @@ const Grants = () => {
           return Number(item) > 0;
         }),
     }),
-    yup.object({
-      housingType: yup.string().required('Must indicate housing type'),
-      flatSize: yup.mixed().when('housingType', {
-        is: 'Resale',
-        then: notEmptyStrCheck('Must indicate resale flat size'),
-      }),
-    }),
-    yup.object({
-      receivedProximityBefore: notEmptyStrCheck(
-        'Must indicate if received proximity grant before'
-      ),
-    }),
+    yup.object(),
+    yup.object(),
   ];
 
   const currentValidationSchema = validationSchema[activeStep];
@@ -195,11 +175,15 @@ const Grants = () => {
       .slice(0, idx)
       .every((validation) => validation.isValidSync(methods.getValues()));
 
+  const isFirstStep = activeStep === 0;
+  const isLastStep = activeStep === steps.length - 2;
+  const otherSteps = activeStep < steps.length - 2;
+
   return (
     <Container sx={{ p: 3 }}>
       <Paper sx={{ p: '1rem' }}>
         <Grid container direction="column" spacing={10} padding={5}>
-          <Grid item>
+          <Grid item xs={12}>
             <Typography variant="h2" gutterBottom>
               Grant Calculator
             </Typography>
@@ -217,7 +201,7 @@ const Grants = () => {
               Questions that are required (*)
             </Typography>
           </Grid>
-          <Grid item>
+          <Grid item xs={12}>
             <Stepper activeStep={activeStep}>
               {steps.map((label, idx) => {
                 const stepProps = {};
@@ -249,54 +233,66 @@ const Grants = () => {
             </Stepper>
           </Grid>
           {/* button group */}
-          <Grid container item direction="column">
+          <Grid container item>
             <FormProvider {...methods}>
-              <form>
-                <Grid container item>
-                  {getStepContent(
-                    activeStep,
-                    methods as UseFormReturn<FieldValues>
-                  )}
-                </Grid>
-                <Grid
-                  container
-                  item
-                  alignItems="center"
-                  justifyContent="center"
-                  padding={5}
-                  spacing={3}
-                >
-                  <Grid item>
-                    <Button
-                      disabled={activeStep === 0}
-                      onClick={handleBack}
-                      size="large"
-                    >
-                      Back
-                    </Button>
-                  </Grid>
-
-                  <Grid item>
-                    {activeStep < steps.length - 1 ? (
-                      <Button
-                        variant="contained"
-                        onClick={handleNext}
-                        size="large"
-                      >
-                        {activeStep < steps.length - 2 ? 'Continue' : 'Finish'}
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="contained"
-                        onClick={handleReset}
-                        size="large"
-                      >
-                        Reset
-                      </Button>
+              <Grid container item>
+                <form>
+                  <Grid container item>
+                    <Grid item xs={otherSteps || isLastStep ? 9 : 12}>
+                      {getStepContent(
+                        activeStep,
+                        methods as UseFormReturn<FieldValues>
+                      )}
+                    </Grid>
+                    {(otherSteps || isLastStep) && (
+                      <Grid item xs={3}>
+                        <MiniGrantsResult
+                          formWatch={methods.watch as UseFormWatch<FieldValues>}
+                        />
+                      </Grid>
                     )}
+                    <Grid
+                      container
+                      item
+                      alignItems="center"
+                      justifyContent="center"
+                      padding={5}
+                      spacing={3}
+                      xs={12}
+                    >
+                      <Grid item>
+                        <Button
+                          disabled={isFirstStep}
+                          onClick={handleBack}
+                          size="large"
+                        >
+                          Back
+                        </Button>
+                      </Grid>
+
+                      <Grid item>
+                        {otherSteps || isLastStep ? (
+                          <Button
+                            variant="contained"
+                            onClick={handleNext}
+                            size="large"
+                          >
+                            {!isLastStep ? 'Continue' : 'Finish'}
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="contained"
+                            onClick={handleReset}
+                            size="large"
+                          >
+                            Reset
+                          </Button>
+                        )}
+                      </Grid>
+                    </Grid>
                   </Grid>
-                </Grid>
-              </form>
+                </form>
+              </Grid>
             </FormProvider>
           </Grid>
         </Grid>

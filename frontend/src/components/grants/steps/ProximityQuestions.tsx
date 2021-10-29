@@ -1,6 +1,8 @@
-import { Grid, Link } from '@mui/material';
+import { Grid } from '@mui/material';
+import NewTabLink from '../../common/Link';
 import { getProximityGrantWebsite } from '../calculation/GrantsWebsite';
-import FormRadioInput from '../FormRadioInput';
+import FormRadioInput from '../../forms/FormRadioInput';
+import { UNSURE_OPTION } from './Options';
 import StepProps from './StepProps';
 
 const ProximityQuestions = (props: StepProps) => {
@@ -11,6 +13,7 @@ const ProximityQuestions = (props: StepProps) => {
   const receivedProximityBeforeOptions = [
     { label: 'Yes', value: true },
     { label: 'No', value: false },
+    UNSURE_OPTION,
   ];
 
   const proximityStatusOptions = [
@@ -20,7 +23,7 @@ const ProximityQuestions = (props: StepProps) => {
     },
     { label: 'Yes, within 4km', value: 'within 4km' },
     { label: 'No', value: 'no' },
-    { label: 'Unsure', value: 'NA' },
+    UNSURE_OPTION,
   ];
 
   return (
@@ -30,21 +33,16 @@ const ProximityQuestions = (props: StepProps) => {
           label={
             <span>
               Have you {isCouple ? 'or your partner ' : ''} received a
-              <Link
-                href={`//${getProximityGrantWebsite().slice(12)}`}
-                target="_blank"
-                rel="noopener"
-                sx={{ paddingLeft: 1 }}
-              >
-                proximity grant
-              </Link>{' '}
+              <NewTabLink
+                link={getProximityGrantWebsite()}
+                label="proximity grant"
+              />{' '}
               before?
             </span>
           }
           name="receivedProximityBefore"
           form={form}
           options={receivedProximityBeforeOptions}
-          required
         />
       </Grid>
       <Grid item>
