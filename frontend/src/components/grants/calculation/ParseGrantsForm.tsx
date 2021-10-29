@@ -1,3 +1,4 @@
+import { NA } from '../steps/Options';
 import { NullableGrantRange } from './GrantCalculation';
 
 export const parseFormValues = (values: Record<string, string>) => {
@@ -27,7 +28,7 @@ export const parseFormValues = (values: Record<string, string>) => {
   };
 
   Object.keys(formValues).forEach((field) => {
-    if (formValues[field] === 'NA') {
+    if (formValues[field] === NA) {
       formValues[field] = '';
     }
   });
