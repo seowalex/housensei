@@ -17,10 +17,14 @@ const HousingQuestions = (props: StepProps) => {
   ];
 
   if (isCouple) {
-    housingTypeOptions.push({ label: 'Executive Condominium', value: 'EC' });
+    housingTypeOptions.push({
+      label: 'New Executive Condominium',
+      value: 'EC',
+    });
   }
 
   housingTypeOptions.push(UNSURE_OPTION);
+  housingTypeOptions.push({ label: 'None of the above', value: 'None' });
 
   const leaseOptions = [
     { label: 'Yes', value: true },
