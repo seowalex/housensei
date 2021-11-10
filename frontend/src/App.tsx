@@ -65,7 +65,7 @@ const App = () => {
       }),
     [darkMode]
   );
-  const hlp = initHelpHero('Uw9RsnlVLn');
+  const hlp = initHelpHero('PS8XrjsaC5');
   hlp.anonymous();
 
   return (
