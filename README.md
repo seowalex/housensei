@@ -1,11 +1,12 @@
 <p align="center">
-    <img width="200" alt="Housensei" src="docs/logo.png">
+    <img width="200" alt="Housensei" src="logo.png">
 </p>
 
 # Housensei
 
-![Poster](docs/poster.png)
-[Final Report](docs/final-report.pdf)
+![Poster](group-1-poster.png)
+
+[Final Report](group-1-final-report.pdf)
 
 ## Development
 
