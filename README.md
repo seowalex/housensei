@@ -2,7 +2,7 @@
     <img width="200" alt="Housensei" src="logo.png">
 </p>
 
-# Housensei (<https://housensei.herokuapp.com>)
+# Housensei
 
 ![Poster](group-1-poster.png)
 
